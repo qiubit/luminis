@@ -1,8 +1,29 @@
-from sqlalchemy import Column, Integer, String
+import configparser
+
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, sessionmaker
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
+def create_engine_str():
+    config = configparser.ConfigParser()
+    config.read('configs/database.ini')
+
+    config_module = 'database'
+    db_engine = config.get(config_module, 'engine')
+    login = config.get(config_module, 'user')
+    passwd = config.get(config_module, 'passwd')
+    host = config.get(config_module, 'host')
+    port = config.get(config_module, 'port')
+    db_name = config.get(config_module, 'db_name')
+
+    return '{}://{}:{}@{}:{}/{}'.format(db_engine, login, passwd, host, port, db_name)
+
+engine = create_engine(create_engine_str(), echo=True)
+
+Session = sessionmaker(bind=engine)
 
 class EntityType(Base):
     __tablename__ = 'Entity_Types'
@@ -10,18 +31,15 @@ class EntityType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
 
-    tags = relationship('TagAttribute', backref='entity_type', primaryjoin='id == TagAttribute.entity_type_id')
-    series = relationship('SeriesAttribute', backref='entity_type', primaryjoin='id == SeriesAttribute.entity_type_id')
-    meta = relationship('MetaAttributes', backref='entity_type', primaryjoin='id == MetaAttribute.entity_type_id')
-
 
 class TagAttribute(Base):
     __tablename__ = 'Tag_Attributes'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
-    entity_type_id = Column('entity_type_ID_FK', Integer, ForeignKey(EntityType.id, ondelete='CASCADE'),
-                            nullable=False)
+    entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id', ondelete='CASCADE'), nullable=False)
+
+    entity_type = relationship('EntityType', backref='tags', primaryjoin='EntityType.id == TagAttribute.entity_type_id_fk')
 
 
 class SeriesAttribute(Base):
@@ -29,8 +47,9 @@ class SeriesAttribute(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
-    entity_type_id = Column('entity_type_ID_FK', Integer, ForeignKey(EntityType.id, ondelete='CASCADE'),
-                            nullable=False)
+    entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id', ondelete='CASCADE'), nullable=False)
+
+    entity_type = relationship('EntityType', backref='series', primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
 
 
 class MetaAttribute(Base):
@@ -38,40 +57,39 @@ class MetaAttribute(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
-    entity_type_id = Column('entity_type_ID_FK', Integer, ForeignKey(EntityType.id, ondelete='CASCADE'),
-                            nullable=False)
+    entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id', ondelete='CASCADE'), nullable=False)
+
+    entity_type = relationship('EntityType', backref='meta', primaryjoin='EntityType.id == MetaAttribute.entity_type_id_fk')
 
 
 class Entity(Base):
     __tablename__ = 'Entities'
 
     id = Column(Integer, primary_key=True)
-    entity_type_id = Column('entity_type_ID_FK', Integer, ForeignKey(EntityType.id, ondelete='CASCADE'),
-                            nullable=False)
-    parent_id = Column('parent_ID_FK', Integer, ForeignKey(Entity.id, ondelete='CASCADE'), nullable=True)
+    entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id', ondelete='CASCADE'), nullable=False)
+    parent_id_fk = Column(Integer, ForeignKey('Entities.id', ondelete='CASCADE'), nullable=True)
 
-    entity_type = relationship(EntityType, primaryjoin=entity_type_id == EntityType.id)
-    parent = relationship(Entity, primaryjoin=parent_id == Entity.id)
-    tags = relationship('EntityTag', backref='entity', primaryjoin='id == EntityTag.entity_id')
-    meta = relationship('EntityMeta', backref='entity', primaryjoin='id == EntityMeta.entity_id')
+    entity_type = relationship('EntityType', primaryjoin='Entity.entity_type_id_fk == EntityType.id')
+    parent = relationship('Entity', primaryjoin='Entity.parent_id_fk == Entity.id')
 
 
 class EntityTag(Base):
     __tablename__ = 'Entity_Tags'
 
-    entity_id = Column('entity_ID_FK', Integer, ForeignKey(Entity.id, ondelete='CASCADE'), primary_key=True)
-    tag_id = Column('tag_ID_FK', Integer, ForeignKey(TagAttribute.id, ondelete='CASCADE'), primary_key=True)
+    entity_id_fk = Column(Integer, ForeignKey('Entities.id', ondelete='CASCADE'), primary_key=True)
+    tag_id_fk = Column(Integer, ForeignKey('Tag_Attributes.id', ondelete='CASCADE'), primary_key=True)
     value = Column(String(255), nullable=False)
 
-    tag = relationship(TagAttribute, primaryjoin=tag_id == TagAttribute.id)
-
+    name = relationship('TagAttribute', primaryjoin='EntityTag.tag_id_fk == TagAttribute.id')
+    entity = relationship('Entity', backref='tags', primaryjoin='Entity.id == EntityTag.entity_id_fk')
 
 class EntityMeta(Base):
     __tablename__ = 'Entity_Meta'
 
-    entity_id = Column('entity_ID_FK', Integer, ForeignKey(Entity.id, ondelete='CASCADE'), primary_key=True)
-    meta_id = Column('meta_ID_FK', Integer, ForeignKey(MetaAttribute.id, ondelete='CASCADE'), primary_key=True)
+    entity_id_fk = Column(Integer, ForeignKey('Entities.id', ondelete='CASCADE'), primary_key=True)
+    meta_id_fk = Column(Integer, ForeignKey('Meta_Attributes.id', ondelete='CASCADE'), primary_key=True)
     value = Column(String(255), nullable=False)
 
-    tag = relationship(MetaAttribute, primaryjoin=tag_id == MetaAttribute.id)
+    name = relationship('MetaAttribute', primaryjoin='EntityMeta.meta_id_fk == MetaAttribute.id')
+    entity = relationship('Entity', backref='meta', primaryjoin='Entity.id == EntityMeta.entity_id_fk')
 
