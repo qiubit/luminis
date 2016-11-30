@@ -61,26 +61,23 @@ class InputDataExtractor:
     def getMeasurementName(self):
         return self.measurement_name
 
+
 class DatabaseDataExtractor:
 
     def __init__(self, engine):
         self.engine = engine
         Session = sessionmaker(bind=engine)
-        Session = sessionmaker()
-        Session.configure(bind=engine)
         self.session = Session()
 
     def getTagDict(self, ids):
         tag_dict = dict()
-        for row in [row._asdict() for row in self.session.query(\
-                                            EntityTag.entity_id, EntityTag.tag_id, EntityTag.value)\
-                                            .filter(EntityTag.entity_id.in_(list(ids)))]:
-            row_id = row['entity_id']
-            if row_id not in tag_dict:
-                tag_dict[row_id] = dict()
-                tag_dict[row_id]['entity_id'] = row_id
+        for entity_tag in self.session.query(EntityTag).filter(EntityTag.entity_id_fk.in_(list(ids))):
+            entity_id = entity_tag.entity_id_fk
+            if entity_id not in tag_dict:
+                tag_dict[entity_id] = dict()
+                tag_dict[entity_id]['entity_id'] = entity_id
 
-            tag_dict[row_id][row['tag_id']] = row['value']
+            tag_dict[entity_id][entity_tag.tag_id_fk] = entity_tag.value
 
         return tag_dict
 
@@ -98,7 +95,7 @@ class InfluxWriterStdout:
         pass
 
 
-class InfluxWriteException(BaseException):
+class InfluxWriteException(Exception):
     pass
 
 
@@ -162,10 +159,11 @@ class OutputStream:
             points = self.buffer_policy.getData()
             influx_points = self.getInfluxPoints(points)
             self.influx_writer.write(influx_points)
-        except Exception:
+        except Exception as e:
             # what else can I do?
             print('Failed when processing points:')
             print(self.buffer_policy.getData())
+            print(e)
 
         self.buffer_policy.clean()
 
