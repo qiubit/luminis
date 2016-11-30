@@ -71,13 +71,13 @@ class DatabaseDataExtractor:
 
     def getTagDict(self, ids):
         tag_dict = dict()
-        for entity_tag in self.session.query(EntityTag).filter(EntityTag.entity_id_fk.in_(list(ids))):
-            entity_id = entity_tag.entity_id_fk
+        for entity_tag in self.session.query(EntityTag).filter(EntityTag.entity.id.in_(list(ids))):
+            entity_id = entity_tag.entity.id
             if entity_id not in tag_dict:
                 tag_dict[entity_id] = dict()
-                tag_dict[entity_id]['entity_id'] = entity_id
+                tag_dict[entity_id]['id'] = entity_id
 
-            tag_dict[entity_id][entity_tag.tag_id_fk] = entity_tag.value
+            tag_dict[entity_id][entity_tag.name] = entity_tag.value
 
         return tag_dict
 
