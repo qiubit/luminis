@@ -1,15 +1,15 @@
 import configparser
 
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy import create_engine, sessionmaker
-from sqlalchemy.orm import relationship
+from sqlalchemy import create_engine
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
 def create_engine_str():
     config = configparser.ConfigParser()
-    config.read('configs/database.ini')
+    config.read('config/database.ini')
 
     config_module = 'database'
     db_engine = config.get(config_module, 'engine')
