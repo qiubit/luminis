@@ -1,2 +1,2 @@
-https://github.com/influxdata/influxdb-python/archive/v3.0.0.zip
+influxdb
 sqlalchemy
