@@ -2,6 +2,7 @@ import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
+import {ListItem, List} from 'material-ui/List';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import AppBar from 'material-ui/AppBar';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -41,6 +42,37 @@ class AppPage extends React.Component {
   handleDrawerClose = () => this.setState({drawerOpen: false});
 
   handleMapOpen = () => this.setState({pageId: 0})
+  handleLandingOpen = () => this.setState({pageId: -1})
+
+
+  tree = [{
+    id: '1',
+    primaryText: 'wezel 1',
+    children: [
+      {
+        id: '2',
+        primaryText: 'wezel 2',
+        children: [],
+      },
+      {
+        id: '3',
+        primaryText: 'wezel 3',
+        children: []
+      }
+    ]
+  }]
+
+  mapStructure = (nodes) => {
+    if (nodes) {
+      return nodes.map(node => (
+            <ListItem
+              key={node.id}
+              primaryText={node.primaryText}
+              nestedItems={this.mapStructure(node.children)}
+            />
+        ));
+      }
+  }
 
   render() {
     return(
@@ -57,9 +89,14 @@ class AppPage extends React.Component {
         >
           <AppBar
             title="Luminis"
-            showMenuIconButton={false}
+            showMenuIconButton={true}
+            onLeftIconButtonTouchTap={this.handleDrawerToggle}
           />
-          <MenuItem onTouchTap={this.handleMapOpen}>Map</MenuItem>
+          <List>
+            <ListItem onTouchTap={this.handleLandingOpen} nestedItems={this.generateTree}>LandingPage</ListItem>
+            <ListItem onTouchTap={this.handleMapOpen}>Mapdaskdlns</ListItem>
+            {this.mapStructure(this.tree)}
+          </List>
         </Drawer>
         <PageToRender pageId={this.state.pageId} />
       </div>
