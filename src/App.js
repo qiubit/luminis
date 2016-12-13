@@ -11,6 +11,8 @@ import LandingPage from './LandingPage'
 import MapPage from './MapPage'
 import TreeListItem from './TreeListItem'
 
+import sample_tree from './sample_tree'
+
 // Needed for buttons to react on user tap
 injectTapEventPlugin();
 
@@ -64,7 +66,7 @@ class AppPage extends React.Component {
           <List>
             <ListItem onTouchTap={this.handleLandingOpen} nestedItems={this.generateTree}>LandingPage</ListItem>
             <ListItem onTouchTap={this.handleMapOpen}>Mapdaskdlns</ListItem>
-            <TreeListItem />
+            <TreeListItem tree={sample_tree}/>
           </List>
         </Drawer>
         <PageToRender pageId={this.state.pageId} />
