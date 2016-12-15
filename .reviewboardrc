@@ -1,2 +1,0 @@
-REVIEWBOARD_URL = 'http://review.domyno.pl:8080/'
-REPOSITORY = 'Luminis'
