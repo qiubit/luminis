@@ -8,6 +8,7 @@ class TreeListItem extends React.Component {
   constructor(props) {
     super(props);
     this.tree = props.tree;
+    this.handleNodeClick = props.handleNodeClick;
     this.state = {};
 
     var generateState = function(nodes) {
@@ -44,6 +45,7 @@ class TreeListItem extends React.Component {
               nestedItems={this.mapStructure(node.children)}
               autoGenerateNestedIndicator={false}
               open={this.state[node.id]['open']}
+              onClick={this.handleNodeClick(node.id)}
             >
               <IconButton
                 style={{position: 'absolute', display: 'block', top: 0, left: 4}}
