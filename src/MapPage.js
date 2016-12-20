@@ -1,7 +1,6 @@
 import React from 'react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import config from './config';
-import sample_tree from './sample_tree'
 
 
 const styles = {

@@ -54,7 +54,7 @@ class AppPage extends React.Component {
 
   getSubTree(searched_id, tree) {
     for (var i = 0; i < tree.length; i++) {
-      if (tree[i].id == searched_id) {
+      if (tree[i].id === searched_id) {
         return [tree[i]];
       }
       var res = this.getSubTree(searched_id, tree[i].children)
