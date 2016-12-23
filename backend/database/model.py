@@ -3,7 +3,6 @@ import configparser
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.orm.query import Query
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -24,28 +23,9 @@ def create_engine_str():
 
 Base = declarative_base()
 
-
-class FilterQuery(Query):
-    def get(self, ident):
-        return Query.get(self.populate_existing(), ident)
-
-    def __iter__(self):
-        return Query.__iter__(self.filter())
-
-    def from_self(self, *ent):
-        return Query.from_self(self.filter(), *ent)
-
-    def filter(self):
-        mapper = self._mapper_zero()
-        if mapper is not None:
-            crit = mapper.class_.delete_ts == None
-            return self.enable_assertions(False).filter(crit)
-        else:
-            return self
-
 engine = create_engine(create_engine_str(), echo=True)
 
-Session = sessionmaker(bind=engine, query_cls=FilterQuery)
+Session = sessionmaker(bind=engine)
 
 
 class EntityType(Base):

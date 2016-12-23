@@ -23,7 +23,7 @@ class WSHandler(WebSocketHandler):
     """
 
     def __init__(self, application, request, **kwargs):
-        super(WSHandler, self).__init__(application, request, **kwargs)
+        super(WSHandler, self).__init__(application, request)
         self._subscription = []  # initially no nodes to send
         self._last_pulling_ts = time()
         self._push_interval = kwargs['push_interval']
@@ -31,7 +31,7 @@ class WSHandler(WebSocketHandler):
     
     def _push_loop(self):
         while not self._on_close_called:
-            self.write_message(get_current_measurements(self._subscription, self._last_pulling_ts))
+            self.write_message(json.dumps(get_current_measurements(self._subscription, self._last_pulling_ts)))
             self._last_pulling_ts = time()
             sleep(self._push_interval)
 
@@ -65,7 +65,7 @@ def get_config(filename):
     config = configparser.ConfigParser()
     config.read(filename)
 
-    params = {"push_interval": int, "port": int, "initial_pulling_data": int}
+    params = {"push_interval": int, "port": int, "initial_pulling_delta": int}
     for param in params:
         result[param] = params[param](config.get("websocket", param))
     return result
