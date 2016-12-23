@@ -4,13 +4,14 @@ import configparser
 import json
 import logging
 
-from time import sleep
+from time import sleep, time
 
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
 from database.helpers import get_current_measurements
+
 
 class WSHandler(WebSocketHandler):
     """ Handler of WebSocket request.
@@ -19,11 +20,14 @@ class WSHandler(WebSocketHandler):
     def __init__(self, application, request, **kwargs):
         super(WSHandler, self).__init__(application, request, **kwargs)
         self._subscription = []  # initially no nodes to send
+        self._last_pulling_ts = time()
         self._push_interval = kwargs['push_interval']
+        self._initial_pulling_delta = kwargs['initial_pulling_delta']
     
     def _push_loop(self):
         while not self._on_close_called:
-            self.write_message(get_current_measurements(self._subscription))
+            self.write_message(get_current_measurements(self._subscription, self._last_pulling_ts))
+            self._last_pulling_ts = time()
             sleep(self._push_interval)
 
     def check_origin(self, origin):
@@ -40,6 +44,8 @@ class WSHandler(WebSocketHandler):
             # simple input validation
             if isinstance(new_subscription, list) and all(isinstance(a, int) for a in new_subscription):
                 self._subscription = sorted(new_subscription)
+                # reset data pulling range
+                self._last_pulling_ts = min(time() - self._initial_pulling_delta, self._last_pulling_ts)
             else:
                 logging.debug("Bad new subscription request: \"{}\"".format(message))
         except json.JSONDecodeError:
@@ -54,8 +60,9 @@ def get_config(filename):
     config = configparser.ConfigParser()
     config.read(filename)
 
-    result['push_interval'] = config.getint("websocket", "push_interval")
-    result['port'] = config.getint("websocket", "port")
+    params = {"push_interval": int, "port": int, "initial_pulling_data": int}
+    for param in params:
+        result[param] = params[param](config.get("websocket", param))
     return result
 
 if __name__ == "__main__":
