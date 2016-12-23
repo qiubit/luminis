@@ -4,13 +4,18 @@ import configparser
 import json
 import logging
 
-from time import sleep, time
+from time import sleep
 
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
 from database.helpers import get_current_measurements
+
+
+def time():
+    import time
+    return int(time.time())
 
 
 class WSHandler(WebSocketHandler):

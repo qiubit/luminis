@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm.query import Query
 from sqlalchemy.ext.declarative import declarative_base
 
+
 def create_engine_str():
     config = configparser.ConfigParser()
     config.read('config/database.ini')
@@ -23,12 +24,13 @@ def create_engine_str():
 
 Base = declarative_base()
 
+
 class FilterQuery(Query):
     def get(self, ident):
-        return super(self, FilterQuery).get(self.populate_existing(), ident)
+        return Query.get(self.populate_existing(), ident)
 
     def __iter__(self):
-        return super(self, FilterQuery).__iter__(self.filter())
+        return Query.__iter__(self.filter())
 
     def from_self(self, *ent):
         return Query.from_self(self.filter(), *ent)
@@ -44,6 +46,7 @@ class FilterQuery(Query):
 engine = create_engine(create_engine_str(), echo=True)
 
 Session = sessionmaker(bind=engine, query_cls=FilterQuery)
+
 
 class EntityType(Base):
     __tablename__ = 'Entity_Types'
@@ -61,7 +64,8 @@ class TagAttribute(Base):
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
 
-    entity_type = relationship('EntityType', backref='tags', primaryjoin='EntityType.id == TagAttribute.entity_type_id_fk')
+    entity_type = relationship('EntityType', backref='tags',
+                               primaryjoin='EntityType.id == TagAttribute.entity_type_id_fk')
 
 
 class SeriesAttribute(Base):
@@ -72,7 +76,8 @@ class SeriesAttribute(Base):
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
 
-    entity_type = relationship('EntityType', backref='series', primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
+    entity_type = relationship('EntityType', backref='series',
+                               primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
 
 
 class MetaAttribute(Base):
@@ -83,7 +88,8 @@ class MetaAttribute(Base):
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
 
-    entity_type = relationship('EntityType', backref='meta', primaryjoin='EntityType.id == MetaAttribute.entity_type_id_fk')
+    entity_type = relationship('EntityType', backref='meta',
+                               primaryjoin='EntityType.id == MetaAttribute.entity_type_id_fk')
 
 
 class Entity(Base):
@@ -109,6 +115,7 @@ class EntityTag(Base):
     name = relationship('TagAttribute', primaryjoin='EntityTag.tag_id_fk == TagAttribute.id')
     entity = relationship('Entity', backref='tags', primaryjoin='Entity.id == EntityTag.entity_id_fk')
 
+
 class EntityMeta(Base):
     __tablename__ = 'Entity_Meta'
 
@@ -119,4 +126,3 @@ class EntityMeta(Base):
 
     name = relationship('MetaAttribute', primaryjoin='EntityMeta.meta_id_fk == MetaAttribute.id')
     entity = relationship('Entity', backref='meta', primaryjoin='Entity.id == EntityMeta.entity_id_fk')
-
