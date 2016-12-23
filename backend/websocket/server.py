@@ -3,6 +3,7 @@
 import configparser
 import json
 import logging
+import threading
 
 from time import sleep
 
@@ -39,9 +40,8 @@ class WSHandler(WebSocketHandler):
         return True  # TODO we really should make sure that request is from our website to prevent XSS
     
     def open(self, *args, **kwargs):
-        logging.debug("Connection created")
-        self._subscription = None  # TODO it's only for testing
-        self._push_loop()
+        print("Connection created")
+        threading.Thread(target=self._push_loop, daemon=True).start()
 
     def on_message(self, message):
         try:
@@ -52,9 +52,9 @@ class WSHandler(WebSocketHandler):
                 # reset data pulling range
                 self._last_pulling_ts = min(time() - self._initial_pulling_delta, self._last_pulling_ts)
             else:
-                logging.debug("Bad new subscription request: \"{}\"".format(message))
+                print("Bad new subscription request: \"{}\"".format(message))
         except json.JSONDecodeError:
-            logging.debug("Bad new subscription request: \"{}\"".format(message))
+            print("Bad new subscription request: \"{}\"".format(message))
 
 
 def get_config(filename):
@@ -78,4 +78,5 @@ if __name__ == "__main__":
             (r'/', WSHandler, config) 
     ])
     application.listen(config['port'])
+    print('Server listening on port {}'.format(config['port']))
     IOLoop.current().start()
