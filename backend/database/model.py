@@ -20,12 +20,11 @@ def create_engine_str():
 
     return '{}://{}:{}@{}:{}/{}'.format(db_engine, login, passwd, host, port, db_name)
 
-
-Base = declarative_base()
-
 engine = create_engine(create_engine_str(), echo=True)
 
 Session = sessionmaker(bind=engine)
+
+Base = declarative_base()
 
 
 class EntityType(Base):
@@ -34,6 +33,15 @@ class EntityType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     delete_ts = Column(Integer, nullable=True, default=None)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "tags": [tag.to_dict() for tag in self.tags],
+            "series": [series.to_dict() for series in self.series],
+            "meta": [meta.to_dict() for meta in self.meta],
+        }
 
 
 class TagAttribute(Base):
@@ -47,6 +55,13 @@ class TagAttribute(Base):
     entity_type = relationship('EntityType', backref='tags',
                                primaryjoin='EntityType.id == TagAttribute.entity_type_id_fk')
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "entity_type_id": self.entity_type_id_fk,
+        }
+
 
 class SeriesAttribute(Base):
     __tablename__ = 'Series_Attributes'
@@ -58,6 +73,13 @@ class SeriesAttribute(Base):
 
     entity_type = relationship('EntityType', backref='series',
                                primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "entity_type_id": self.entity_type_id_fk,
+        }
 
 
 class MetaAttribute(Base):
@@ -71,6 +93,13 @@ class MetaAttribute(Base):
     entity_type = relationship('EntityType', backref='meta',
                                primaryjoin='EntityType.id == MetaAttribute.entity_type_id_fk')
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "entity_type_id": self.entity_type_id_fk,
+        }
+
 
 class Entity(Base):
     __tablename__ = 'Entities'
@@ -81,7 +110,22 @@ class Entity(Base):
     delete_ts = Column(Integer, nullable=True, default=None)
 
     entity_type = relationship('EntityType', primaryjoin='Entity.entity_type_id_fk == EntityType.id')
-    parent = relationship('Entity', primaryjoin='Entity.parent_id_fk == Entity.id')
+    parent = relationship('Entity', backref='children', remote_side='Entity.id',
+                          primaryjoin='Entity.parent_id_fk == Entity.id')
+
+    def to_dict(self, deep=False):
+        result = {
+            "id": self.id,
+            "entity_type": self.entity_type_id_fk,
+            "parent_id": self.parent_id_fk,
+            "tags": {k: v for k, v in (tag.to_dict().items() for tag in self.tags)},
+            "meta": {k: v for k, v in (meta.to_dict().items() for meta in self.meta)},
+        }
+        if deep:
+            result["children"] = [child.to_dict(deep) for child in self.children]
+        else:
+            result["children_ids"] = [child.id for child in self.children]
+        return result
 
 
 class EntityTag(Base):
@@ -95,6 +139,12 @@ class EntityTag(Base):
     name = relationship('TagAttribute', primaryjoin='EntityTag.tag_id_fk == TagAttribute.id')
     entity = relationship('Entity', backref='tags', primaryjoin='Entity.id == EntityTag.entity_id_fk')
 
+    def to_dict(self):
+        return {
+            self.name.name: self.value,
+            "entity_id": self.entity_id_fk,
+        }
+
 
 class EntityMeta(Base):
     __tablename__ = 'Entity_Meta'
@@ -106,3 +156,9 @@ class EntityMeta(Base):
 
     name = relationship('MetaAttribute', primaryjoin='EntityMeta.meta_id_fk == MetaAttribute.id')
     entity = relationship('Entity', backref='meta', primaryjoin='Entity.id == EntityMeta.entity_id_fk')
+
+    def to_dict(self):
+        return {
+            self.name.name: self.value,
+            "entity_id": self.entity_id_fk,
+        }
