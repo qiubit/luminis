@@ -7,11 +7,11 @@ import AppBar from 'material-ui/AppBar';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import LandingPage from './LandingPage'
-import MapPage from './MapPage'
-import TreeListItem from './TreeListItem'
+import LandingPage from '../../components/LandingPage/index';
+import MapPage from '../MapPage/index';
+import TreeListItem from '../TreeListItem/index';
 
-import sample_tree from './sample_tree'
+import sample_tree from './sample_tree';
 import config from './config';
 
 
