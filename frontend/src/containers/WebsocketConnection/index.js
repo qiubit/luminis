@@ -21,7 +21,6 @@ let websocketOnOpen = () => {
 };
 
 let websocketOnMessage = (dispatch) => (evt) => {
-  console.log('data recieved');
   dispatch(processData(evt.data));
 };
 
