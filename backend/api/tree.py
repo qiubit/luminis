@@ -1,5 +1,6 @@
 from pycnic.core import Handler
 from database.model import Entity, Session, EntityTag, EntityMeta
+import json
 
 
 class Node(Handler):
@@ -47,5 +48,7 @@ class Tree(Handler):
         if ident:
             return session.query(Entity).get(ident).to_dict(deep=True)
         else:
-            return [root.to_dict(deep=True)
-                    for root in session.query(Entity).filter_by(parent=None, delete_ts=None).all()]
+            # TODO json.dumps() is temporary until a fix in pycnic will be merged
+            # (see: https://github.com/nullism/pycnic/pull/19)
+            return json.dumps([root.to_dict(deep=True)
+                               for root in session.query(Entity).filter_by(parent=None, delete_ts=None).all()])
