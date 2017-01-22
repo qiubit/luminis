@@ -8,7 +8,8 @@ const sagaMiddleware = createSagaMiddleware();
 export default function configureStore(initialState = {}) {
 
   const store = createStore(
-    createReducer,
+    createReducer(),
+    initialState,
     applyMiddleware(sagaMiddleware)
   );
 
