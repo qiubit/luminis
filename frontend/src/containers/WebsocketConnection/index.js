@@ -36,10 +36,6 @@ let websocketOnClose = (dispatch) => () => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {};
-}
-
 const mapDispatchToProps = (dispatch) => {
   return {
     connectWebsocket: dispatch(
@@ -53,6 +49,4 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(WebsocketConnection);
+export default connect(null, mapDispatchToProps)(WebsocketConnection);

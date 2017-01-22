@@ -16,7 +16,7 @@ const style = {
 
 function DataBox(props) {
   let metrics = props.measurements.map(measurement => {
-      if (measurement.shouldLoading) {
+      if (measurement.showLoadingIcon) {
         return <DataRow key={measurement.key}>{measurement.name}: <CircularProgress size={13}/></DataRow>;
       } else {
         return <DataRow key={measurement.key}>{measurement.name}: {measurement.value}</DataRow>;
@@ -27,7 +27,7 @@ function DataBox(props) {
     <BoxWrapper>
     		<BoxHeader>{props.name}</BoxHeader>
         <BoxContent>
-    		{metrics}
+          {metrics}
         </BoxContent>
     </BoxWrapper>
     </Paper>

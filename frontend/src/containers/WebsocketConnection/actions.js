@@ -29,9 +29,9 @@ export function saveWebsocket(websocket) {
   };
 }
 
-export function dataRecieved(new_measurement_data) {
+export function dataRecieved(newMeasurementData) {
   return {
     type: DATA_RECIEVED,
-    new_measurement_data: new_measurement_data
+    newMeasurementData: newMeasurementData
   }
 }

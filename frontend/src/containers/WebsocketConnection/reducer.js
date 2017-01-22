@@ -13,7 +13,7 @@ function websocketReducer(state = initialState, action) {
       })
     case DATA_RECIEVED:
       return Object.assign({}, state, {
-        measurement_data: action.new_measurement_data
+        measurementData: action.newMeasurementData
       })
     default:
       return state;
