@@ -120,6 +120,7 @@ class Entity(Base):
             "parent_id": self.parent_id_fk,
             "tags": {k: v for k, v in (tag.to_dict().items() for tag in self.tags)},
             "meta": {k: v for k, v in (meta.to_dict().items() for meta in self.meta)},
+            "series": [series.name for series in self.entity_type.series],
         }
         if deep:
             result["children"] = [child.to_dict(deep) for child in self.children]
