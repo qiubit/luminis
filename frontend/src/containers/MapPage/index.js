@@ -1,39 +1,34 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+import { createStructuredSelector } from 'reselect';
+
 import config from './config';
-
-
-const styles = {
-  container: {
-    marginTop: 48,
-    marginBottom: 48,
-    marginLeft: 272,
-    marginRight: 72,
-  },
-};
+import { selectMapTree } from './selectors';
+import { WARSAW_COORDS } from './constants';
 
 class MapPage extends React.Component {
 
   mapTreeToMarkers = (tree) => {
-    if (tree){
-      return (
-          <div>
-          <Marker key={tree[0].id} position={tree[0].position}>
+    if (tree.get(0)) {
+      let markers = [];
+      markers.push(
+        <Marker key={tree.get(0).get('id')} position={tree.get(0).get('position').toJS()}>
+          <Popup>
+            <span>Grouping node<br/>id: {tree.get(0).get('id')}</span>
+          </Popup>
+        </Marker>
+      );
+      tree.get(0).get('children').forEach(node => {
+        markers.push(
+          <Marker key={node.get('id')} position={node.get('position').toJS()}>
             <Popup>
-              <span>Grouping node<br/>id: {tree[0].id}</span>
+              <span>Child node<br/>id: {node.get('id')}.</span>
             </Popup>
           </Marker>
-          {
-            tree[0].children.map(node => (
-              <Marker key={node.id} position={node.position}>
-                <Popup>
-                  <span>Child node<br/>id: {node.id}.</span>
-                </Popup>
-              </Marker>
-            ))
-          }
-          </div>
-      );
+        );
+      });
+      return markers;
     }
   }
 
@@ -41,18 +36,19 @@ class MapPage extends React.Component {
     var upperLeft = [1, 1];
     var lowerRight = [0, 0];
 
-    if (tree) {
-      upperLeft[0] = tree[0].position[0];
-      upperLeft[1] = tree[0].position[1];
-      lowerRight[0] = tree[0].position[0];
-      lowerRight[1] = tree[0].position[1];
-    }
+    // Tree exists and is not empty
+    if (tree.get(0)) {
+      upperLeft[0] = tree.get(0).get('position').get(0);
+      upperLeft[1] = tree.get(0).get('position').get(1);
+      lowerRight[0] = tree.get(0).get('position').get(0);
+      lowerRight[1] = tree.get(0).get('position').get(1);
 
-    for (var i = 0; i < tree[0].children.length; ++i) {
-      upperLeft[0] = Math.max(upperLeft[0], tree[0].children[i].position[0]);
-      upperLeft[1] = Math.min(upperLeft[1], tree[0].children[i].position[1]);
-      lowerRight[0] = Math.min(lowerRight[0], tree[0].children[i].position[0]);
-      lowerRight[1] = Math.max(lowerRight[1], tree[0].children[i].position[1]);
+      for (var i = 0; i < tree.get(0).get('children').size; ++i) {
+        upperLeft[0] = Math.max(upperLeft[0], tree.get(0).get('children').get(i).get('position').get(0));
+        upperLeft[1] = Math.min(upperLeft[1], tree.get(0).get('children').get(i).get('position').get(1));
+        lowerRight[0] = Math.min(lowerRight[0], tree.get(0).get('children').get(i).get('position').get(0));
+        lowerRight[1] = Math.max(lowerRight[1], tree.get(0).get('children').get(i).get('position').get(1));
+      }
     }
 
     return [upperLeft, lowerRight];
@@ -61,7 +57,7 @@ class MapPage extends React.Component {
   render() {
     return (
       <Map
-        center={this.props.position}
+        center={this.props.tree.get(0) ? this.props.tree.get(0).get('position').toJS() : WARSAW_COORDS}
         style={{height: "300px"}}
         bounds={this.getBounds(this.props.tree)}
         boundsOptions={{padding: config.mapPadding}}
@@ -79,4 +75,9 @@ class MapPage extends React.Component {
   }
 }
 
-export default MapPage;
+const mapStateToProps = createStructuredSelector({
+  tree: selectMapTree(),
+});
+
+// Wrap the component to inject dispatch and state into it
+export default connect(mapStateToProps)(MapPage);

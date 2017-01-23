@@ -1,4 +1,7 @@
-var tree = [{
+export const DRAWER_TOGGLE = 'luminis/App/DRAWER_TOGGLE';
+export const DRAWER_CHANGE = 'luminis/App/DRAWER_CHANGE';
+
+export const SAMPLE_TREE = [{
     id: '1',
     primaryText: 'node 1',
     position: [52.2088199, 20.997372],
@@ -38,5 +41,3 @@ var tree = [{
       }
     ]
 }]
-
-export default tree;

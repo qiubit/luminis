@@ -1,113 +1,99 @@
 import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Drawer from 'material-ui/Drawer';
-import {ListItem, List} from 'material-ui/List';
+import { ListItem, List } from 'material-ui/List';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import AppBar from 'material-ui/AppBar';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import { push } from 'react-router-redux';
+import { createStructuredSelector } from 'reselect';
+import { connect } from 'react-redux';
+import { fromJS } from 'immutable';
 
-import LandingPage from '../../components/LandingPage/index';
-import MapPage from '../MapPage/index';
 import TreeListItem from '../TreeListItem/index';
-
-import sample_tree from './sample_tree';
+import { MAP_URL } from '../MapPage/constants';
 import config from './config';
+import { selectDataTree, selectDrawerOpen } from './selectors';
+import { drawerToggle, drawerChange } from './actions';
+import { showMapTree } from '../MapPage/actions';
 
 
 // Needed for buttons to react on user tap
 injectTapEventPlugin();
 
-function PageToRender(props) {
-  // pageId is its position in drawer
-  switch(props.pageId) {
-    // LandingPage is not in drawer, so it gets -1
-    case -1:
-      return <LandingPage />
-    case 0:
-      return <MapPage position={props.position} tree={props.tree}/>
-    default:
-      return <LandingPage />
-  }
-}
-
 class AppPage extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      pageId: -1,
-      drawerOpen: false,
-      mapPosition: sample_tree[0].position,
-      activeTree: sample_tree,
-    };
-  }
-
-  handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen});
-
-  handleDrawerOpen = () => this.setState({drawerOpen: true});
-
-  handleDrawerClose = () => this.setState({drawerOpen: false});
-
-  handleMapOpen = () => this.setState({pageId: 0})
-  handleLandingOpen = () => this.setState({pageId: -1})
-
-  getSubTree(searched_id, tree) {
-    for (var i = 0; i < tree.length; i++) {
-      if (tree[i].id === searched_id) {
-        return [tree[i]];
-      }
-      var res = this.getSubTree(searched_id, tree[i].children)
-      if (res.length != 0) {
-        return res;
-      }
-    }
-    return [];
-  }
-
-  handleNodeClick = (id) => () => {
-    var sub_tree = this.getSubTree(id, sample_tree);
-    var position = this.state.mapPosition;
-    if (sub_tree) {
-      position = sub_tree[0].position;
-    }
-    this.setState({mapPosition: position, activeTree: sub_tree})
-  }
-
   render() {
     return(
       <div>
         <AppBar
           title="Luminis"
-          onLeftIconButtonTouchTap={this.handleDrawerToggle}
+          onLeftIconButtonTouchTap={this.props.onDrawerToggle}
         />
         <Drawer
-          docked={this.state.pageId !== -1}
           width={config.drawerWidth}
-          open={this.state.drawerOpen}
-          onRequestChange={(drawerOpen) => this.setState({drawerOpen})}
+          open={this.props.drawerOpen}
+          onRequestChange={this.props.onRequestDrawerChange}
         >
           <AppBar
             title="Luminis"
             showMenuIconButton={true}
-            onLeftIconButtonTouchTap={this.handleDrawerToggle}
+            onLeftIconButtonTouchTap={this.props.onDrawerToggle}
           />
           <List>
-            <ListItem onTouchTap={this.handleLandingOpen} nestedItems={this.generateTree}>LandingPage</ListItem>
-            <ListItem onTouchTap={this.handleMapOpen}>Map</ListItem>
-            <TreeListItem tree={sample_tree} handleNodeClick={this.handleNodeClick}/>
+            <ListItem onTouchTap={this.props.onMapOpen}>Map</ListItem>
+            <TreeListItem tree={this.props.tree.toJS()} handleNodeClick={this.props.onTreeListNodeClick}/>
           </List>
         </Drawer>
-        <PageToRender pageId={this.state.pageId} position={this.state.mapPosition} tree={this.state.activeTree}/>
+        {this.props.children}
       </div>
     );
   }
 }
 
-const App = () => (
+const App = (props) => (
   <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-    <AppPage />
+    <AppPage {...props} />
   </MuiThemeProvider>
 );
 
-export default App;
+function getSubTree(searchedId, tree) {
+  for (var i = 0; i < tree.size; i++) {
+    if (tree.get(i).get('id') === searchedId) {
+      return fromJS([tree.get(i)]);
+    }
+    var res = getSubTree(searchedId, tree.get(i).get('children'))
+    if (res.size !== 0) {
+      return res;
+    }
+  }
+  return fromJS([]);
+}
+
+function mergeProps(stateProps, dispatchProps, ownProps) {
+  let merged = Object.assign({}, ownProps, stateProps, dispatchProps);
+  merged.onTreeListNodeClick = merged.onTreeListNodeClick(stateProps.tree);
+  return merged;
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onRequestDrawerChange: (drawerOpen) => dispatch(drawerChange(drawerOpen)),
+    onDrawerToggle: () => dispatch(drawerToggle()),
+    onMapOpen: () => dispatch(push(MAP_URL)),
+    onTreeListNodeClick: (tree) => (id) => () => {
+      var subTree = getSubTree(id, tree);
+      if (subTree) {
+        dispatch(showMapTree(subTree));
+      }
+    },
+  };
+}
+
+const mapStateToProps = createStructuredSelector({
+  tree: selectDataTree(),
+  drawerOpen: selectDrawerOpen(),
+});
+
+// Wrap the component to inject dispatch and state into it
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);
