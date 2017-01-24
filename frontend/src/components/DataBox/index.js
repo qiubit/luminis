@@ -25,10 +25,8 @@ function DataBox(props) {
 	return (
     <Paper style={style} zDepth={5}>
     <BoxWrapper>
-    		<BoxHeader>{props.name}</BoxHeader>
-        <BoxContent>
-          {metrics}
-        </BoxContent>
+      <BoxHeader>{props.name}</BoxHeader>
+      <BoxContent>{metrics}</BoxContent>
     </BoxWrapper>
     </Paper>
 		);
