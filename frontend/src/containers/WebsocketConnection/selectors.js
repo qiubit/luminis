@@ -1,25 +1,8 @@
-import * as Immutable from 'immutable';
+import { createSelector } from 'reselect';
 
-export function getMeasurementData(state) {
-  if (state.websocketReducer.measurementData) {
-    return state.websocketReducer.measurementData;
-  } else {
-    return Immutable.Map();
-  }
-}
+export const selectWebsocketConnection = (state) => state.get('WebsocketConnection')
 
-export function getMeasurementDataForId(measurementData, id) {
-  if (measurementData.has(id)) {
-    return measurementData.get(id);
-  } else {
-    return Immutable.Map();
-  }
-}
-
-export function getMeasurementDataByName(measurementDataForID, name) {
-  if (measurementDataForID.has(name)) {
-    return measurementDataForID.get(name);
-  } else {
-    return Immutable.List();
-  }
-}
+export const selectMeasurementData = createSelector(
+  selectWebsocketConnection,
+  (websocketConnection) => websocketConnection.get('measurementData')
+);

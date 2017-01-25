@@ -35,8 +35,8 @@ function routeReducer(state = routeInitialState, action) {
 export default function createReducer() {
   return combineReducers({
     route: routeReducer,
-    global: globalReducer,
-    map: mapReducer,
-    websocket: websocketReducer,
+    App: globalReducer,
+    MapPage: mapReducer,
+    WebsocketConnection: websocketReducer,
   });
 }

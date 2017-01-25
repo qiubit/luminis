@@ -1,21 +1,19 @@
 import { fromJS } from 'immutable';
 
 import {
-  SHOW_MAP_TREE,
+  CHANGE_ACTIVE_SUBTREE,
 } from './constants';
 
 // The initial state of the App
 const initialState = fromJS({
-  tree: [],
-  position: [],
+  activeSubtreeRoot: 0,
 });
 
 function mapReducer(state = initialState, action) {
   switch (action.type) {
-    case SHOW_MAP_TREE:
+    case CHANGE_ACTIVE_SUBTREE:
       return state
-        .set('tree', action.tree)
-        .set('position', action.tree.get(0).get('position'));
+        .set('activeSubtreeRoot', action.subtreeId);
     default:
       return state;
   }

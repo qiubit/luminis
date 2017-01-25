@@ -4,7 +4,7 @@ import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { createStructuredSelector } from 'reselect';
 
 import config from './config';
-import { selectMapTree } from './selectors';
+import { selectActiveSubtree } from './selectors';
 import { WARSAW_COORDS } from './constants';
 
 class MapPage extends React.Component {
@@ -51,6 +51,16 @@ class MapPage extends React.Component {
       }
     }
 
+    // If no tree is active, just render default bounds (for WARSAW_COORDS)
+    else {
+      upperLeft = WARSAW_COORDS.slice();
+      lowerRight = WARSAW_COORDS.slice();
+      upperLeft[0] += 0.1;
+      upperLeft[1] -= 0.1;
+      lowerRight[0] -= 0.1;
+      lowerRight[1] += 0.1;
+    }
+
     return [upperLeft, lowerRight];
   }
 
@@ -76,7 +86,7 @@ class MapPage extends React.Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  tree: selectMapTree(),
+  tree: selectActiveSubtree,
 });
 
 // Wrap the component to inject dispatch and state into it

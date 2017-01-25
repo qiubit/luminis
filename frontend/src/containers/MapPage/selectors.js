@@ -1,18 +1,12 @@
 import { createSelector } from 'reselect';
 
-const selectMap = () => (state) => state.get('map');
+import { createSelectSubtree } from '../App/selectors';
 
-const selectMapTree = () => createSelector(
-  selectMap(),
-  (mapState) => mapState.get('tree')
+export const selectMapPage = (state) => state.get('MapPage');
+
+export const selectActiveSubtreeRoot = createSelector(
+  selectMapPage,
+  (mapState) => mapState.get('activeSubtreeRoot')
 );
 
-const selectMapPosition = () => createSelector(
-  selectMap(),
-  (mapState) => mapState.get('position')
-);
-
-export {
-  selectMapTree,
-  selectMapPosition,
-};
+export const selectActiveSubtree = createSelectSubtree(selectActiveSubtreeRoot);

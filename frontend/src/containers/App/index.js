@@ -9,14 +9,13 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import { push } from 'react-router-redux';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 
 import TreeListItem from '../TreeListItem/index';
 import { MAP_URL } from '../MapPage/constants';
 import config from './config';
 import { selectDataTree, selectDrawerOpen } from './selectors';
 import { drawerToggle, drawerChange } from './actions';
-import { showMapTree } from '../MapPage/actions';
+import { changeActiveSubtree } from '../MapPage/actions';
 
 
 // Needed for buttons to react on user tap
@@ -57,43 +56,19 @@ const App = (props) => (
   </MuiThemeProvider>
 );
 
-function getSubTree(searchedId, tree) {
-  for (var i = 0; i < tree.size; i++) {
-    if (tree.get(i).get('id') === searchedId) {
-      return fromJS([tree.get(i)]);
-    }
-    var res = getSubTree(searchedId, tree.get(i).get('children'))
-    if (res.size !== 0) {
-      return res;
-    }
-  }
-  return fromJS([]);
-}
-
-function mergeProps(stateProps, dispatchProps, ownProps) {
-  let merged = Object.assign({}, ownProps, stateProps, dispatchProps);
-  merged.onTreeListNodeClick = merged.onTreeListNodeClick(stateProps.tree);
-  return merged;
-}
-
 function mapDispatchToProps(dispatch) {
   return {
     onRequestDrawerChange: (drawerOpen) => dispatch(drawerChange(drawerOpen)),
     onDrawerToggle: () => dispatch(drawerToggle()),
     onMapOpen: () => dispatch(push(MAP_URL)),
-    onTreeListNodeClick: (tree) => (id) => () => {
-      var subTree = getSubTree(id, tree);
-      if (subTree) {
-        dispatch(showMapTree(subTree));
-      }
-    },
+    onTreeListNodeClick: (nodeId) => () => dispatch(changeActiveSubtree(nodeId)),
   };
 }
 
 const mapStateToProps = createStructuredSelector({
-  tree: selectDataTree(),
-  drawerOpen: selectDrawerOpen(),
+  tree: selectDataTree,
+  drawerOpen: selectDrawerOpen,
 });
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

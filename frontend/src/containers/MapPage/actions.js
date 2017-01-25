@@ -1,10 +1,10 @@
 import {
-  SHOW_MAP_TREE,
+  CHANGE_ACTIVE_SUBTREE,
 } from './constants';
 
-export function showMapTree(tree) {
+export function changeActiveSubtree(subtreeId) {
   return {
-    type: SHOW_MAP_TREE,
-    tree,
+    type: CHANGE_ACTIVE_SUBTREE,
+    subtreeId,
   };
 }

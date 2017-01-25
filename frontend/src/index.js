@@ -9,8 +9,6 @@ import 'babel-polyfill';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './containers/App/index';
-import WebsocketConnection from './containers/WebsocketConnection/index';
 import { Provider } from 'react-redux';
 import { Router, browserHistory, IndexRoute, Route } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
@@ -32,6 +30,7 @@ const history = syncHistoryWithStore(browserHistory, store, {
 import App from './containers/App/index';
 import LandingPage from './components/LandingPage/index';
 import MapPage from './containers/MapPage/index';
+import WebsocketConnection from './containers/WebsocketConnection/index';
 import { MAP_URL } from './containers/MapPage/constants';
 
 ReactDOM.render(
