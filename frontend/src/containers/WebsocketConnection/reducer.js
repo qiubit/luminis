@@ -1,20 +1,22 @@
+import { fromJS } from 'immutable';
+
 import {
   SAVE_WEBSOCKET,
   DATA_RECIEVED
 } from './constants.js'
 
-const initialState = {};
+const initialState = fromJS({
+  measurementData: {},
+});
 
 function websocketReducer(state = initialState, action) {
   switch(action.type) {
     case SAVE_WEBSOCKET:
-      return Object.assign({}, state, {
-        websocket: action.websocket
-      })
+      return state
+        .set('websocket', action.websocket);
     case DATA_RECIEVED:
-      return Object.assign({}, state, {
-        measurementData: action.newMeasurementData
-      })
+      return state
+        .set('measurementData', action.newMeasurementData);
     default:
       return state;
   }

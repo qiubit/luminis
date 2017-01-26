@@ -1,7 +1,10 @@
 import { connect } from 'react-redux'
 
 import DataBox from '../../components/DataBox/index';
-import { getMeasurementData, getMeasurementDataForId } from '../WebsocketConnection/selectors';
+import {
+  selectMeasurementData,
+} from '../WebsocketConnection/selectors';
+import { getNodeMeasurements } from '../WebsocketConnection/parsers';
 
 function getName(id) {
   return 'lampa' + id;
@@ -32,13 +35,13 @@ function formatMeasurements(measurementDataForID) {
 
 const mapStateToProps = (state, ownProps) => {
   let name = getName(ownProps.id);
-  let measurementData = getMeasurementData(state);
-  let measurementDataForID = getMeasurementDataForId(measurementData, ownProps.id);
-  let measurements = formatMeasurements(measurementDataForID);
+  let measurementData = selectMeasurementData(state);
+  let measurements = getNodeMeasurements(measurementData, ownProps.id);
+  let formattedMeasurements = formatMeasurements(measurements);
   return {
     key: ownProps.id,
     name: name,
-    measurements: measurements
+    measurements: formattedMeasurements,
   }
 }
 
