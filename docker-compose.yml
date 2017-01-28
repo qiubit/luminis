@@ -1,0 +1,17 @@
+version: '2'
+services:
+    influxdb:
+        image: influxdb
+        ports:
+            - "8086:8086"
+        volumes:
+            - ./STORAGE/influxdb:/var/lib/influxdb
+    db:
+        image: postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./STORAGE/db:/var/lib/postgresql/data
+        environment:
+            POSTGRES_USER: luminis
+            POSTGRES_PASSWORD: luminis
