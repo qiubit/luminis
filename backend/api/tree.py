@@ -1,4 +1,5 @@
 from pycnic.core import Handler
+from pycnic.errors import HTTP_404
 from database.model import Entity, Session, EntityTag, EntityMeta
 import json
 
@@ -7,7 +8,11 @@ class Node(Handler):
 
     def get(self, ident):
         session = Session()
-        return session.query(Entity).get(ident).to_dict()
+        result = session.query(Entity).filter(id=ident, delete_ts=None).all()
+        if len(result) == 1:
+            return result[0].to_dict(deep=False)
+        else:
+            raise HTTP_404("Entity #{} not found.".format(ident))
 
     def post(self):
         session = Session()

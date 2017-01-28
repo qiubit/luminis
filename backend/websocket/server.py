@@ -5,6 +5,7 @@ import json
 import logging
 import threading
 
+import time
 from time import sleep
 
 from tornado.websocket import WebSocketHandler
@@ -15,7 +16,6 @@ from database.helpers import get_current_measurements
 
 
 def time():
-    import time
     return int(time.time())
 
 
@@ -29,7 +29,7 @@ class WSHandler(WebSocketHandler):
         self._last_pulling_ts = time()
         self._push_interval = kwargs['push_interval']
         self._initial_pulling_delta = kwargs['initial_pulling_delta']
-    
+
     def _push_loop(self):
         while not self._on_close_called:
             self.write_message(json.dumps(get_current_measurements(self._subscription, self._last_pulling_ts)))
@@ -38,7 +38,7 @@ class WSHandler(WebSocketHandler):
 
     def check_origin(self, origin):
         return True  # TODO we really should make sure that request is from our website to prevent XSS
-    
+
     def open(self, *args, **kwargs):
         print("Connection created")
         threading.Thread(target=self._push_loop, daemon=True).start()
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     # start our application - we need only one handler for websocket interface only
     application = Application([
-            (r'/', WSHandler, config) 
+            (r'/', WSHandler, config)
     ])
     application.listen(config['port'])
     print('Server listening on port {}'.format(config['port']))
