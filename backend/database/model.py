@@ -118,14 +118,14 @@ class Entity(Base):
             "id": self.id,
             "entity_type": self.entity_type_id_fk,
             "parent_id": self.parent_id_fk,
-            "tags": {k: v for k, v in (tag.to_dict().items() for tag in self.tags)},
-            "meta": {k: v for k, v in (meta.to_dict().items() for meta in self.meta)},
+            "tags": {tag.name.name: tag.value for tag in self.tags},
+            "meta": {meta.name.name: meta.value for meta in self.meta},
             "series": [series.name for series in self.entity_type.series],
         }
         if deep:
-            result["children"] = [child.to_dict(deep) for child in self.children]
+            result["children"] = [child.to_dict(deep) for child in self.children if child.delete_ts is None]
         else:
-            result["children_ids"] = [child.id for child in self.children]
+            result["children_ids"] = [child.id for child in self.children if child.delete_ts is None]
         return result
 
 
