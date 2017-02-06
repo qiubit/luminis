@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
 from pycnic.core import WSGI
+
+from api.entity_type import EntityTypeHandler
 from api.tree import *
 
 
 class Application(WSGI):
     routes = [
-        (r'/tree', Tree()),
-        (r'/tree/(\d+)', Tree()),
-        (r'/node', Node()),
-        (r'/node/(\d+)', Node()),
+        (r'/tree', TreeHandler()),
+        (r'/tree/(\d+)', TreeHandler()),
+        (r'/node', NodeHandler()),
+        (r'/node/(\d+)', NodeHandler()),
+        (r'/entity_type', EntityTypeHandler()),
+        (r'/entity_type/(\d+)', EntityTypeHandler()),
     ]
 
 if __name__ == "__main__":

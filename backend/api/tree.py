@@ -1,18 +1,15 @@
 from pycnic.core import Handler
-from pycnic.errors import HTTP_404
 from database.model import Entity, Session, EntityTag, EntityMeta
-import json
+from .helpers import get_one, get_all
 
 
-class Node(Handler):
+class NodeHandler(Handler):
+
+    def __init__(self):
+        self.session = Session()
 
     def get(self, ident):
-        session = Session()
-        result = session.query(Entity).filter(id=ident, delete_ts=None).all()
-        if len(result) == 1:
-            return result[0].to_dict(deep=False)
-        else:
-            raise HTTP_404("Entity #{} not found.".format(ident))
+        return get_one(self.session, Entity, ident).to_dict(deep=False)
 
     def post(self):
         session = Session()
@@ -46,14 +43,14 @@ class Node(Handler):
         return {'success': True}
 
 
-class Tree(Handler):
+class TreeHandler(Handler):
+
+    def __init__(self):
+        self.session = Session()
 
     def get(self, ident=None):
-        session = Session()
         if ident:
-            return session.query(Entity).get(ident).to_dict(deep=True)
+            return get_one(self.session, Entity, ident).to_dict(deep=True)
         else:
-            # TODO json.dumps() is temporary until a fix in pycnic will be merged
-            # (see: https://github.com/nullism/pycnic/pull/19)
-            return json.dumps([root.to_dict(deep=True)
-                               for root in session.query(Entity).filter_by(parent=None, delete_ts=None).all()])
+            return [root.to_dict(deep=True)
+                    for root in get_all(self.session, Entity) if root.parent is None]
