@@ -20,6 +20,11 @@ def create_engine_str():
 
     return '{}://{}:{}@{}:{}/{}'.format(db_engine, login, passwd, host, port, db_name)
 
+
+def _is_not_deleted(obj):
+    return obj.delete_ts is None
+
+
 engine = create_engine(create_engine_str(), echo=True)
 
 Session = sessionmaker(bind=engine)
@@ -38,9 +43,9 @@ class EntityType(Base):
         return {
             "id": self.id,
             "name": self.name,
-            "tags": [tag.to_dict() for tag in self.tags],
-            "series": [series.to_dict() for series in self.series],
-            "meta": [meta.to_dict() for meta in self.meta],
+            "tags": [tag.to_dict() for tag in self.tags if _is_not_deleted(tag)],
+            "series": [series.to_dict() for series in self.series if _is_not_deleted(series)],
+            "meta": [meta.to_dict() for meta in self.meta if _is_not_deleted(meta)],
         }
 
 
@@ -118,14 +123,14 @@ class Entity(Base):
             "id": self.id,
             "entity_type": self.entity_type_id_fk,
             "parent_id": self.parent_id_fk,
-            "tags": {tag.name.name: tag.value for tag in self.tags},
-            "meta": {meta.name.name: meta.value for meta in self.meta},
-            "series": [series.name for series in self.entity_type.series],
+            "tags": {tag.name.name: tag.value for tag in self.tags if _is_not_deleted(tag)},
+            "meta": {meta.name.name: meta.value for meta in self.meta if _is_not_deleted(meta)},
+            "series": [series.name for series in self.entity_type.series if _is_not_deleted(series)],
         }
         if deep:
-            result["children"] = [child.to_dict(deep) for child in self.children if child.delete_ts is None]
+            result["children"] = [child.to_dict(deep) for child in self.children if _is_not_deleted(child)]
         else:
-            result["children_ids"] = [child.id for child in self.children if child.delete_ts is None]
+            result["children_ids"] = [child.id for child in self.children if _is_not_deleted(child)]
         return result
 
 
