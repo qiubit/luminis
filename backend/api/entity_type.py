@@ -21,7 +21,7 @@ class EntityTypeHandler(Handler):
         entity_type = EntityType(name=data['name'])
         self.session.add(entity_type)
 
-        # add tags, meta and series 
+        # add tags, meta and series
         for tag in data['tags']:
             self.session.add(TagAttribute(
                 entity_type=entity_type,
