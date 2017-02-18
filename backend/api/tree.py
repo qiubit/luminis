@@ -5,7 +5,7 @@ from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute,
 from .helpers import get_one, get_all
 
 
-class NodeHandler(Handler):
+class EntityHandler(Handler):
 
     def __init__(self):
         self.session = Session()
@@ -17,7 +17,7 @@ class NodeHandler(Handler):
         data = self.request.data
         entity = Entity(
             entity_type=get_one(self.session, EntityType, id=data['entity_type_id']),
-            parent_id_fk=None if data['parent_id'] is None else get_one(self.session, Entity, id=data['parent_id']),
+            parent=None if data['parent_id'] is None else get_one(self.session, Entity, id=data['parent_id']),
         )
         self.session.add(entity)
 
@@ -26,13 +26,13 @@ class NodeHandler(Handler):
             if 'tag_' in key:
                 self.session.add(EntityTag(
                     entity=entity,
-                    name=get_one(self.session, TagAttribute, id=int(key.split('_')[1])),
+                    attribute=get_one(self.session, TagAttribute, id=int(key.split('_')[1])),
                     value=data[key],
                 ))
             elif 'meta_' in key:
                 self.session.add(EntityMeta(
                     entity=entity,
-                    name=get_one(self.session, MetaAttribute, id=int(key.split('_')[1])),
+                    attribute=get_one(self.session, MetaAttribute, id=int(key.split('_')[1])),
                     value=data[key],
                 ))
 
@@ -45,7 +45,7 @@ class NodeHandler(Handler):
 
     def put(self, ident):
         data = self.request.data
-        get_one(self.session, Entity)  # to ensure that the entity exists
+        get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
 
         # add tags and meta
         for key in data:
@@ -67,6 +67,8 @@ class NodeHandler(Handler):
             tag.delete_ts = now
         for meta in entity.meta:
             meta.delete_ts = now
+        for child in entity.children:
+            child.parent = entity.parent
 
         self.session.commit()
         return {'success': True}

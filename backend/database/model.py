@@ -123,8 +123,8 @@ class Entity(Base):
             "id": self.id,
             "entity_type": self.entity_type_id_fk,
             "parent_id": self.parent_id_fk,
-            "tags": {tag.name.name: tag.value for tag in self.tags if _is_not_deleted(tag)},
-            "meta": {meta.name.name: meta.value for meta in self.meta if _is_not_deleted(meta)},
+            "tags": {tag.attribute.name: tag.value for tag in self.tags if _is_not_deleted(tag)},
+            "meta": {meta.attribute.name: meta.value for meta in self.meta if _is_not_deleted(meta)},
             "series": [series.name for series in self.entity_type.series if _is_not_deleted(series)],
         }
         if deep:
@@ -142,12 +142,12 @@ class EntityTag(Base):
     value = Column(String(255), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
 
-    name = relationship('TagAttribute', primaryjoin='EntityTag.tag_id_fk == TagAttribute.id')
+    attribute = relationship('TagAttribute', primaryjoin='EntityTag.tag_id_fk == TagAttribute.id')
     entity = relationship('Entity', backref='tags', primaryjoin='Entity.id == EntityTag.entity_id_fk')
 
     def to_dict(self):
         return {
-            self.name.name: self.value,
+            self.attribute.name: self.value,
             "entity_id": self.entity_id_fk,
         }
 
@@ -160,11 +160,11 @@ class EntityMeta(Base):
     value = Column(String(255), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
 
-    name = relationship('MetaAttribute', primaryjoin='EntityMeta.meta_id_fk == MetaAttribute.id')
+    attribute = relationship('MetaAttribute', primaryjoin='EntityMeta.meta_id_fk == MetaAttribute.id')
     entity = relationship('Entity', backref='meta', primaryjoin='Entity.id == EntityMeta.entity_id_fk')
 
     def to_dict(self):
         return {
-            self.name.name: self.value,
+            self.attribute.name: self.value,
             "entity_id": self.entity_id_fk,
         }

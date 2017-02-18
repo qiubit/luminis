@@ -2,11 +2,11 @@
 
 from pycnic.core import WSGI
 
-from .entity_type import EntityTypeHandler
-from .meta_attribute import MetaAttributeHandler
-from .series_attribute import SeriesAttributeHandler
-from .tag_attribute import TagAttributeHandler
-from .tree import NodeHandler, TreeHandler
+from api.entity_type import EntityTypeHandler
+from api.meta_attribute import MetaAttributeHandler
+from api.series_attribute import SeriesAttributeHandler
+from api.tag_attribute import TagAttributeHandler
+from api.tree import EntityHandler, TreeHandler
 
 
 class Application(WSGI):
@@ -14,8 +14,8 @@ class Application(WSGI):
         # trees and nodes
         (r'/tree', TreeHandler()),
         (r'/tree/(\d+)', TreeHandler()),
-        (r'/node', NodeHandler()),
-        (r'/node/(\d+)', NodeHandler()),
+        (r'/node', EntityHandler()),
+        (r'/node/(\d+)', EntityHandler()),
 
         # entity types and attributes
         (r'/entity_type', EntityTypeHandler()),
