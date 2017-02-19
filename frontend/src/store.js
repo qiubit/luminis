@@ -4,6 +4,7 @@ import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 import createReducer from './reducers';
 import websocketSagas from './containers/WebsocketConnection/sagas';
+import treeProviderSagas from './containers/TreeProvider/sagas';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -38,6 +39,7 @@ export default function configureStore(initialState = {}, history) {
   store.runSaga = sagaMiddleware.run;
 
   websocketSagas.map(store.runSaga);
+  treeProviderSagas.map(store.runSaga);
 
   return store;
 }

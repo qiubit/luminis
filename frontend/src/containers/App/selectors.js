@@ -1,12 +1,9 @@
 import { createSelector } from 'reselect';
 import { fromJS } from 'immutable';
 
-export const selectApp = (state) => state.get('App');
+import { selectDataTree } from '../TreeProvider/selectors';
 
-export const selectDataTree = createSelector(
-  selectApp,
-  (globalState) => globalState.get('dataTree')
-);
+export const selectApp = (state) => state.get('App');
 
 export const selectDrawerOpen = createSelector(
   selectApp,

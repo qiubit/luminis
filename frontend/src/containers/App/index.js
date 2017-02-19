@@ -13,7 +13,8 @@ import { connect } from 'react-redux';
 import TreeListItem from '../TreeListItem/index';
 import { MAP_URL } from '../MapPage/constants';
 import config from './config';
-import { selectDataTree, selectDrawerOpen } from './selectors';
+import { selectDrawerOpen } from './selectors';
+import { selectDataTree } from '../TreeProvider/selectors';
 import { drawerToggle, drawerChange } from './actions';
 import { changeActiveSubtree } from '../MapPage/actions';
 

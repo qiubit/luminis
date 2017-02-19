@@ -1,14 +1,14 @@
 import { fromJS } from 'immutable';
 
 import {
-  SAMPLE_TREE,
   DRAWER_TOGGLE,
   DRAWER_CHANGE,
 } from './constants';
 
+
+
 // The initial state of the App
 const initialState = fromJS({
-  dataTree: SAMPLE_TREE,
   drawerOpen: false,
 });
 

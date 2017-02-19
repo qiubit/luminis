@@ -5,6 +5,7 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import globalReducer from './containers/App/reducer';
 import mapReducer from './containers/MapPage/reducer';
 import websocketReducer from './containers/WebsocketConnection/reducer';
+import treeProviderReducer from './containers/TreeProvider/reducer';
 
 /*
  * routeReducer
@@ -38,5 +39,6 @@ export default function createReducer() {
     App: globalReducer,
     MapPage: mapReducer,
     WebsocketConnection: websocketReducer,
+    TreeProvider: treeProviderReducer,
   });
 }
