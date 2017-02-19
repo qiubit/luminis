@@ -6,6 +6,7 @@ import globalReducer from './containers/App/reducer';
 import mapReducer from './containers/MapPage/reducer';
 import websocketReducer from './containers/WebsocketConnection/reducer';
 import treeProviderReducer from './containers/TreeProvider/reducer';
+import treeListReducer from './containers/TreeList/reducer';
 
 /*
  * routeReducer
@@ -40,5 +41,6 @@ export default function createReducer() {
     MapPage: mapReducer,
     WebsocketConnection: websocketReducer,
     TreeProvider: treeProviderReducer,
+    TreeList: treeListReducer
   });
 }

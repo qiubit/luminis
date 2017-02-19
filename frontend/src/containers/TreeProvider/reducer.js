@@ -4,12 +4,8 @@ import {
   SAVE_TREE,
 } from './constants.js'
 
-import {
-  SAMPLE_TREE
-} from '../App/constants'
-
 const initialState = fromJS({
-  dataTree: SAMPLE_TREE,
+  dataTree: [],
 });
 
 function treeProviderReducer(state = initialState, action) {

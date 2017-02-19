@@ -1,6 +1,7 @@
 import { put, throttle } from 'redux-saga/effects'
 import { DOWNLOAD_TREE } from './constants';
 import { saveTree } from './actions';
+import { updateTreeListToggle } from '../TreeList/actions'
 import { fromJS } from 'immutable';
 import 'whatwg-fetch';
 
@@ -18,6 +19,7 @@ function* downloadTree(action) {
     });
   if (newTree.length > 0) {
     yield put(saveTree(fromJS(newTree)));
+    yield put(updateTreeListToggle(fromJS(newTree)));
   }
 }
 

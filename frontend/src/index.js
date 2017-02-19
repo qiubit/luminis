@@ -33,13 +33,13 @@ import MapPage from './containers/MapPage/index';
 import WebsocketConnection from './containers/WebsocketConnection/index';
 import TreeProvider from './containers/TreeProvider/index';
 import { MAP_URL } from './containers/MapPage/constants';
+import config from './config'
 
 ReactDOM.render(
   (
     <Provider store={store}>
       <div>
-        <WebsocketConnection/>
-        <TreeProvider url={'http://api.luminis.domyno.pl:7000/tree'} refreshTime={10}/>
+        <TreeProvider url={config.apiUrl} refreshTime={config.fetchTreeRefreshTime}/>
         <Router history={history}>
           <Route path="/" component={App}>
             <IndexRoute component={LandingPage}/>

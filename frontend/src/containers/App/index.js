@@ -10,7 +10,7 @@ import { push } from 'react-router-redux';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
-import TreeListItem from '../TreeListItem/index';
+import TreeList from '../TreeList/index'
 import { MAP_URL } from '../MapPage/constants';
 import config from './config';
 import { selectDrawerOpen } from './selectors';
@@ -42,7 +42,7 @@ class AppPage extends React.Component {
           />
           <List>
             <ListItem onTouchTap={this.props.onMapOpen}>Map</ListItem>
-            <TreeListItem tree={this.props.tree.toJS()} handleNodeClick={this.props.onTreeListNodeClick}/>
+            <TreeList/>
           </List>
         </Drawer>
         {this.props.children}
