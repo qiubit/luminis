@@ -1,8 +1,11 @@
 import { createSelector } from 'reselect';
+import { fromJS } from 'immutable';
 
-export const selectTreeProvider = (state) => state.get('TreeProvider');
+import { selectDataTree } from '../App/selectors'
 
-export const selectDataTree = createSelector(
-  selectTreeProvider,
-  (globalState) => globalState.get('dataTree')
-);
+
+
+export const selectDataTreeIdList = createSelector (
+    selectDataTree,
+    (tree) => getTreeIdList(tree)
+)

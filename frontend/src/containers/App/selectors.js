@@ -1,9 +1,8 @@
 import { createSelector } from 'reselect';
 import { fromJS } from 'immutable';
 
-import { selectDataTree } from '../TreeProvider/selectors';
-
 export const selectApp = (state) => state.get('App');
+
 
 export const selectDrawerOpen = createSelector(
   selectApp,
@@ -25,6 +24,16 @@ export const selectLocationState = () => {
     return prevRoutingStateJS;
   };
 };
+
+export const selectDataTree = createSelector(
+  selectApp,
+  (globalState) => globalState.get('dataTree')
+);
+
+export const selectActiveSubtreeRoot = createSelector(
+  selectApp,
+  (globalState) => globalState.get('activeSubtreeRootId')
+);
 
 function getSubTree(dataTree, subtreeId) {
   // Traverse all roots (our data tree is actually a forest)
@@ -50,3 +59,29 @@ export const createSelectSubtree = (selectSubTreeId) => createSelector(
   selectSubTreeId,
   getSubTree
 );
+
+export const selectActiveSubtree = createSelectSubtree(selectActiveSubtreeRoot);
+
+export const selectMeasurementData = createSelector(
+  selectApp,
+  (globalState) => globalState.get('measurementData')
+);
+
+export function getTreeIdList(tree, maxDepth = -1) {
+  let depth = 0;
+  let unlimitedDepth = (maxDepth ===   -1)
+  let idList = fromJS([])
+
+  let mapTree = (nodes) => {
+    if (unlimitedDepth || depth <= maxDepth) {
+      depth += 1
+      nodes.forEach((node) => {
+        idList = idList.push(node.get('id'))
+        mapTree(node.get('children'))
+      })
+    }
+  }
+
+  mapTree(tree)
+  return idList
+}

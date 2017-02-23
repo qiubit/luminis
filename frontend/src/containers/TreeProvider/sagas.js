@@ -1,9 +1,9 @@
-import { put, throttle } from 'redux-saga/effects'
-import { DOWNLOAD_TREE } from './constants';
-import { saveTree } from './actions';
-import { updateTreeListToggle } from '../TreeList/actions'
-import { fromJS } from 'immutable';
 import 'whatwg-fetch';
+import { fromJS } from 'immutable';
+import { put, throttle } from 'redux-saga/effects'
+
+import { DOWNLOAD_TREE } from './constants';
+import treeListeners from './listeners'
 
 function* downloadTree(action) {
   let newTree = [];
@@ -17,9 +17,11 @@ function* downloadTree(action) {
       console.log(error);
       return [];
     });
-  if (newTree.length > 0) {
-    yield put(saveTree(fromJS(newTree)));
-    yield put(updateTreeListToggle(fromJS(newTree)));
+  newTree = fromJS(newTree)
+  if (newTree.size > 0) {
+    for (let listener of treeListeners) {
+      yield put(listener(newTree))
+    }
   }
 }
 

@@ -40,6 +40,7 @@ ReactDOM.render(
     <Provider store={store}>
       <div>
         <TreeProvider url={config.apiUrl} refreshTime={config.fetchTreeRefreshTime}/>
+        <WebsocketConnection url={config.websocketUrl}/>
         <Router history={history}>
           <Route path="/" component={App}>
             <IndexRoute component={LandingPage}/>

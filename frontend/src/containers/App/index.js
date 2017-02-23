@@ -13,10 +13,8 @@ import { connect } from 'react-redux';
 import TreeList from '../TreeList/index'
 import { MAP_URL } from '../MapPage/constants';
 import config from './config';
-import { selectDrawerOpen } from './selectors';
-import { selectDataTree } from '../TreeProvider/selectors';
-import { drawerToggle, drawerChange } from './actions';
-import { changeActiveSubtree } from '../MapPage/actions';
+import { selectDrawerOpen, selectDataTree } from './selectors';
+import { drawerToggle, drawerChange, changeActiveSubtree } from './actions';
 
 
 // Needed for buttons to react on user tap

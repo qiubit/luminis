@@ -2,11 +2,10 @@ import { fromJS } from 'immutable';
 
 import {
   SAVE_WEBSOCKET,
-  DATA_RECIEVED
 } from './constants.js'
 
 const initialState = fromJS({
-  measurementData: {},
+  websocket: null
 });
 
 function websocketReducer(state = initialState, action) {
@@ -14,9 +13,6 @@ function websocketReducer(state = initialState, action) {
     case SAVE_WEBSOCKET:
       return state
         .set('websocket', action.websocket);
-    case DATA_RECIEVED:
-      return state
-        .set('measurementData', action.newMeasurementData);
     default:
       return state;
   }

@@ -2,9 +2,9 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect';
 
 import { selectTreeListToggle } from './selectors'
-import { selectDataTree } from '../TreeProvider/selectors'
+import { selectDataTree } from '../App/selectors'
 import { changeNodeToggle } from './actions'
-import { changeActiveSubtree } from '../MapPage/actions'
+import { changeActiveSubtree } from '../App/actions'
 import TreeList from '../../components/TreeList/index'
 
 

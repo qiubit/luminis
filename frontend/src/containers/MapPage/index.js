@@ -4,8 +4,10 @@ import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { createStructuredSelector } from 'reselect';
 
 import config from './config';
-import { selectActiveSubtree } from './selectors';
+import { selectActiveSubtree } from '../App/selectors';
 import { WARSAW_COORDS } from './constants';
+
+import DataBoxGrid from '../DataBoxGrid/index'
 
 class MapPage extends React.Component {
 
@@ -66,6 +68,7 @@ class MapPage extends React.Component {
 
   render() {
     return (
+      <div>
       <Map
         center={this.props.tree.get(0) ? this.props.tree.get(0).get('position').toJS() : WARSAW_COORDS}
         style={{height: "300px"}}
@@ -81,6 +84,8 @@ class MapPage extends React.Component {
         />
         {this.mapTreeToMarkers(this.props.tree)}
       </Map>
+      <DataBoxGrid/>
+      </div>
     );
   }
 }

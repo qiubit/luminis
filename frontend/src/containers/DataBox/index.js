@@ -1,9 +1,7 @@
 import { connect } from 'react-redux'
 
 import DataBox from '../../components/DataBox/index';
-import {
-  selectMeasurementData,
-} from '../WebsocketConnection/selectors';
+import { selectMeasurementData } from '../App/selectors';
 import { getNodeMeasurements } from '../WebsocketConnection/parsers';
 
 function getName(id) {
@@ -18,7 +16,7 @@ function formatMeasurements(measurementDataForID) {
     let showLoadingIcon = true;
     if (value.size > 0) {
       showLoadingIcon = false;
-      lastValue = value.get(value.size - 1).value;
+      lastValue = value.get(value.size - 1).get('value');
     }
     let measurement = {
       key: reactKey,
