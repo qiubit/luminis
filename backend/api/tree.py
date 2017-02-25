@@ -1,5 +1,8 @@
 import time
 from pycnic.core import Handler
+from pycnic.errors import HTTP_400
+from pycnic.utils import requires_validation
+from voluptuous import Schema, Required, Or, ALLOW_EXTRA
 
 from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType, SeriesAttribute
 from database.helpers import get_all, get_one
@@ -13,6 +16,10 @@ class EntityHandler(Handler):
     def get(self, ident):
         return get_one(self.session, Entity, id=ident).to_dict(deep=False)
 
+    @requires_validation(Schema({
+        Required('parent_id'): Or(int, None),
+        Required('entity_type_id'): int,
+    }, extra=ALLOW_EXTRA))
     def post(self):
         data = self.request.data
         entity = Entity(
@@ -20,6 +27,16 @@ class EntityHandler(Handler):
             parent=None if data['parent_id'] is None else get_one(self.session, Entity, id=data['parent_id']),
         )
         self.session.add(entity)
+
+        # check if we got all tags and meta
+        tag_ids = sorted(int(key.split('_')[1]) for key in data if 'tag_' in key)
+        meta_ids = sorted(int(key.split('_')[1]) for key in data if 'meta_' in key)
+        expected_tag_ids = sorted(tag.id for tag in entity.entity_type.tags)
+        expected_meta_ids = sorted(meta.id for meta in entity.entity_type.meta)
+        if tag_ids != expected_tag_ids:
+            raise HTTP_400('Expected tag IDs {}, got {}'.format(expected_tag_ids, tag_ids))
+        if meta_ids != expected_meta_ids:
+            raise HTTP_400('Expected meta IDs {}, got {}'.format(expected_meta_ids, meta_ids))
 
         # add tags and meta
         for key in data:
@@ -45,15 +62,15 @@ class EntityHandler(Handler):
 
     def put(self, ident):
         data = self.request.data
-        get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
+        entity = get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
 
         # add tags and meta
         for key in data:
             if 'tag_' in key:
-                tag = get_one(self.session, EntityTag, entity_id_fk=ident, tag_id_fk=key.split('_')[1])
+                tag = get_one(self.session, EntityTag, entity=entity, tag_id_fk=key.split('_')[1])
                 tag.value = data[key]
             elif 'meta_' in key:
-                meta = get_one(self.session, EntityMeta, entity_id_fk=ident, meta_id_fk=key.split('_')[1])
+                meta = get_one(self.session, EntityMeta, entity=entity, meta_id_fk=key.split('_')[1])
                 meta.value = data[key]
 
         self.session.commit()
