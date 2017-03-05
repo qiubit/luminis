@@ -2,7 +2,7 @@ import time
 from pycnic.core import Handler
 
 from database.model import Session, MetaAttribute, EntityType, EntityMeta
-from .helpers import get_one, get_all
+from database.helpers import get_all, get_one
 
 
 class MetaAttributeHandler(Handler):

@@ -2,20 +2,12 @@
 
 import configparser
 import json
-import threading
-
-import time
-from time import sleep
 
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application
-from tornado.ioloop import IOLoop
+from tornado.ioloop import IOLoop, PeriodicCallback
 
-from database.helpers import get_current_measurements
-
-
-def now():
-    return int(time.time())
+from websocket.request_processor import RequestProcessor
 
 
 class WSHandler(WebSocketHandler):
@@ -24,36 +16,40 @@ class WSHandler(WebSocketHandler):
 
     def __init__(self, application, request, **kwargs):
         super(WSHandler, self).__init__(application, request)
-        self._subscription = []  # initially no nodes to send
-        self._last_pulling_ts = now()
+        self._callback = None
+        self._processor = RequestProcessor()
         self._push_interval = kwargs['push_interval']
-        self._initial_pulling_delta = kwargs['initial_pulling_delta']
-
-    def _push_loop(self):
-        while not self._on_close_called:
-            self.write_message(json.dumps(get_current_measurements(self._subscription, self._last_pulling_ts)))
-            self._last_pulling_ts = now()
-            sleep(self._push_interval)
 
     def check_origin(self, origin):
         return True  # TODO we really should make sure that request is from our website to prevent XSS
 
+    def _run_callback(self):
+        response = self._processor.run_requests()
+        self.write_message(json.dumps(response))
+
     def open(self, *args, **kwargs):
         print("Connection created")
-        threading.Thread(target=self._push_loop, daemon=True).start()
+        self._callback = PeriodicCallback(self._run_callback, self._push_interval).start()
+
+    def close(self, code=None, reason=None):
+        self._callback.stop()
 
     def on_message(self, message):
+        msg = json.loads(message)
         try:
-            new_subscription = json.loads(message)
-            # simple input validation
-            if isinstance(new_subscription, list) and all(isinstance(a, int) for a in new_subscription):
-                self._subscription = sorted(new_subscription)
-                # reset data pulling range
-                self._last_pulling_ts = min(now() - self._initial_pulling_delta, self._last_pulling_ts)
-            else:
-                print("Bad new subscription request: \"{}\"".format(message))
-        except json.JSONDecodeError:
-            print("Bad new subscription request: \"{}\"".format(message))
+            self._processor.process_new_request(msg)
+            # response = {
+            #     'status': 'ok',
+            #     'request_id': msg['request_id'],
+            # }
+        except Exception as err:
+            # response = {
+            #     'status': 'error',
+            #     'request_id': msg['request_id'],
+            #     'error': str(err),
+            # }
+            pass
+        # self.write_message(json.dumps(response))
 
 
 def get_config(filename):
@@ -64,18 +60,22 @@ def get_config(filename):
     config = configparser.ConfigParser()
     config.read(filename)
 
-    params = {"push_interval": int, "port": int, "initial_pulling_delta": int}
+    params = {"push_interval": int, "port": int}
     for param in params:
         result[param] = params[param](config.get("websocket", param))
     return result
 
-if __name__ == "__main__":
+
+def main():
     config = get_config("config/websocket.ini")
 
     # start our application - we need only one handler for websocket interface only
     application = Application([
-            (r'/', WSHandler, config)
+        (r'/', WSHandler, config)
     ])
     application.listen(config['port'])
     print('Server listening on port {}'.format(config['port']))
     IOLoop.current().start()
+
+if __name__ == "__main__":
+    main()
