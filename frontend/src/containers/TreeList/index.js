@@ -2,15 +2,15 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect';
 
 import { selectTreeListToggle } from './selectors'
-import { selectDataTree } from '../App/selectors'
+import { selectTreeStructure } from '../App/selectors'
 import { changeNodeToggle } from './actions'
-import { changeActiveSubtree } from '../App/actions'
+import { changeActiveNodeId } from '../App/actions'
 import TreeList from '../../components/TreeList/index'
 
 
 const mapStateToProps = createStructuredSelector({
     isOpened: selectTreeListToggle,
-    tree: selectDataTree
+    tree: selectTreeStructure
 })
 
 const mapDispatchToProps = (dispatch) => {
@@ -19,7 +19,7 @@ const mapDispatchToProps = (dispatch) => {
       event.stopPropagation();
       dispatch(changeNodeToggle(nodeId, nodeToggle))
     },
-    handleNodeClick: (nodeId) => () => dispatch(changeActiveSubtree(nodeId)),
+    handleNodeClick: (nodeId) => () => dispatch(changeActiveNodeId(nodeId)),
   }
 }
 

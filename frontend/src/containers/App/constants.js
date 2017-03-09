@@ -1,5 +1,8 @@
 export const DRAWER_TOGGLE = 'luminis/App/DRAWER_TOGGLE';
 export const DRAWER_CHANGE = 'luminis/App/DRAWER_CHANGE';
-export const CHANGE_ACTIVE_SUBTREE = 'luminis/App/CHANGE_ACTIVE_SUBTREE';
-export const SAVE_TREE = 'luminis/App/SAVE_TREE';
-export const DATA_RECIEVED = 'luminis/App/DATA_RECIEVED';
+export const SAVE_ACTIVE_NODE_ID = 'luminis/App/SAVE_ACTIVE_NODE_ID';
+export const SAVE_METADATA = 'luminis/App/SAVE_METADATA';
+export const SAVE_MEASUREMENTDATA = 'luminis/App/SAVE_MEASUREMENTDATA';
+export const CHANGE_ACTIVE_NODE_ID = 'luminis/App/CHANGE_ACTIVE_NODE_ID';
+export const SIGNAL_ACTIVE_NODE_ID_CHANGE = 'luminis/App/SIGNAL_ACTIVE_NODE_ID_CHANGE';
+export const HANDLE_REQUEST = 'luminis/App/HANDLE_REQUEST';

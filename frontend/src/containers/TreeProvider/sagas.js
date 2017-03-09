@@ -3,7 +3,8 @@ import { fromJS } from 'immutable';
 import { put, throttle } from 'redux-saga/effects'
 
 import { DOWNLOAD_TREE } from './constants';
-import treeListeners from './listeners'
+import { saveTree } from '../App/actions'
+
 
 function* downloadTree(action) {
   let newTree = [];
@@ -19,9 +20,7 @@ function* downloadTree(action) {
     });
   newTree = fromJS(newTree)
   if (newTree.size > 0) {
-    for (let listener of treeListeners) {
-      yield put(listener(newTree))
-    }
+    yield put(saveTree(newTree));
   }
 }
 

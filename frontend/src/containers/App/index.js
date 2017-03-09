@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 import TreeList from '../TreeList/index'
 import { MAP_URL } from '../MapPage/constants';
 import config from './config';
-import { selectDrawerOpen, selectDataTree } from './selectors';
+import { selectDrawerOpen, selectTreeStructure } from './selectors';
 import { drawerToggle, drawerChange, changeActiveSubtree } from './actions';
 
 
@@ -65,7 +65,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  tree: selectDataTree,
+  tree: selectTreeStructure,
   drawerOpen: selectDrawerOpen,
 });
 

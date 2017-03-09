@@ -2,6 +2,7 @@ import {
   CONNECT_WEBSOCKET,
   PROCESS_DATA,
   SAVE_WEBSOCKET,
+  SEND_REQUEST
 } from './constants';
 
 export function connectWebsocket(url, onOpen, onMessage, onClose) {
@@ -17,13 +18,20 @@ export function connectWebsocket(url, onOpen, onMessage, onClose) {
 export function processData(data) {
   return {
     type: PROCESS_DATA,
-    data: data
+    data,
   };
 }
 
 export function saveWebsocket(websocket) {
   return {
     type: SAVE_WEBSOCKET,
-    websocket: websocket
+    websocket,
+  };
+}
+
+export function sendRequest(request) {
+  return {
+    type: SEND_REQUEST,
+    request,
   };
 }

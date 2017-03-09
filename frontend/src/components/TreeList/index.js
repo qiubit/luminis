@@ -9,24 +9,24 @@ function TreeList(props) {
     if (nodes) {
       return nodes.map(node => (
         <ListItem
-          key={node.get('id')}
+          key={node.get('node_id')}
           nestedItems={mapStructure(node.get('children')).toJS()}
           autoGenerateNestedIndicator={false}
-          open={props.isOpened.get(node.get('id'))}
-          onClick={props.handleNodeClick(node.get('id'))}
+          open={props.isOpened.get(node.get('node_id'))}
+          onClick={props.handleNodeClick(node.get('node_id'))}
         >
           <IconButton
             style={{position: 'absolute', display: 'block', top: 0, left: 4}}
-            onTouchTap={props.handleNestedListToggle(node.get('id'), !props.isOpened.get(node.get('id')))}
+            onTouchTap={props.handleNestedListToggle(node.get('node_id'), !props.isOpened.get(node.get('node_id')))}
           >
             {node.get('children').size > 0 ?
-            (props.isOpened.get(node.get('id')) ? <CloseIcon/> : <OpenIcon/>)
+            (props.isOpened.get(node.get('node_id')) ? <CloseIcon/> : <OpenIcon/>)
             : null}
           </IconButton>
           <span
             style={{marginLeft: node.get('children').size > 0 ? 30 : 0}}
           >
-            {node.get('primaryText')}
+            {node.get('node_id')}
           </span>
         </ListItem>
       ));
