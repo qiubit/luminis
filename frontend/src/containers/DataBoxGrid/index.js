@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import AbsoluteGrid from 'react-absolute-grid';
+import createAbosluteGrid from 'react-absolute-grid';
 
 import DataBox from '../DataBox/index'
 import DataBoxManager from '../DataBoxManager/index'
@@ -15,6 +15,8 @@ function DataBoxWrapper(props) {
   return (<DataBox {...props.item} />)
 }
 
+const AbsoluteGrid = createAbosluteGrid(DataBoxWrapper);
+
 function DataBoxGrid(props){
       return (
         <div style={{marginLeft: props.isDrawerOpen ? 200 : 0}}>
@@ -26,7 +28,6 @@ function DataBoxGrid(props){
               responsive={true}
               items={props.dataBoxes}
               verticalMargin={20}
-              displayObject={<DataBoxWrapper />}
         />
         </div>
       );
