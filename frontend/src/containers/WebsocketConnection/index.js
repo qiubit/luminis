@@ -9,7 +9,7 @@ export class WebsocketConnection extends React.Component {
   }
 
   render() {
-    return <div></div>
+    return null;
   }
 }
 
