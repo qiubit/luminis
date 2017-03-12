@@ -112,6 +112,7 @@ class Entity(Base):
     id = Column(Integer, primary_key=True)
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     parent_id_fk = Column(Integer, ForeignKey('Entities.id'), nullable=True)
+    last_data_fetch_ts = Column(Integer, nullable=False, default=0)
     delete_ts = Column(Integer, nullable=True, default=None)
 
     entity_type = relationship('EntityType', primaryjoin='Entity.entity_type_id_fk == EntityType.id')

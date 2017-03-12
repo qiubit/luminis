@@ -1,3 +1,5 @@
 backend/.idea/
 backend/venv/
 STORAGE/
+frontend/node_modules/
+*__pycache__*
