@@ -1,43 +1,8 @@
 export const DRAWER_TOGGLE = 'luminis/App/DRAWER_TOGGLE';
 export const DRAWER_CHANGE = 'luminis/App/DRAWER_CHANGE';
-
-export const SAMPLE_TREE = [{
-    id: '1',
-    primaryText: 'node 1',
-    position: [52.2088199, 20.997372],
-    children: [
-      {
-        id: '2',
-        primaryText: 'node 2',
-        position: [52.2078299, 20.997372],
-        children: [
-          {
-            id: '4',
-            primaryText: 'node 4',
-            position: [52.2068399, 20.997372],
-            children: [
-              {
-                id: '5',
-                primaryText: 'node 5',
-                position: [52.2058499, 20.997372],
-                children: [
-                  {
-                    id: '6',
-                    primaryText: 'node 6',
-                    position: [52.2048599, 20.997372],
-                    children: [],
-                  }
-                ],
-              }
-            ],
-          }
-        ],
-      },
-      {
-        id: '3',
-        primaryText: 'node 3',
-        position: [52.2038699, 20.997372],
-        children: []
-      }
-    ]
-}]
+export const SAVE_ACTIVE_NODE_ID = 'luminis/App/SAVE_ACTIVE_NODE_ID';
+export const SAVE_METADATA = 'luminis/App/SAVE_METADATA';
+export const SAVE_MEASUREMENTDATA = 'luminis/App/SAVE_MEASUREMENTDATA';
+export const CHANGE_ACTIVE_NODE_ID = 'luminis/App/CHANGE_ACTIVE_NODE_ID';
+export const SIGNAL_ACTIVE_NODE_ID_CHANGE = 'luminis/App/SIGNAL_ACTIVE_NODE_ID_CHANGE';
+export const HANDLE_REQUEST = 'luminis/App/HANDLE_REQUEST';

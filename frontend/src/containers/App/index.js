@@ -10,12 +10,11 @@ import { push } from 'react-router-redux';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
-import TreeListItem from '../TreeListItem/index';
+import TreeList from '../TreeList/index'
 import { MAP_URL } from '../MapPage/constants';
 import config from './config';
-import { selectDataTree, selectDrawerOpen } from './selectors';
-import { drawerToggle, drawerChange } from './actions';
-import { changeActiveSubtree } from '../MapPage/actions';
+import { selectDrawerOpen, selectTreeStructure } from './selectors';
+import { drawerToggle, drawerChange, changeActiveSubtree } from './actions';
 
 
 // Needed for buttons to react on user tap
@@ -41,7 +40,7 @@ class AppPage extends React.Component {
           />
           <List>
             <ListItem onTouchTap={this.props.onMapOpen}>Map</ListItem>
-            <TreeListItem tree={this.props.tree.toJS()} handleNodeClick={this.props.onTreeListNodeClick}/>
+            <TreeList/>
           </List>
         </Drawer>
         {this.props.children}
@@ -66,7 +65,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  tree: selectDataTree,
+  tree: selectTreeStructure,
   drawerOpen: selectDrawerOpen,
 });
 

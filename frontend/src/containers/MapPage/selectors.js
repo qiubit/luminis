@@ -1,12 +1,17 @@
 import { createSelector } from 'reselect';
 
-import { createSelectSubtree } from '../App/selectors';
+import { selectNodePositionX, selectNodePositionY } from '../App/selectors'
 
-export const selectMapPage = (state) => state.get('MapPage');
-
-export const selectActiveSubtreeRoot = createSelector(
-  selectMapPage,
-  (mapState) => mapState.get('activeSubtreeRoot')
+export const selectNodeCoordinates = createSelector(
+  selectNodePositionX,
+  selectNodePositionY,
+  (getNodePositionX, getNodePositionY) => (nodeId) => {
+    let x = getNodePositionX(nodeId);
+    let y = getNodePositionY(nodeId);
+    if (x == null || y == null) {
+      return null;
+    } else {
+      return [x, y]
+    }
+  }
 );
-
-export const selectActiveSubtree = createSelectSubtree(selectActiveSubtreeRoot);

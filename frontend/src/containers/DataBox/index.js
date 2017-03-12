@@ -1,45 +1,44 @@
 import { connect } from 'react-redux'
 
 import DataBox from '../../components/DataBox/index';
-import {
-  selectMeasurementData,
-} from '../WebsocketConnection/selectors';
-import { getNodeMeasurements } from '../WebsocketConnection/parsers';
+import { selectMeasurementName, selectNodeMeasurements, selectRequestLiveDataValue, selectNodeName } from '../App/selectors';
+import { selectNodeMeasurementRequest } from '../DataBoxManager/selectors'
 
-function getName(id) {
-  return 'lampa' + id;
-}
 
-function formatMeasurements(measurementDataForID) {
+function formatMeasurements(availableMeasurements, getRequestLiveDataValue, getMeasurementName, getMeasurementRequest) {
   let measurements = [];
   let reactKey = 1;
-  measurementDataForID.forEach((value, key, map) => {
-    let lastValue = 0;
+
+  availableMeasurements.forEach((measurementId) => {
+    let requestId = getMeasurementRequest(measurementId.toString())
+    let lastValue = getRequestLiveDataValue(requestId);
     let showLoadingIcon = true;
-    if (value.size > 0) {
+    if (lastValue) {
       showLoadingIcon = false;
-      lastValue = value.get(value.size - 1).value;
     }
     let measurement = {
       key: reactKey,
-      name: key,
+      name: getMeasurementName(measurementId.toString()),
       value: lastValue,
       showLoadingIcon: showLoadingIcon
     }
     reactKey += 1;
     measurements.push(measurement);
-  })
+  });
   return measurements
 }
 
 
 const mapStateToProps = (state, ownProps) => {
-  let name = getName(ownProps.id);
-  let measurementData = selectMeasurementData(state);
-  let measurements = getNodeMeasurements(measurementData, ownProps.id);
-  let formattedMeasurements = formatMeasurements(measurements);
+  let nodeId = ownProps.nodeId.toString();
+  let name = selectNodeName(state)(nodeId);
+  let measurements = selectNodeMeasurements(state)(nodeId);
+  let getRequestLiveDataValue = selectRequestLiveDataValue(state);
+  let getMeasurementName = selectMeasurementName(state);
+  let getMeasurementRequest = (measurementId) => selectNodeMeasurementRequest(state)(nodeId, measurementId)
+  let formattedMeasurements = formatMeasurements(measurements, getRequestLiveDataValue, getMeasurementName, getMeasurementRequest);
   return {
-    key: ownProps.id,
+    key: ownProps.nodeId,
     name: name,
     measurements: formattedMeasurements,
   }
