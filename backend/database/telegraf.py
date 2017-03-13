@@ -31,7 +31,7 @@ class PointGenerator(object):
             for series, value in measurements:
                 result.append({
                     'measurement': series,
-                    'tags': {tag.attribute.name: tag.value for tag in self._entity.tags},
+                    'tags': dict(id=self._entity.id, **{tag.attribute.name: tag.value for tag in self._entity.tags}),
                     'time': time,
                     'fields': {'value': value},
                 })

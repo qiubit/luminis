@@ -23,7 +23,7 @@ def push_new_measurements(directory, pattern):
                        os.path.getmtime(directory + '/' + f) >= node.last_data_fetch_ts]
             # get input files sorted by modification time
             for file in sorted(to_read, key=os.path.getmtime):
-                InfluxWriter().write(PointGenerator(node.id, FileParser(node.id, file)))
+                InfluxWriter().write(PointGenerator(node, FileParser(node.id, file)).generate_points())
                 node.last_data_fetch_ts = int(os.path.getmtime(file))
                 session.commit()
 
