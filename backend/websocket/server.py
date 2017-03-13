@@ -29,7 +29,7 @@ class WSHandler(WebSocketHandler):
 
     def open(self, *args, **kwargs):
         print("Connection created")
-        self._callback = PeriodicCallback(self._run_callback, self._push_interval).start()
+        self._callback = PeriodicCallback(self._run_callback, self._push_interval * 1000).start()
 
     def close(self, code=None, reason=None):
         self._callback.stop()

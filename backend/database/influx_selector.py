@@ -76,7 +76,8 @@ class InfluxReader(object):
         params['db'] = self._database
         if date_specifier:
             params['epoch'] = date_specifier
-        params['q'] = 'SELECT ' + ','.join(attributes) + ' FROM ' + ' '.join((measurement, where_clause, group_by_clause, extra_clause))
+        params['q'] = 'SELECT ' + ','.join(attributes) + ' FROM ' + ' '.join(('"' + measurement + '"', where_clause,
+                                                                              group_by_clause, extra_clause))
         response = self._session.request(
                 method="GET",
                 url='http://' + self._host + ':' + self._port + '/query',
@@ -93,7 +94,7 @@ class InfluxReader(object):
 
     @staticmethod
     def _apply_cols(json):
-        if json:
+        if not json:
             return []
         result = []
         cols = json['columns']

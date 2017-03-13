@@ -41,8 +41,8 @@ class MeasurementIdType(MeasurementArithmeticType):
     def evaluate(self, start_ts: int, end_ts: int) -> List[Tuple[int, int]]:
         reader = InfluxReader()
         result = reader.query(measurement=self._measurement.name,
-                              attributes=('{}(value)'.format(self._aggregation_type), 'time'),
-                              constraints=(('id', self._entity_id),
+                              attributes=('{}(value) as value'.format(self._aggregation_type)),
+                              constraints=(('id', '\'' + str(self._entity_id) + '\''),
                                            ('time', '>=', str(start_ts) + 's'),
                                            ('time', '<=', str(end_ts) + 's')),
                               group_by=('time({}s)'.format(self._aggregation_length),),
