@@ -143,7 +143,7 @@ class NewLiveDataRequestHandler(AbstractRequestHandler):
         reader = InfluxReader()
         result = reader.query(measurement=self._measurement.name,
                               attributes=('value',),
-                              constraints=(('id', '\'' + self._entity.id + '\''),
+                              constraints=(('id', '\'' + str(self._entity.id) + '\''),
                                            ('time', '>=', str(self._last_data_timestamp) + 's')),
                               only_newest=True,
                               apply_cols=True,
