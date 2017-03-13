@@ -13,7 +13,7 @@ function formatMeasurements(availableMeasurements, getRequestLiveDataValue, getM
     let requestId = getMeasurementRequest(measurementId.toString())
     let lastValue = getRequestLiveDataValue(requestId);
     let showLoadingIcon = true;
-    if (lastValue) {
+    if (lastValue != null) {
       showLoadingIcon = false;
     }
     let measurement = {
