@@ -1,59 +1,87 @@
+import time
 from pycnic.core import Handler
-from pycnic.errors import HTTP_404
-from database.model import Entity, Session, EntityTag, EntityMeta
-import json
+
+from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType
+from .helpers import get_one, get_all
 
 
-class Node(Handler):
+class EntityHandler(Handler):
+
+    def __init__(self):
+        self.session = Session()
 
     def get(self, ident):
-        session = Session()
-        result = session.query(Entity).filter(id=ident, delete_ts=None).all()
-        if len(result) == 1:
-            return result[0].to_dict(deep=False)
-        else:
-            raise HTTP_404("Entity #{} not found.".format(ident))
+        return get_one(self.session, Entity, id=ident).to_dict(deep=False)
 
     def post(self):
-        session = Session()
         data = self.request.data
-        objects_to_insert = []
         entity = Entity(
-            entity_type_id_fk=data['entity_type_id'],
-            parent_id_fk=data['parent_id'],
+            entity_type=get_one(self.session, EntityType, id=data['entity_type_id']),
+            parent=None if data['parent_id'] is None else get_one(self.session, Entity, id=data['parent_id']),
         )
-        session.add(entity)
-        session.commit()  # we need to commit now to have ID of entity
+        self.session.add(entity)
 
         # add tags and meta
         for key in data:
             if 'tag_' in key:
-                objects_to_insert.append(EntityTag(
-                    entity_id_fk=entity.id,
-                    tag_id_fk=key.split('_')[1],
+                self.session.add(EntityTag(
+                    entity=entity,
+                    attribute=get_one(self.session, TagAttribute, id=int(key.split('_')[1])),
                     value=data[key],
                 ))
             elif 'meta_' in key:
-                objects_to_insert.append(EntityMeta(
-                    entity_id_fk=entity.id,
-                    meta_id_fk=key.split('_')[1],
+                self.session.add(EntityMeta(
+                    entity=entity,
+                    attribute=get_one(self.session, MetaAttribute, id=int(key.split('_')[1])),
                     value=data[key],
                 ))
 
-        session.add_all(objects_to_insert)
-        session.commit()
+        self.session.commit()
 
+        return {
+            'success': True,
+            'ID': entity.id,
+        }
+
+    def put(self, ident):
+        data = self.request.data
+        get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
+
+        # add tags and meta
+        for key in data:
+            if 'tag_' in key:
+                tag = get_one(self.session, EntityTag, entity_id_fk=ident, tag_id_fk=key.split('_')[1])
+                tag.value = data[key]
+            elif 'meta_' in key:
+                meta = get_one(self.session, EntityMeta, entity_id_fk=ident, meta_id_fk=key.split('_')[1])
+                meta.value = data[key]
+
+        self.session.commit()
+        return {'success': True}
+
+    def delete(self, ident):
+        entity = get_one(self.session, Entity, id=ident)
+        now = time.time()
+        entity.delete_ts = now
+        for tag in entity.tags:
+            tag.delete_ts = now
+        for meta in entity.meta:
+            meta.delete_ts = now
+        for child in entity.children:
+            child.parent = entity.parent
+
+        self.session.commit()
         return {'success': True}
 
 
-class Tree(Handler):
+class TreeHandler(Handler):
+
+    def __init__(self):
+        self.session = Session()
 
     def get(self, ident=None):
-        session = Session()
         if ident:
-            return session.query(Entity).get(ident).to_dict(deep=True)
+            return get_one(self.session, Entity, id=ident).to_dict(deep=True)
         else:
-            # TODO json.dumps() is temporary until a fix in pycnic will be merged
-            # (see: https://github.com/nullism/pycnic/pull/19)
-            return json.dumps([root.to_dict(deep=True)
-                               for root in session.query(Entity).filter_by(parent=None, delete_ts=None).all()])
+            return [root.to_dict(deep=True)
+                    for root in get_all(self.session, Entity) if root.parent is None]

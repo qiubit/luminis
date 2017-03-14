@@ -2,7 +2,6 @@
 
 import configparser
 import json
-import logging
 import threading
 
 import time
@@ -15,7 +14,7 @@ from tornado.ioloop import IOLoop
 from database.helpers import get_current_measurements
 
 
-def time():
+def now():
     return int(time.time())
 
 
@@ -26,14 +25,14 @@ class WSHandler(WebSocketHandler):
     def __init__(self, application, request, **kwargs):
         super(WSHandler, self).__init__(application, request)
         self._subscription = []  # initially no nodes to send
-        self._last_pulling_ts = time()
+        self._last_pulling_ts = now()
         self._push_interval = kwargs['push_interval']
         self._initial_pulling_delta = kwargs['initial_pulling_delta']
 
     def _push_loop(self):
         while not self._on_close_called:
             self.write_message(json.dumps(get_current_measurements(self._subscription, self._last_pulling_ts)))
-            self._last_pulling_ts = time()
+            self._last_pulling_ts = now()
             sleep(self._push_interval)
 
     def check_origin(self, origin):
@@ -50,7 +49,7 @@ class WSHandler(WebSocketHandler):
             if isinstance(new_subscription, list) and all(isinstance(a, int) for a in new_subscription):
                 self._subscription = sorted(new_subscription)
                 # reset data pulling range
-                self._last_pulling_ts = min(time() - self._initial_pulling_delta, self._last_pulling_ts)
+                self._last_pulling_ts = min(now() - self._initial_pulling_delta, self._last_pulling_ts)
             else:
                 print("Bad new subscription request: \"{}\"".format(message))
         except json.JSONDecodeError:
