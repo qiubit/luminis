@@ -121,7 +121,7 @@ class NewLiveDataRequestHandler(AbstractRequestHandler):
 
     def __init__(self, request_id: int, payload: dict):
         super().__init__(request_id, payload)
-        self._last_data_timestamp = int(time.time())
+        self._last_data_timestamp = 0
         session = Session()
         self._measurement = get_one(session, SeriesAttribute, id=self._raw_payload.measurement_id,
                                     exception_cls=ValueError)
