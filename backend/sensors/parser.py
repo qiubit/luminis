@@ -19,9 +19,10 @@ class FileParser(PointSource):
     def get_values(self) -> Iterable[dict]:
         result = []
         for line in self._file:
-            fields = line.split(',')
+            fields = line[:-1].split(',')
             result.append({
                 'timestamp': convert_timestamp(fields[0]),
-                'measurements': [(s.name, value) for s, value in zip(self._entity.entity_type.series, fields[1:])]
+                'measurements': [(s.name, s.transform(value)) for s, value in
+                                 zip(self._entity.entity_type.series, fields[1:])]
             })
         return result

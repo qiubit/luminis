@@ -86,6 +86,10 @@ class SeriesAttribute(Base):
             "entity_type_id": self.entity_type_id_fk,
         }
 
+    def transform(self, value):
+        # TODO specify cases according to series type
+        return float(value)
+
 
 class MetaAttribute(Base):
     __tablename__ = 'Meta_Attributes'
