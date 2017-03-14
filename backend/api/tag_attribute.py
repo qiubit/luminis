@@ -34,7 +34,7 @@ class TagAttributeHandler(Handler):
         tag = get_one(self.session, TagAttribute, entity_type=entity_type, id=ident)
         now = time.time()
         tag.delete_ts = now
-        for entity_tag in get_all(self.session, EntityTag, name=tag):
+        for entity_tag in get_all(self.session, EntityTag, attribute=tag):
             entity_tag.delete_ts = now
 
         self.session.commit()

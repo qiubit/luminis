@@ -44,7 +44,7 @@ class MetaAttributeHandler(Handler):
         meta = get_one(self.session, MetaAttribute, entity_type=entity_type, id=ident)
         now = time.time()
         meta.delete_ts = now
-        for entity_meta in get_all(self.session, EntityMeta, name=meta):
+        for entity_meta in get_all(self.session, EntityMeta, attribute=meta):
             entity_meta.delete_ts = now
 
         self.session.commit()
