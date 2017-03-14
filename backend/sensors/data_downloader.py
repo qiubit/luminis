@@ -14,21 +14,20 @@ from sensors.parser import FileParser
 
 
 def push_new_measurements(directory, pattern):
-    try:
-        session = Session()
-        pattern = re.compile(pattern)
-        files = os.listdir(directory)
-        for node in get_all(session, Entity):
-            to_read = [directory + '/' + f for f in files if re.match(pattern, f) and
-                       os.path.getmtime(directory + '/' + f) >= node.last_data_fetch_ts]
-            # get input files sorted by modification time
-            for file in sorted(to_read, key=os.path.getmtime):
+    session = Session()
+    pattern = re.compile(pattern)
+    files = os.listdir(directory)
+    for node in get_all(session, Entity):
+        to_read = [directory + '/' + f for f in files if re.match(pattern, f) and
+                   os.path.getmtime(directory + '/' + f) >= node.last_data_fetch_ts]
+        # get input files sorted by modification time
+        for file in sorted(to_read, key=os.path.getmtime):
+            try:
                 InfluxWriter().write(PointGenerator(node, FileParser(node.id, file)).generate_points())
                 node.last_data_fetch_ts = int(os.path.getmtime(file))
                 session.commit()
-
-    except Exception as err:
-        logging.error(err)
+            except Exception as err:
+                logging.error(err)
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
