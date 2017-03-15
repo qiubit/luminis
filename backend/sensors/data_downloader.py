@@ -15,10 +15,9 @@ from sensors.parser import FileParser
 
 def push_new_measurements(directory, pattern):
     session = Session()
-    pattern = re.compile(pattern)
     files = os.listdir(directory)
     for node in get_all(session, Entity):
-        to_read = [directory + '/' + f for f in files if re.match(pattern, f) and
+        to_read = [directory + '/' + f for f in files if re.match(pattern.format(ID=node.id), f) and
                    os.path.getmtime(directory + '/' + f) >= node.last_data_fetch_ts]
         # get input files sorted by modification time
         for file in sorted(to_read, key=os.path.getmtime):
