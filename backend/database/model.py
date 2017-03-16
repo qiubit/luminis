@@ -75,6 +75,8 @@ class SeriesAttribute(Base):
     name = Column(String(255), nullable=False)
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
+    type = Column(String(255), nullable=True, default=None)
+    refresh_time = Column(Integer, nullable=True, default=None)
 
     entity_type = relationship('EntityType', backref='series',
                                primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
