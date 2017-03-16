@@ -88,6 +88,14 @@ class SeriesAttribute(Base):
             "entity_type_id": self.entity_type_id_fk,
         }
 
+    def to_tree_dict(self):
+        return {
+            "measurement_id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "refresh_time": self.refresh_time,
+        }
+
 
 class MetaAttribute(Base):
     __tablename__ = 'Meta_Attributes'

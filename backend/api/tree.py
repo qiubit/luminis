@@ -80,12 +80,8 @@ class TreeHandler(Handler):
         self.session = Session()
 
     def get(self, ident=None):
-        mapped_measurements = { meas.id: {
-            "measurement_id": meas.id,
-            "name": meas.name,
-            "type": meas.type,
-            "refresh_time": meas.refresh_time,
-        } for meas in get_all(self.session, SeriesAttribute)}
+        mapped_measurements = { ser_attr.id: ser_attr.to_tree_dict()
+                                for ser_attr in get_all(self.session, SeriesAttribute) }
 
         if ident:
             tree_model = get_one(self.session, Entity, id=ident)
