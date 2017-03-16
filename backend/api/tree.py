@@ -83,7 +83,7 @@ class TreeHandler(Handler):
         mapped_measurements = { meas.id: {
             "measurement_id": meas.id,
             "name": meas.name,
-            "type:": meas.type,
+            "type": meas.type,
             "refresh_time": meas.refresh_time,
         } for meas in get_all(self.session, SeriesAttribute)}
 
