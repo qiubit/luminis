@@ -87,16 +87,16 @@ class TreeHandler(Handler):
             tree_model = get_one(self.session, Entity, id=ident)
             return {
                 "tree_metadata": tree_model.map_nodes(),
-                "tree": tree_model.tree_structure(),
+                "tree": tree_model.tree_structure_dict(),
                 "measurements_metadata": mapped_measurements,
             }
         else:
-            root_models = [root for root in get_all(self.session, Entity) if root.parent is None]
+            roots = [root for root in get_all(self.session, Entity) if root.parent is None]
             mapped_nodes = {}
-            for root in root_models:
-                root.rec_map_nodes(mapped_nodes)
+            for root in roots:
+                root.add_nodes_rec(mapped_nodes)
             return {
                 "tree_metadata": mapped_nodes,
-                "tree": [root.tree_structure() for root in root_models],
+                "tree": [root.tree_structure_dict() for root in roots],
                 "measurements_metadata": mapped_measurements,
             }

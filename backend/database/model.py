@@ -143,7 +143,7 @@ class Entity(Base):
             result["children_ids"] = [child.id for child in self.children if _is_not_deleted(child)]
         return result
 
-    def rec_map_nodes(self, dict):
+    def add_nodes_rec(self, node_dict):
         meta = {meta.attribute.name: meta.value for meta in self.meta if _is_not_deleted(meta)}
 
         node_description = {
@@ -157,22 +157,21 @@ class Entity(Base):
                 "y": meta.get("position_y", None)
             },
         }
-        dict[node_description['node_id']] = node_description
+        node_dict[self.id] = node_description
 
         for child in self.children:
             if _is_not_deleted(child):
-                    child.rec_map_nodes(dict)
+                    child.add_nodes_rec(node_dict)
 
     def map_nodes(self):
         global_dict = {}
-        self.rec_map_nodes(global_dict)
+        self.add_nodes_rec(global_dict)
         return global_dict
 
-    def tree_structure(self):
-        children = [child for child in self.children if _is_not_deleted(child)]
+    def tree_structure_dict(self):
         return {
             "node_id": self.id,
-            "children": [child.tree_structure() for child in children]
+            "children": [child.tree_structure_dict() for child in self.children if _is_not_deleted(child)]
         }
 
 
