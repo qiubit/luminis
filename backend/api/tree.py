@@ -81,7 +81,12 @@ class TreeHandler(Handler):
 
     def get(self, ident=None):
         if ident:
-            return get_one(self.session, Entity, id=ident).to_dict(deep=True)
+            tree_model = get_one(self.session, Entity, id=ident)
+            return {
+                "tree_metadata": tree_model.map_nodes(),
+                "tree": None,
+                "measurements_metadata": None,
+            }
         else:
             return [root.to_dict(deep=True)
                     for root in get_all(self.session, Entity) if root.parent is None]

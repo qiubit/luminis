@@ -133,6 +133,32 @@ class Entity(Base):
             result["children_ids"] = [child.id for child in self.children if _is_not_deleted(child)]
         return result
 
+    def rec_map_nodes(self, dict):
+        meta = {meta.attribute.name: meta.value for meta in self.meta if _is_not_deleted(meta)}
+
+        node_description = {
+            "node_id": self.id,
+            "name": meta.get('name', None),
+            "children": [child.id for child in self.children if _is_not_deleted(child)],
+            "parent": self.parent_id_fk,
+            "measurements": [series.id for series in self.entity_type.series if _is_not_deleted(series)],
+            "position": {
+                "x": meta.get("position_x", None),
+                "y": meta.get("position_y", None)
+            },
+        }
+        dict[node_description['node_id']] = node_description
+
+        for child in self.children:
+            if _is_not_deleted(child):
+                    child.rec_map_nodes(dict)
+    def map_nodes(self):
+        global_dict = {}
+        self.rec_map_nodes(global_dict)
+        return global_dict
+    def tree_structure(self):
+        pass
+
 
 class EntityTag(Base):
     __tablename__ = 'Entity_Tags'
