@@ -152,12 +152,18 @@ class Entity(Base):
         for child in self.children:
             if _is_not_deleted(child):
                     child.rec_map_nodes(dict)
+
     def map_nodes(self):
         global_dict = {}
         self.rec_map_nodes(global_dict)
         return global_dict
+
     def tree_structure(self):
-        pass
+        children = [child for child in self.children if _is_not_deleted(child)]
+        return {
+            "node_id": self.id,
+            "children": [child.tree_structure() for child in children]
+        }
 
 
 class EntityTag(Base):
