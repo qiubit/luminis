@@ -1,3 +1,4 @@
+import configparser
 import requests
 
 
@@ -20,17 +21,14 @@ class QueryError(Exception):
 class InfluxReader(object):
     """Used to create queries on one measurement
     """
-    def __init__(self,
-                 host='localhost',
-                 port='8086',
-                 username='root',
-                 password='root',
-                 database='mydb'):
-        self._host = host
-        self._port = port
-        self._username = username
-        self._password = password
-        self._database = database
+    def __init__(self, config='config/database.ini'):
+        conf = configparser.ConfigParser()
+        conf.read(config)
+        self._host = conf.get('influxdb', 'host')
+        self._port = conf.get('influxdb', 'port')
+        self._username = conf.get('influxdb', 'user')
+        self._password = conf.get('influxdb', 'passwd')
+        self._database = conf.get('influxdb', 'db_name')
         self._session = requests.Session()
 
     def query(self, measurement, attributes=('*',), constraints=(), group_by=(), apply_cols=False, only_newest=False,

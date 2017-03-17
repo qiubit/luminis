@@ -88,6 +88,11 @@ class SeriesAttribute(Base):
             "entity_type_id": self.entity_type_id_fk,
         }
 
+
+    def transform(self, value):
+        # TODO specify cases according to series type
+        return float(value)
+
     def to_tree_dict(self):
         return {
             "measurement_id": self.id,
@@ -95,6 +100,7 @@ class SeriesAttribute(Base):
             "type": self.type,
             "refresh_time": self.refresh_time,
         }
+
 
 
 class MetaAttribute(Base):
@@ -122,6 +128,7 @@ class Entity(Base):
     id = Column(Integer, primary_key=True)
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     parent_id_fk = Column(Integer, ForeignKey('Entities.id'), nullable=True)
+    last_data_fetch_ts = Column(Integer, nullable=False, default=0)
     delete_ts = Column(Integer, nullable=True, default=None)
 
     entity_type = relationship('EntityType', primaryjoin='Entity.entity_type_id_fk == EntityType.id')
