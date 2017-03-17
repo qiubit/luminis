@@ -75,6 +75,8 @@ class SeriesAttribute(Base):
     name = Column(String(255), nullable=False)
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
+    type = Column(String(255), nullable=True, default=None)
+    refresh_time = Column(Integer, nullable=True, default=None)
 
     entity_type = relationship('EntityType', backref='series',
                                primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
@@ -86,9 +88,19 @@ class SeriesAttribute(Base):
             "entity_type_id": self.entity_type_id_fk,
         }
 
+
     def transform(self, value):
         # TODO specify cases according to series type
         return float(value)
+
+    def to_tree_dict(self):
+        return {
+            "measurement_id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "refresh_time": self.refresh_time,
+        }
+
 
 
 class MetaAttribute(Base):
@@ -137,6 +149,37 @@ class Entity(Base):
         else:
             result["children_ids"] = [child.id for child in self.children if _is_not_deleted(child)]
         return result
+
+    def add_nodes_rec(self, node_dict):
+        meta = {meta.attribute.name: meta.value for meta in self.meta if _is_not_deleted(meta)}
+
+        node_description = {
+            "node_id": self.id,
+            "name": meta.get('name', None),
+            "children": [child.id for child in self.children if _is_not_deleted(child)],
+            "parent": self.parent_id_fk,
+            "measurements": [series.id for series in self.entity_type.series if _is_not_deleted(series)],
+            "position": {
+                "x": meta.get("position_x", None),
+                "y": meta.get("position_y", None)
+            },
+        }
+        node_dict[self.id] = node_description
+
+        for child in self.children:
+            if _is_not_deleted(child):
+                    child.add_nodes_rec(node_dict)
+
+    def map_nodes(self):
+        global_dict = {}
+        self.add_nodes_rec(global_dict)
+        return global_dict
+
+    def tree_structure_dict(self):
+        return {
+            "node_id": self.id,
+            "children": [child.tree_structure_dict() for child in self.children if _is_not_deleted(child)]
+        }
 
 
 class EntityTag(Base):
