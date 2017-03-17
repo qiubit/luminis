@@ -1,7 +1,7 @@
 import time
 from pycnic.core import Handler
 
-from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType
+from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType, SeriesAttribute
 from database.helpers import get_all, get_one
 
 
@@ -80,8 +80,23 @@ class TreeHandler(Handler):
         self.session = Session()
 
     def get(self, ident=None):
+        mapped_measurements = { ser_attr.id: ser_attr.to_tree_dict()
+                                for ser_attr in get_all(self.session, SeriesAttribute) }
+
         if ident:
-            return get_one(self.session, Entity, id=ident).to_dict(deep=True)
+            tree_model = get_one(self.session, Entity, id=ident)
+            return {
+                "tree_metadata": tree_model.map_nodes(),
+                "tree": tree_model.tree_structure_dict(),
+                "measurements_metadata": mapped_measurements,
+            }
         else:
-            return [root.to_dict(deep=True)
-                    for root in get_all(self.session, Entity) if root.parent is None]
+            roots = [root for root in get_all(self.session, Entity) if root.parent is None]
+            mapped_nodes = {}
+            for root in roots:
+                root.add_nodes_rec(mapped_nodes)
+            return {
+                "tree_metadata": mapped_nodes,
+                "tree": [root.tree_structure_dict() for root in roots],
+                "measurements_metadata": mapped_measurements,
+            }

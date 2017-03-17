@@ -19,7 +19,8 @@ class SeriesAttributeHandler(Handler):
     def post(self, entity_type_id):
         data = self.request.data
         entity_type = get_one(self.session, EntityType, id=entity_type_id)
-        series = SeriesAttribute(entity_type=entity_type, name=data['name'])
+        series = SeriesAttribute(entity_type=entity_type, name=data['name'],
+                                 type=data['type'], refresh_time=data['refresh_time'])
         self.session.add(series)
 
         self.session.commit()
