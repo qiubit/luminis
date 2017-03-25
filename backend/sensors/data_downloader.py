@@ -28,6 +28,8 @@ def push_new_measurements(directory, pattern):
             except Exception as err:
                 logging.error(err)
 
+    session.close()
+
 if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config/sensors.ini')
