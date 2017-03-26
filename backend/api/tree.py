@@ -57,7 +57,10 @@ class EntityHandler(Handler):
                 meta.value = data[key]
 
         self.session.commit()
-        return {'success': True}
+        return {
+            'success': True,
+            'ID': entity.id,
+        }
 
     def delete(self, ident):
         entity = get_one(self.session, Entity, id=ident)
