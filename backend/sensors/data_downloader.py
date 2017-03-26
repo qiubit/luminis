@@ -35,8 +35,4 @@ if __name__ == '__main__':
     config.read('config/sensors.ini')
     directory = config.get('input', 'directory')
     pattern = config.get('input', 'file_pattern')
-    sleep_time = config.getint('input', 'loop_time')
-    while True:
-        push_new_measurements(directory=directory, pattern=pattern)
-        logging.info('sleeping for {} seconds'.format(sleep_time))
-        time.sleep(sleep_time)
+    push_new_measurements(directory=directory, pattern=pattern)
