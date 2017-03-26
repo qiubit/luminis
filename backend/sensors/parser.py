@@ -25,7 +25,7 @@ class FileParser(PointSource):
             fields = line[:-1].split(',')
             result.append({
                 'timestamp': convert_timestamp(fields[0]),
-                'measurements': [(s.name, s.transform(value)) for s, value in
+                'measurements': [(s.name, float(value)) for s, value in
                                  zip(self._entity.entity_type.series, fields[1:])]
             })
         return result

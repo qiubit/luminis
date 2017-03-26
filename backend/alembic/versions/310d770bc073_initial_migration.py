@@ -43,7 +43,7 @@ def upgrade():
                     sa.Column('name', sa.String(length=255), nullable=False),
                     sa.Column('entity_type_id_fk', sa.Integer(), nullable=False),
                     sa.Column('delete_ts', sa.Integer(), nullable=True),
-                    sa.Column('type', sa.Enum('real', 'bool', 'enum', name='series_type'), nullable=False,
+                    sa.Column('type', sa.Enum('real', 'enum', name='series_type'), nullable=False,
                               default='real'),
                     sa.Column('refresh_time', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['entity_type_id_fk'], ['Entity_Types.id'], ),

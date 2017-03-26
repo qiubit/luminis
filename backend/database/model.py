@@ -88,9 +88,16 @@ class SeriesAttribute(Base):
             "entity_type_id": self.entity_type_id_fk,
         }
 
+    def _enum_val_dict(self):
+        return {v.int_value: v.str_value for v in self.enum_vals}
+
     def transform(self, value):
-        # TODO specify cases according to series type
-        return float(value)
+        if value is None:
+            return None
+        elif self.type == 'real':
+            return float(value)
+        else:
+            return self._enum_val_dict().get(int(value), None)
 
     def to_tree_dict(self):
         return {
@@ -99,6 +106,17 @@ class SeriesAttribute(Base):
             "type": self.type,
             "refresh_time": self.refresh_time,
         }
+
+
+class SeriesEnumValue(Base):
+    __tablename__ = 'Series_Enum_Values'
+
+    series_id_fk = Column(Integer, ForeignKey('Series_Attributes.id'), primary_key=True)
+    int_value = Column(Integer, primary_key=True)
+    str_value = Column(String(255), nullable=False)
+
+    series = relationship('SeriesAttribute', backref='enum_vals',
+                          primaryjoin='SeriesAttribute.id == SeriesEnumValue.series_id_fk')
 
 
 class MetaAttribute(Base):
