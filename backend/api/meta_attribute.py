@@ -5,7 +5,7 @@ from voluptuous import Schema, Required
 
 from .validators import non_empty_string, assert_attribute_does_not_exist
 from database.model import Session, MetaAttribute, EntityType, EntityMeta
-from database.helpers import get_all, get_one
+from database.helpers import get_all, get_one, update_last_data_modification_ts
 
 
 class MetaAttributeHandler(Handler):
@@ -28,6 +28,7 @@ class MetaAttributeHandler(Handler):
         self.session.add(meta)
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': meta.id
@@ -44,6 +45,7 @@ class MetaAttributeHandler(Handler):
             meta.name = data['name']
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': meta.id,
@@ -58,4 +60,5 @@ class MetaAttributeHandler(Handler):
             entity_meta.delete_ts = now
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {'success': True}

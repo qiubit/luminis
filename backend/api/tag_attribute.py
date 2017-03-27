@@ -5,7 +5,7 @@ from voluptuous import Schema, Required
 
 from .validators import non_empty_string, assert_attribute_does_not_exist
 from database.model import Session, TagAttribute, EntityType, EntityTag
-from database.helpers import get_all, get_one
+from database.helpers import get_all, get_one, update_last_data_modification_ts
 
 
 class TagAttributeHandler(Handler):
@@ -29,6 +29,7 @@ class TagAttributeHandler(Handler):
         self.session.add(tag)
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': tag.id
@@ -43,4 +44,5 @@ class TagAttributeHandler(Handler):
             entity_tag.delete_ts = now
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {'success': True}

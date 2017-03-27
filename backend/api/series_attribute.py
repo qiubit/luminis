@@ -5,7 +5,7 @@ from voluptuous import Schema, Required, Or
 
 from .validators import non_empty_string, assert_attribute_does_not_exist
 from database.model import Session, SeriesAttribute, EntityType
-from database.helpers import get_all, get_one
+from database.helpers import get_all, get_one, update_last_data_modification_ts
 
 
 class SeriesAttributeHandler(Handler):
@@ -33,6 +33,7 @@ class SeriesAttributeHandler(Handler):
         self.session.add(series)
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': series.id
@@ -44,4 +45,5 @@ class SeriesAttributeHandler(Handler):
         series.delete_ts = time.time()
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {'success': True}

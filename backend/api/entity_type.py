@@ -5,7 +5,7 @@ from voluptuous import Schema, Required, And, Unique
 
 from .validators import non_empty_string
 from database.model import EntityType, Session, TagAttribute, SeriesAttribute, MetaAttribute
-from database.helpers import get_all, get_one
+from database.helpers import get_all, get_one, update_last_data_modification_ts
 
 
 def _assert_objects_were_not_created(data, entity_type_id):
@@ -61,6 +61,7 @@ class EntityTypeHandler(Handler):
             ))
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': entity_type.id,
@@ -100,6 +101,7 @@ class EntityTypeHandler(Handler):
                 ))
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': entity_type.id,
@@ -125,4 +127,5 @@ class EntityTypeHandler(Handler):
                 child.parent = entity.parent
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {'success': True}
