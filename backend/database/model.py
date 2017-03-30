@@ -1,6 +1,6 @@
 import configparser
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -75,7 +75,7 @@ class SeriesAttribute(Base):
     name = Column(String(255), nullable=False)
     entity_type_id_fk = Column(Integer, ForeignKey('Entity_Types.id'), nullable=False)
     delete_ts = Column(Integer, nullable=True, default=None)
-    type = Column(String(255), nullable=True, default=None)
+    type = Column(Enum('real', 'enum', name='series_type'), nullable=False, default='real')
     refresh_time = Column(Integer, nullable=True, default=None)
 
     entity_type = relationship('EntityType', backref='series',
@@ -88,7 +88,6 @@ class SeriesAttribute(Base):
             "entity_type_id": self.entity_type_id_fk,
         }
 
-
     def transform(self, value):
         # TODO specify cases according to series type
         return float(value)
@@ -100,7 +99,6 @@ class SeriesAttribute(Base):
             "type": self.type,
             "refresh_time": self.refresh_time,
         }
-
 
 
 class MetaAttribute(Base):

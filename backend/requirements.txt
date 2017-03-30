@@ -5,3 +5,4 @@ tornado
 pycnic
 voluptuous
 nose
+alembic
