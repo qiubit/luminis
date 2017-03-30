@@ -37,7 +37,10 @@ class MetaAttributeHandler(Handler):
             meta.name = data['name']
 
         self.session.commit()
-        return {'success': True}
+        return {
+            'success': True,
+            'ID': meta.id,
+        }
 
     def delete(self, entity_type_id, ident):
         entity_type = get_one(self.session, EntityType, id=entity_type_id)  # check if route is correct

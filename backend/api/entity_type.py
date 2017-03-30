@@ -71,7 +71,10 @@ class EntityTypeHandler(Handler):
                 ))
 
         self.session.commit()
-        return {'success': True}
+        return {
+            'success': True,
+            'ID': entity_type.id,
+        }
 
     def delete(self, ident):
         entity_type = get_one(self.session, EntityType, id=ident)
