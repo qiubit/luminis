@@ -3,7 +3,7 @@ from pycnic.core import Handler
 from pycnic.utils import requires_validation
 from voluptuous import Schema, Required, Or
 
-from .validators import non_empty_string
+from .validators import non_empty_string, assert_attribute_does_not_exist
 from database.model import Session, SeriesAttribute, EntityType
 from database.helpers import get_all, get_one
 
@@ -19,17 +19,10 @@ class SeriesAttributeHandler(Handler):
         else:
             return get_one(self.session, SeriesAttribute, entity_type=entity_type, id=ident).to_dict()
 
-    @staticmethod
-    def _assert_attribute_does_not_exist(data, entity_type_id):
-        attributes = [m.name for m in get_all(Session(), SeriesAttribute, entity_type_id_fk=entity_type_id)]
-        if 'name' in data:
-            if data['name'] in attributes:
-                raise ValueError("attribute {} exists for entity type {}".format(data['name'], entity_type_id))
-
-    @requires_validation(_assert_attribute_does_not_exist, with_route_params=True)
+    @requires_validation(assert_attribute_does_not_exist(SeriesAttribute), with_route_params=True)
     @requires_validation(Schema({
         Required('name'): non_empty_string,
-        'type': Or('real', 'bool', 'enum'),
+        'type': Or('real', 'enum'),
         'refresh_time': Or(int, None),
     }))
     def post(self, entity_type_id):

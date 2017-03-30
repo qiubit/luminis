@@ -16,6 +16,14 @@ class EntityHandler(Handler):
     def get(self, ident):
         return get_one(self.session, Entity, id=ident).to_dict(deep=False)
 
+    def _assert_got_all_needed_tag_and_meta_ids(self, entity_type, tag_ids, meta_ids):
+        expected_tag_ids = sorted(tag.id for tag in entity_type.tags)
+        expected_meta_ids = sorted(meta.id for meta in entity_type.meta)
+        if tag_ids != expected_tag_ids:
+            raise HTTP_400('Expected tag IDs {}, got {}'.format(expected_tag_ids, tag_ids))
+        if meta_ids != expected_meta_ids:
+            raise HTTP_400('Expected meta IDs {}, got {}'.format(expected_meta_ids, meta_ids))
+
     @requires_validation(Schema({
         Required('parent_id'): Or(int, None),
         Required('entity_type_id'): int,
@@ -31,12 +39,7 @@ class EntityHandler(Handler):
         # check if we got all tags and meta
         tag_ids = sorted(int(key.split('_')[1]) for key in data if 'tag_' in key)
         meta_ids = sorted(int(key.split('_')[1]) for key in data if 'meta_' in key)
-        expected_tag_ids = sorted(tag.id for tag in entity.entity_type.tags)
-        expected_meta_ids = sorted(meta.id for meta in entity.entity_type.meta)
-        if tag_ids != expected_tag_ids:
-            raise HTTP_400('Expected tag IDs {}, got {}'.format(expected_tag_ids, tag_ids))
-        if meta_ids != expected_meta_ids:
-            raise HTTP_400('Expected meta IDs {}, got {}'.format(expected_meta_ids, meta_ids))
+        self._assert_got_all_needed_tag_and_meta_ids(entity.entity_type, tag_ids, meta_ids)
 
         # add tags and meta
         for key in data:
