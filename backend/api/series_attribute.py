@@ -1,6 +1,9 @@
 import time
 from pycnic.core import Handler
+from pycnic.utils import requires_validation
+from voluptuous import Schema, Required, Or
 
+from .validators import non_empty_string, assert_attribute_does_not_exist
 from database.model import Session, SeriesAttribute, EntityType
 from database.helpers import get_all, get_one
 
@@ -16,11 +19,17 @@ class SeriesAttributeHandler(Handler):
         else:
             return get_one(self.session, SeriesAttribute, entity_type=entity_type, id=ident).to_dict()
 
+    @requires_validation(assert_attribute_does_not_exist(SeriesAttribute), with_route_params=True)
+    @requires_validation(Schema({
+        Required('name'): non_empty_string,
+        'type': Or('real', 'enum'),
+        'refresh_time': Or(int, None),
+    }))
     def post(self, entity_type_id):
         data = self.request.data
         entity_type = get_one(self.session, EntityType, id=entity_type_id)
         series = SeriesAttribute(entity_type=entity_type, name=data['name'],
-                                 type=data['type'], refresh_time=data['refresh_time'])
+                                 type=data.get('type', 'real'), refresh_time=data.get('refresh_time'))
         self.session.add(series)
 
         self.session.commit()

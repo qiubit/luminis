@@ -1,6 +1,9 @@
 import time
 from pycnic.core import Handler
+from pycnic.utils import requires_validation
+from voluptuous import Schema, Required
 
+from .validators import non_empty_string, assert_attribute_does_not_exist
 from database.model import Session, TagAttribute, EntityType, EntityTag
 from database.helpers import get_all, get_one
 
@@ -17,6 +20,8 @@ class TagAttributeHandler(Handler):
         else:
             return get_one(self.session, TagAttribute, entity_type=entity_type, id=ident).to_dict()
 
+    @requires_validation(assert_attribute_does_not_exist(TagAttribute), with_route_params=True)
+    @requires_validation(Schema({Required('name'): non_empty_string}))
     def post(self, entity_type_id):
         data = self.request.data
         entity_type = get_one(self.session, EntityType, id=entity_type_id)
