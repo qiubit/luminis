@@ -42,18 +42,17 @@ class WSHandler(WebSocketHandler):
         msg = json.loads(message)
         try:
             self._processor.process_new_request(msg)
-            # response = {
-            #     'status': 'ok',
-            #     'request_id': msg['request_id'],
-            # }
+            response = {
+                'status': 'ok',
+                'request_id': msg['request_id'],
+            }
         except Exception as err:
-            # response = {
-            #     'status': 'error',
-            #     'request_id': msg['request_id'],
-            #     'error': str(err),
-            # }
-            pass
-        # self.write_message(json.dumps(response))
+            response = {
+                'status': 'error',
+                'request_id': msg['request_id'],
+                'error': str(err),
+            }
+        self.write_message(json.dumps(response))
 
 
 def get_config(filename):
