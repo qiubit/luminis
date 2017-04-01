@@ -16,7 +16,8 @@ class EntityHandler(Handler):
     def get(self, ident):
         return get_one(self.session, Entity, id=ident).to_dict(deep=False)
 
-    def _assert_got_all_needed_tag_and_meta_ids(self, entity_type, tag_ids, meta_ids):
+    @staticmethod
+    def _assert_got_all_needed_tag_and_meta_ids(entity_type, tag_ids, meta_ids):
         expected_tag_ids = sorted(tag.id for tag in entity_type.tags)
         expected_meta_ids = sorted(meta.id for meta in entity_type.meta)
         if tag_ids != expected_tag_ids:
@@ -30,16 +31,18 @@ class EntityHandler(Handler):
     }, extra=ALLOW_EXTRA))
     def post(self):
         data = self.request.data
-        entity = Entity(
-            entity_type=get_one(self.session, EntityType, id=data['entity_type_id']),
-            parent=None if data['parent_id'] is None else get_one(self.session, Entity, id=data['parent_id']),
-        )
-        self.session.add(entity)
+        entity_type = get_one(self.session, EntityType, id=data['entity_type_id'])
 
         # check if we got all tags and meta
         tag_ids = sorted(int(key.split('_')[1]) for key in data if 'tag_' in key)
         meta_ids = sorted(int(key.split('_')[1]) for key in data if 'meta_' in key)
-        self._assert_got_all_needed_tag_and_meta_ids(entity.entity_type, tag_ids, meta_ids)
+        self._assert_got_all_needed_tag_and_meta_ids(entity_type, tag_ids, meta_ids)
+
+        entity = Entity(
+            entity_type=entity_type,
+            parent=None if data['parent_id'] is None else get_one(self.session, Entity, id=data['parent_id']),
+        )
+        self.session.add(entity)
 
         # add tags and meta
         for key in data:

@@ -57,6 +57,6 @@ class RequestProcessor(object):
                 handler = self.HANDLER_CLASSES[request_type](request_id, params)
                 self._requests[request_id] = handler
             else:
-                raise ValueError('Request type {} not found'.format(type))
+                raise ValueError('Request type {} not found'.format(request_type))
         finally:
             self._lock.release()

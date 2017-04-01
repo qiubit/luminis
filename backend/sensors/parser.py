@@ -14,11 +14,14 @@ def convert_timestamp(timestamp):
 class FileParser(PointSource):
     def __init__(self, entity_id, filename):
         self._entity = get_one(Session(), Entity, id=entity_id)
-        self._file = open(filename)
+        self._filename = filename
 
     def get_values(self) -> Iterable[dict]:
         result = []
-        for line in self._file:
+        with open(self._filename) as file:
+            lines = file.readlines()
+
+        for line in lines:
             fields = line[:-1].split(',')
             result.append({
                 'timestamp': convert_timestamp(fields[0]),

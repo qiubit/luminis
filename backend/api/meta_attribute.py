@@ -33,7 +33,7 @@ class MetaAttributeHandler(Handler):
             'ID': meta.id
         }
 
-    @requires_validation(_assert_attribute_does_not_exist, with_route_params=True)
+    @requires_validation(assert_attribute_does_not_exist(MetaAttribute), with_route_params=True)
     @requires_validation(Schema({'name': non_empty_string}))
     def put(self, entity_type_id, ident):
         data = self.request.data

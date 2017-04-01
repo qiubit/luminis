@@ -129,7 +129,7 @@ class Entity(Base):
     last_data_fetch_ts = Column(Integer, nullable=False, default=0)
     delete_ts = Column(Integer, nullable=True, default=None)
 
-    entity_type = relationship('EntityType', primaryjoin='Entity.entity_type_id_fk == EntityType.id')
+    entity_type = relationship('EntityType', backref='nodes', primaryjoin='Entity.entity_type_id_fk == EntityType.id')
     parent = relationship('Entity', backref='children', remote_side='Entity.id',
                           primaryjoin='Entity.parent_id_fk == Entity.id')
 
