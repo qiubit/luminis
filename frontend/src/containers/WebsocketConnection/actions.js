@@ -2,7 +2,12 @@ import {
   CONNECT_WEBSOCKET,
   PROCESS_DATA,
   SAVE_WEBSOCKET,
-  SEND_REQUEST
+  SEND_REQUEST,
+  WEBSOCKET_CONNECTED,
+  WEBSOCKET_DISCONNECTED,
+  SEND_REQUEST_OK,
+  SEND_REQUEST_FAIL,
+  REQUEST_MESSAGE,
 } from './constants';
 
 export function connectWebsocket(url, onOpen, onMessage, onClose) {
@@ -34,4 +39,38 @@ export function sendRequest(request) {
     type: SEND_REQUEST,
     request,
   };
+}
+
+/* Parts of the new API (not yet implemented) */
+export function websocketConnected() {
+  return {
+    type: WEBSOCKET_CONNECTED,
+  }
+}
+
+export function websocketDisconnected() {
+  return {
+    type: WEBSOCKET_DISCONNECTED,
+  }
+}
+
+export function sendRequestSuccess(request_id) {
+  return {
+    type: SEND_REQUEST_OK,
+    request_id,
+  }
+}
+
+export function sendRequestFail(request_id) {
+  return {
+    type: SEND_REQUEST_FAIL,
+    request_id,
+  }
+}
+
+export function requestMessage(message) {
+  return {
+    type: REQUEST_MESSAGE,
+    message,
+  }
 }
