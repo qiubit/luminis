@@ -22,7 +22,7 @@ import {
   SEND_REQUEST_OK,
   SEND_REQUEST_FAIL,
   WEBSOCKET_DISCONNECTED,
-  REQUEST_MESSAGE,
+  WEBSOCKET_MESSAGE_FROM_SERVER,
 } from '../WebsocketConnection/constants'
 
 /*
@@ -72,8 +72,8 @@ function requestManagerReducer(state = initialState, action) {
     case WEBSOCKET_DISCONNECTED:
       return state
         .set('activeRequests', websocketDisconnectCallback(state.get('activeRequests')))
-    case REQUEST_MESSAGE:
-      let requestMessage = new Map({
+    case WEBSOCKET_MESSAGE_FROM_SERVER:
+      let serverMessage = new Map({
         state: FRESH_STATE,
         type: action.message.get('type'),
         data: action.message.get('data'),
@@ -81,7 +81,7 @@ function requestManagerReducer(state = initialState, action) {
       // In order to save incoming request data, we must have it subscribed
       if (state.get('activeRequests').get(action.message.get('request_id'))) {
         return state
-          .set('activeRequests', state.get('activeRequests').set(action.message.get('request_id'), requestMessage))
+          .set('activeRequests', state.get('activeRequests').set(action.message.get('request_id'), serverMessage))
       }
       return state  
     default:

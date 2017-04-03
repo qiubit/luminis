@@ -8,7 +8,7 @@ import {
 } from '../constants'
 import {
   sendRequest,
-  requestMessage,
+  messageFromServer,
   websocketDisconnected,
   sendRequestFail,
 } from '../../WebsocketConnection/actions'
@@ -62,7 +62,7 @@ describe('RequestManager reducer', () => {
   })
 
   it('drops incoming request messages from requests that we do not subscribe', () => {
-    const action1 = requestMessage(message1)
+    const action1 = messageFromServer(message1)
 
     const state1 = reducer(initialState, action1)
     expect(state1.size).toBe(1)
@@ -91,8 +91,8 @@ describe('RequestManager reducer', () => {
   it('saves incoming data for PENDING_STATE requests', () => {
     const sendMessage1Request = sendRequest(message1Request)
     let state = reducer(initialState, sendMessage1Request)
-    const requestMessage1 = requestMessage(message1)
-    state = reducer(state, requestMessage1)
+    const messageFromServer1 = messageFromServer(message1)
+    state = reducer(state, messageFromServer1)
     expect(state.size).toBe(1)
     expect(state.get('activeRequests').size).toBe(1)
     // message1 data and type field + one RequestManager field for saving "staleness"
@@ -103,8 +103,8 @@ describe('RequestManager reducer', () => {
     const sendMessage2Request = sendRequest(message2Request)
     state = reducer(state, sendMessage2Request)
     expect(state.get('activeRequests').size).toBe(2)
-    const requestMessage2 = requestMessage(message2)
-    state = reducer(state, requestMessage2)
+    const messageFromServer2 = messageFromServer(message2)
+    state = reducer(state, messageFromServer2)
     expect(state.get('activeRequests').size).toBe(2)
     expect(state.get('activeRequests').get(1).size).toBe(3)
     expect(state.get('activeRequests').get(1).get('state')).toBe(FRESH_STATE)
@@ -119,12 +119,12 @@ describe('RequestManager reducer', () => {
   it('updates subscribed requests on new data', () => {
     const sendMessage1Request = sendRequest(message1Request)
     let state = reducer(initialState, sendMessage1Request)
-    const requestMessage1 = requestMessage(message1)
-    state = reducer(state, requestMessage1)
+    const messageFromServer1 = messageFromServer(message1)
+    state = reducer(state, messageFromServer1)
 
     let newMessage1 = message1
     newMessage1 = newMessage1.set('data', newMessage1.get('data').set('value', 3.1415))
-    const requestNewMessage1 = requestMessage(newMessage1)
+    const requestNewMessage1 = messageFromServer(newMessage1)
     state = reducer(state, requestNewMessage1)
     expect(state.size).toBe(1)
     expect(state.get('activeRequests').size).toBe(1)
@@ -149,8 +149,8 @@ describe('RequestManager reducer', () => {
     let state = reducer(initialState, sendMessage1Request)
     expect(state.get('activeRequests').size).toBe(1)
     expect(state.get('activeRequests').get(1).get('state')).toBe(PENDING_STATE)
-    const requestMessage1 = requestMessage(message1)
-    state = reducer(state, requestMessage1)
+    const messageFromServer1 = messageFromServer(message1)
+    state = reducer(state, messageFromServer1)
     expect(state.get('activeRequests').size).toBe(1)
     expect(state.get('activeRequests').get(1).get('state')).toBe(FRESH_STATE)
     state = reducer(state, websocketDisconnected())
@@ -161,8 +161,8 @@ describe('RequestManager reducer', () => {
   it('drops PENDING_STATE requests and makes other requests into STALE_STATE on WebSocket disconnection', () => {
     const sendMessage1Request = sendRequest(message1Request)
     let state = reducer(initialState, sendMessage1Request)
-    const requestMessage1 = requestMessage(message1)
-    state = reducer(state, requestMessage1)
+    const messageFromServer1 = messageFromServer(message1)
+    state = reducer(state, messageFromServer1)
     const sendMessage2Request = sendRequest(message2Request)
     state = reducer(state, sendMessage2Request)
     expect(state.get('activeRequests').size).toBe(2)

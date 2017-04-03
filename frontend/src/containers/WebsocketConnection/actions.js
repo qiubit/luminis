@@ -7,7 +7,7 @@ import {
   WEBSOCKET_DISCONNECTED,
   SEND_REQUEST_OK,
   SEND_REQUEST_FAIL,
-  REQUEST_MESSAGE,
+  WEBSOCKET_MESSAGE_FROM_SERVER,
 } from './constants';
 
 export function connectWebsocket(url, onOpen, onMessage, onClose) {
@@ -68,9 +68,9 @@ export function sendRequestFail(request_id) {
   }
 }
 
-export function requestMessage(message) {
+export function messageFromServer(message) {
   return {
-    type: REQUEST_MESSAGE,
+    type: WEBSOCKET_MESSAGE_FROM_SERVER,
     message,
   }
 }
