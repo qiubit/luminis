@@ -3,9 +3,22 @@ from pycnic.core import Handler
 from pycnic.utils import requires_validation
 from voluptuous import Schema, Required, And, Unique
 
-from .validators import non_empty_string, lowercase_or_underscores
+from .validators import non_empty_string
 from database.model import EntityType, Session, TagAttribute, SeriesAttribute, MetaAttribute
 from database.helpers import get_all, get_one
+
+
+def _assert_objects_were_not_created(data, entity_type_id):
+    session = Session()
+    existing_objects = {
+        'tags': [tag.name for tag in get_all(session, TagAttribute, entity_type_id_fk=entity_type_id)],
+        'meta': [meta.name for meta in get_all(session, MetaAttribute, entity_type_id_fk=entity_type_id)],
+        'series': [series.name for series in get_all(session, SeriesAttribute, entity_type_id_fk=entity_type_id)]
+    }
+    for object_type in ('tags', 'meta', 'series'):
+        for obj in data.get(object_type, []):
+            if obj in existing_objects[object_type]:
+                raise ValueError('{} is in existing {}'.format(obj, object_type))
 
 
 class EntityTypeHandler(Handler):
@@ -23,7 +36,7 @@ class EntityTypeHandler(Handler):
         Required('name'): non_empty_string,
         Required('tags'): And([non_empty_string], Unique()),
         Required('meta'): And([non_empty_string], Unique()),
-        Required('series'): And([lowercase_or_underscores], Unique()),
+        Required('series'): And([non_empty_string], Unique()),
     }))
     def post(self):
         data = self.request.data
@@ -52,19 +65,6 @@ class EntityTypeHandler(Handler):
             'success': True,
             'ID': entity_type.id,
         }
-
-    @staticmethod
-    def _assert_objects_were_not_created(data, entity_type_id):
-        session = Session()
-        existing_objects = {
-            'tags': [tag.name for tag in get_all(session, TagAttribute, entity_type_id_fk=entity_type_id)],
-            'meta': [meta.name for meta in get_all(session, MetaAttribute, entity_type_id_fk=entity_type_id)],
-            'series': [series.name for series in get_all(session, SeriesAttribute, entity_type_id_fk=entity_type_id)]
-        }
-        for object_type in ('tags', 'meta', 'series'):
-            for obj in data[object_type]:
-                if obj in existing_objects[object_type]:
-                    raise ValueError('{} is in existing {}'.format(obj, object_type))
 
     @requires_validation(_assert_objects_were_not_created, with_route_params=True)
     @requires_validation(Schema({
@@ -115,6 +115,14 @@ class EntityTypeHandler(Handler):
             series.delete_ts = now
         for meta in entity_type.meta:
             meta.delete_ts = now
+        for entity in entity_type.nodes:
+            entity.delete_ts = now
+            for tag in entity.tags:
+                tag.delete_ts = now
+            for meta in entity.meta:
+                meta.delete_ts = now
+            for child in entity.children:
+                child.parent = entity.parent
 
         self.session.commit()
         return {'success': True}

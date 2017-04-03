@@ -11,6 +11,6 @@ def get_one(session, cls, **kwargs):
         exception_cls = HTTP_404
     result = session.query(cls).filter_by(delete_ts=None, **kwargs).all()
     if len(result) != 1:
-        raise exception_cls("{} with ID: {} not found".format(cls.__name__, kwargs["id"]))
+        raise exception_cls("{} with ID: {} not found".format(cls.__name__, kwargs.get('id', '?')))
     else:
         return result[0]

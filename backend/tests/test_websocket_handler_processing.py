@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
+from .test_utils import mocked_get_one
 from websocket.arithmetic import MeasurementIdType
 from websocket.handlers import NewChartRequestHandler, NewLiveDataRequestHandler
 
@@ -18,16 +19,16 @@ def _updated(d, **kwargs):
 
 
 @patch('websocket.handlers.NewChartRequestHandler._run_assertions')
-@patch('websocket.arithmetic.get_one', return_value=MagicMock())
-@patch('websocket.handlers.get_one', return_value=MagicMock())
+@patch('websocket.arithmetic.get_one', new=mocked_get_one)
+@patch('websocket.handlers.get_one', new=mocked_get_one)
 class TestWebSocketNewChartRequestHandler(unittest.TestCase):
 
-    def testHandlerProperCreation(self, get_one_mock, get_one_mock2, assertions_mock):
+    def testHandlerProperCreation(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, DEFAULT_NEW_CHART_REQUEST_PAYLOAD)
         self.assertTrue(isinstance(self.handler._requested_data, MeasurementIdType))
         assertions_mock.assert_called_once_with()
 
-    def testHandlerProperProcessing(self, get_one_mock, get_one_mock2, assertions_mock):
+    def testHandlerProperProcessing(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, DEFAULT_NEW_CHART_REQUEST_PAYLOAD)
         self.handler._requested_data.evaluate = MagicMock(return_value=[(1, 2), (3, 4)])
         result = self.handler()
@@ -35,13 +36,13 @@ class TestWebSocketNewChartRequestHandler(unittest.TestCase):
         self.assertEqual(result, {'request_id': 1, 'type': 'new_chart',
                                   'data': {'plot_data': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]}})
 
-    def testHandlerIsRemovedWhenUpdateDataIsFalse(self, get_one_mock, get_one_mock2, assertions_mock):
+    def testHandlerIsRemovedWhenUpdateDataIsFalse(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, DEFAULT_NEW_CHART_REQUEST_PAYLOAD)
         self.handler._requested_data.evaluate = MagicMock()
         self.handler()
         self.assertTrue(self.handler.to_be_removed)
 
-    def testHandlerIsNotRemovedWhenUpdateDataIsTrue(self, get_one_mock, get_one_mock2, assertions_mock):
+    def testHandlerIsNotRemovedWhenUpdateDataIsTrue(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, _updated(DEFAULT_NEW_CHART_REQUEST_PAYLOAD, update_data=True))
         self.handler._requested_data.evaluate = MagicMock()
         self.handler()
@@ -49,22 +50,22 @@ class TestWebSocketNewChartRequestHandler(unittest.TestCase):
 
 
 @patch('websocket.handlers.NewLiveDataRequestHandler._run_assertions')
-@patch('websocket.handlers.get_one', return_value=MagicMock())
+@patch('websocket.handlers.get_one', new=mocked_get_one)
 class TestWebSocketNewLiveDataRequestHandler(unittest.TestCase):
 
-    def testHandlerProperCreation(self, get_one_mock, assertions_mock):
+    def testHandlerProperCreation(self, assertions_mock):
         self.handler = NewLiveDataRequestHandler(1, DEFAULT_NEW_LIVE_DATA_REQUEST_PAYLOAD)
         assertions_mock.assert_called_once_with()
 
     @patch('websocket.handlers.InfluxReader.query', return_value=[{'time': 100000, 'value': 0.17}])
-    def testHandlerProperProcessing(self, influx_reader_mock, get_one_mock, assertions_mock):
+    def testHandlerProperProcessing(self, influx_reader_mock, assertions_mock):
         self.handler = NewLiveDataRequestHandler(1, DEFAULT_NEW_LIVE_DATA_REQUEST_PAYLOAD)
         result = self.handler()
         self.assertEqual(result, {'request_id': 1, 'type': 'new_live_data',
                                   'data': {'timestamp': 100000, 'value': 0.17}})
 
     @patch('websocket.handlers.InfluxReader.query', return_value=[])
-    def testHandlerReturnsNoneWhenNoDataFromInflux(self, influx_reader_mock, get_one_mock, assertions_mock):
+    def testHandlerReturnsNoneWhenNoDataFromInflux(self, influx_reader_mock, assertions_mock):
         self.handler = NewLiveDataRequestHandler(1, DEFAULT_NEW_LIVE_DATA_REQUEST_PAYLOAD)
         result = self.handler()
         self.assertEqual(result, None)

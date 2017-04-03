@@ -1,5 +1,8 @@
 from voluptuous import truth, message
+
+from database.helpers import get_all
 from database.model import Session
+
 
 @message('expected a non-empty string')
 @truth
