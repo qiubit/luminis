@@ -1,46 +1,35 @@
-import { fromJS } from 'immutable';
-import { throttle, put, takeEvery, select } from 'redux-saga/effects';
+import { put, takeEvery, call } from 'redux-saga/effects';
 
-import { CONNECT_WEBSOCKET, PROCESS_DATA, SEND_REQUEST } from './constants';
-import { saveData } from '../App/actions';
-import { saveWebsocket } from './actions'
-import { selectWebsocket } from './selectors'
+import { SEND_REQUEST } from './constants';
+import { sendRequestSuccess, sendRequestFail } from './actions'
+import { getWebsocket } from './websocket'
 
-
-function* processData(action) {
-  let newData = fromJS(JSON.parse(action.data));
-  yield put(saveData(newData));
-}
-
-function* connectWebsocket(action) {
-  let websocket = new WebSocket(action.url);
-  websocket.onopen = action.websocketOnOpen;
-  websocket.onmessage = action.websocketOnMessage;
-  websocket.onclose = action.websocketOnClose;
-  yield put(saveWebsocket(websocket));
-}
 
 function* sendRequest(action) {
-  let websocket = yield select(selectWebsocket)
+  let websocket = getWebsocket()
+  const request = action.request
+  const requestId = request.request_id
+  let errFlag = false
+
   if (websocket) {
-    websocket.send(action.request)
+    try {
+      websocket.send(action.request)
+      yield put(sendRequestSuccess(requestId))
+    } catch (e) {
+      errFlag = true
+    }
+  } else {
+    errFlag = true
   }
-}
 
-function* processDataSaga(action) {
-  yield takeEvery(PROCESS_DATA, processData);
-}
-
-function* connectWebsocketSaga(action) {
-  yield throttle(10000, CONNECT_WEBSOCKET, connectWebsocket);
+  if (errFlag)
+    yield put(sendRequestFail(requestId))
 }
 
 function* sendRequestSaga(action) {
-  yield takeEvery(SEND_REQUEST, sendRequest)
+  yield call(takeEvery, SEND_REQUEST, sendRequest)
 }
 
 export default [
-  processDataSaga,
-  connectWebsocketSaga,
   sendRequestSaga,
 ];

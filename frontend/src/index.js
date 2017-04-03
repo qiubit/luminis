@@ -27,10 +27,13 @@ const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: selectLocationState(),
 });
 
+// Setup websocket connection
+import { setupWebsocket } from './containers/WebsocketConnection/websocket'
+setupWebsocket(store.dispatch)
+
 import App from './containers/App/index';
 import LandingPage from './components/LandingPage/index';
 import MapPage from './containers/MapPage/index';
-import WebsocketConnection from './containers/WebsocketConnection/index';
 import TreeProvider from './containers/TreeProvider/index';
 import { MAP_URL } from './containers/MapPage/constants';
 import config from './config'
@@ -40,7 +43,6 @@ ReactDOM.render(
     <Provider store={store}>
       <div>
         <TreeProvider url={config.apiUrl} refreshTime={config.fetchTreeRefreshTime}/>
-        <WebsocketConnection url={config.websocketUrl}/>
         <Router history={history}>
           <Route path="/" component={App}>
             <IndexRoute component={LandingPage}/>
