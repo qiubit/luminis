@@ -11,7 +11,6 @@ import { selectNodeCoordinates } from './selectors';
 import { WARSAW_COORDS } from './constants';
 
 import DataBoxGrid from '../DataBoxGrid/index'
-import Chart from '../Chart/index'
 
 class MapPage extends React.Component {
 
@@ -104,7 +103,6 @@ class MapPage extends React.Component {
         {this.mapTreeToMarkers(this.props.tree)}
       </Map>
       <DataBoxGrid/>
-      <Chart/>
       </div>
     );
   }

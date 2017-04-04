@@ -4,8 +4,7 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 
 import globalReducer from './containers/App/reducer';
 import treeListReducer from './containers/TreeList/reducer';
-import dataBoxManagerReducer from './containers/DataBoxManager/reducer';
-import chartManagerReducer from './containers/ChartManager/reducer'
+import requestManagerReducer from './containers/RequestManager/reducer'
 
 /*
  * routeReducer
@@ -38,7 +37,6 @@ export default function createReducer() {
     route: routeReducer,
     App: globalReducer,
     TreeList: treeListReducer,
-    DataBoxManager: dataBoxManagerReducer,
-    ChartManager: chartManagerReducer,
+    RequestManager: requestManagerReducer,
   });
 }
