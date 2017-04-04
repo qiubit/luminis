@@ -7,7 +7,7 @@
  *
  */
 
-import { Map, Set } from 'immutable';
+import { Map } from 'immutable';
 
 import {
   HANDLE_REQUEST,
@@ -19,7 +19,6 @@ import {
 
 import {
   SEND_REQUEST,
-  SEND_REQUEST_OK,
   SEND_REQUEST_FAIL,
   WEBSOCKET_DISCONNECTED,
   WEBSOCKET_MESSAGE_FROM_SERVER,

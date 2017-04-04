@@ -1,4 +1,4 @@
-import { put, takeEvery, call } from 'redux-saga/effects';
+import { put, takeEvery } from 'redux-saga/effects';
 
 import { SEND_REQUEST } from './constants';
 import { sendRequestSuccess, sendRequestFail } from './actions'

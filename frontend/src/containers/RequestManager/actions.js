@@ -1,6 +1,5 @@
 import {
   HANDLE_REQUEST,
-  CANCEL_REQUEST,
 } from './constants'
 
 function getNextRequestId() {

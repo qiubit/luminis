@@ -1,4 +1,4 @@
-import { call, takeEvery, put } from 'redux-saga/effects'
+import { takeEvery, put } from 'redux-saga/effects'
 
 import { sendRequest } from '../WebsocketConnection/actions'
 import { HANDLE_REQUEST } from './constants'
