@@ -1,6 +1,7 @@
 import React from 'react';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
+import RefreshIcon from 'material-ui/svg-icons/action/cached'
 
 import BoxWrapper from './BoxWrapper';
 import BoxHeader from './BoxHeader';
@@ -30,7 +31,7 @@ function DataBox(props) {
 	return (
     <Paper style={style} zDepth={5}>
     <BoxWrapper>
-      <BoxHeader>{props.name}</BoxHeader>
+      <BoxHeader>{props.name}{props.refreshCallback && <RefreshIcon color="black" onClick={props.refreshCallback}/>}</BoxHeader>
       <BoxContent>{metrics}</BoxContent>
     </BoxWrapper>
     </Paper>
@@ -41,6 +42,7 @@ function DataBox(props) {
 DataBox.propTypes = {
   measurements: React.PropTypes.array.isRequired,
   name: React.PropTypes.string,
+  refreshCallback: React.PropTypes.func,
 }
 
 export default DataBox;

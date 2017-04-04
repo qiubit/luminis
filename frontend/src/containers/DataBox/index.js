@@ -6,15 +6,19 @@ import DataBoxComponent from '../../components/DataBox/index';
 import { selectMeasurementName, selectNodeMeasurements, selectNodeName } from '../App/selectors';
 import { requestNewLiveData, cancelRequest } from '../RequestManager/actions'
 import { selectActiveRequests } from '../RequestManager/selectors'
+import { STALE_STATE } from '../RequestManager/constants'
 import { DATA_ERROR } from './constants'
 
 class DataBox extends React.Component {
   constructor(props) {
     super(props)
     this.formatMeasurements = this.formatMeasurements.bind(this)
+    this.createRequests = this.createRequests.bind(this)
+    this.dropRequests = this.dropRequests.bind(this)
+    this.refreshCallback = this.refreshCallback.bind(this)
   }
 
-  componentWillMount() {
+  createRequests() {
     let dataRequests = new Map()
     let actionsToDispatch = []
     this.props.measurementIds.forEach((measurementId) => {
@@ -29,14 +33,28 @@ class DataBox extends React.Component {
     this.setState({ requestMeasurementMap: dataRequests })
   }
 
-  componentWillUnmount() {
+  dropRequests() {
     const dataRequests = this.state.requestMeasurementMap
     dataRequests.forEach((measurementId, requestId) => {
       this.props.dispatch(cancelRequest(requestId))
     })
   }
 
-  formatMeasurements() {
+  componentWillMount() {
+    this.createRequests()
+  }
+
+  componentWillUnmount() {
+    this.dropRequests()
+  }
+
+  refreshCallback() {
+    this.dropRequests()
+    this.createRequests()
+  }
+
+  // We set refreshObj.refreshFlag to true if some measurement has PENDING_STATE or DATA_ERROR
+  formatMeasurements(refreshObj) {
     let formattedMeasurements = []
     let reactKey = 1
     this.state.requestMeasurementMap.forEach((measurementId, requestId) => {
@@ -51,9 +69,13 @@ class DataBox extends React.Component {
           measurement.value = requestData.get('data').get('value')
         }
         measurement.state = requestData.get('state')
+        if (measurement.state === STALE_STATE) {
+          refreshObj.refreshFlag = true
+        }
       } else {
         // Alert DataBoxComponent that something went wrong
         measurement.state = DATA_ERROR
+        refreshObj.refreshFlag = true
       }
       formattedMeasurements.push(measurement)
       reactKey++
@@ -62,9 +84,14 @@ class DataBox extends React.Component {
   }
 
   render() {
-    const formattedMeasurements = this.formatMeasurements()
+    let refreshObj = { refreshFlag: false }
+    const formattedMeasurements = this.formatMeasurements(refreshObj)
     return (
-      <DataBoxComponent measurements={formattedMeasurements} name={this.props.nodeName}/>
+      <DataBoxComponent
+        measurements={formattedMeasurements}
+        name={this.props.nodeName}
+        refreshCallback={refreshObj.refreshFlag ? this.refreshCallback : undefined}
+      />
     )
   }
 }
