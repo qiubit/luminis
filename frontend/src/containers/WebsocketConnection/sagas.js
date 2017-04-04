@@ -13,7 +13,7 @@ function* sendRequest(action) {
 
   if (websocket) {
     try {
-      websocket.send(action.request)
+      websocket.send(JSON.stringify(action.request))
       yield put(sendRequestSuccess(requestId))
     } catch (e) {
       errFlag = true
@@ -27,7 +27,7 @@ function* sendRequest(action) {
 }
 
 function* sendRequestSaga(action) {
-  yield call(takeEvery, SEND_REQUEST, sendRequest)
+  yield takeEvery(SEND_REQUEST, sendRequest)
 }
 
 export default [
