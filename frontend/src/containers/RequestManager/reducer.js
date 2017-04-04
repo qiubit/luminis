@@ -63,11 +63,14 @@ function requestManagerReducer(state = initialState, action) {
       return state
         .set('activeRequests', state.get('activeRequests').delete(action.request_id))
     case SEND_REQUEST:
-      let updatedRequests = state
-        .get('activeRequests')
-        .set(action.request.request_id, new Map({ state: PENDING_STATE }))
+      if (action.request.request_id) {
+        let updatedRequests = state
+          .get('activeRequests')
+          .set(action.request.request_id, new Map({ state: PENDING_STATE }))
+        return state
+          .set('activeRequests', updatedRequests)
+      }
       return state
-        .set('activeRequests', updatedRequests)
     case WEBSOCKET_DISCONNECTED:
       return state
         .set('activeRequests', websocketDisconnectCallback(state.get('activeRequests')))
