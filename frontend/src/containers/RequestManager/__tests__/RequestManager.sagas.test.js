@@ -1,4 +1,4 @@
-import { call, takeEvery, put } from 'redux-saga/effects'
+import { takeEvery, put } from 'redux-saga/effects'
 
 import {
   handleRequestSaga,
@@ -21,7 +21,7 @@ describe('RequestManager sagas', () => {
     const generatorChild = handleRequest(newLiveDataRequest)
 
     // handleRequest will be called on HANDLE_REQUEST action type
-    expect(generatorParent.next().value).toEqual(call(takeEvery, HANDLE_REQUEST, handleRequest))
+    expect(generatorParent.next().value).toEqual(takeEvery(HANDLE_REQUEST, handleRequest))
     // so newLiveDataRequest will trigger saga call
     expect(newLiveDataRequest.type).toBe(HANDLE_REQUEST)
     // and then we expect saga to dispatch the action to store
@@ -35,7 +35,7 @@ describe('RequestManager sagas', () => {
     const generatorParent = handleRequestSaga()
     const generatorChild = handleRequest(newChartRequest)
 
-    expect(generatorParent.next().value).toEqual(call(takeEvery, HANDLE_REQUEST, handleRequest))
+    expect(generatorParent.next().value).toEqual(takeEvery(HANDLE_REQUEST, handleRequest))
     expect(newChartRequest.type).toBe(HANDLE_REQUEST)
     expect(generatorChild.next().value).toEqual(put(sendRequest(newChartRequest.message)))
     expect(generatorChild.next().done).toBeTruthy()
@@ -46,7 +46,7 @@ describe('RequestManager sagas', () => {
     const generatorParent = handleRequestSaga()
     const generatorChild = handleRequest(cancelRequestAction)
 
-    expect(generatorParent.next().value).toEqual(call(takeEvery, HANDLE_REQUEST, handleRequest))
+    expect(generatorParent.next().value).toEqual(takeEvery(HANDLE_REQUEST, handleRequest))
     expect(cancelRequestAction.type).toBe(HANDLE_REQUEST)
     expect(generatorChild.next().value).toEqual(put(sendRequest(cancelRequestAction.message)))
     expect(generatorChild.next().done).toBeTruthy()

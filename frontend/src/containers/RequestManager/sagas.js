@@ -9,7 +9,7 @@ export function* handleRequest(action) {
 
 // Passes request from component to WebsocketConnection
 export function* handleRequestSaga() {
-  yield call(takeEvery, HANDLE_REQUEST, handleRequest)
+  yield takeEvery(HANDLE_REQUEST, handleRequest)
 }
 
 export default [
