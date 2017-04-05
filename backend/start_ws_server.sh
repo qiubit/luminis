@@ -4,11 +4,5 @@
 # Otherwise, current environment values will be used.
 
 [ $# -eq 1 ] && source "./$1/bin/activate"
-
-# Kill working screen if exists
-PID=$(ps ax | grep -i 'SCREEN.*websocket' | grep -v grep | awk '{print $1}')
-[ -n "$PID" ] && kill "$PID"
-
 export PYTHONPATH=`dirname $0`
-
-screen -d -m -S websocket ./websocket/server.py
+./websocket/server.py

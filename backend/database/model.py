@@ -25,7 +25,7 @@ def _is_not_deleted(obj):
     return obj.delete_ts is None
 
 
-engine = create_engine(create_engine_str(), echo=True)
+engine = create_engine(create_engine_str(), echo=False, pool_size=20, max_overflow=0)
 
 Session = sessionmaker(bind=engine)
 
