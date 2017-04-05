@@ -2,11 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { createStructuredSelector } from 'reselect';
-import { fromJS } from 'immutable';
+import { fromJS } from 'immutable'
 
 
 import config from './config';
-import { selectActiveSubtree } from '../App/selectors';
+import { selectActiveSubtree, selectNodeName } from '../App/selectors';
 import { selectNodeCoordinates } from './selectors';
 import { WARSAW_COORDS } from './constants';
 
@@ -14,83 +14,70 @@ import DataBoxGrid from '../DataBoxGrid/index'
 
 class MapPage extends React.Component {
 
-  mapTreeToMarkers = (tree) => {
-    if (tree.get(0)) {
-      let markers = [];
-      let nodeId = tree.get(0).get('node_id').toString();
-      let coordinates = this.props.getNodeCoordinates(nodeId);
-      markers.push(
-        <Marker key={nodeId} position={coordinates}>
-          <Popup>
-            <span>Grouping node<br/>id: {nodeId}</span>
-          </Popup>
-        </Marker>
-      );
-      tree.get(0).get('children').forEach(node => {
-        let nodeId = node.get('node_id').toString();
-        let coordinates = this.props.getNodeCoordinates(nodeId);
-        markers.push(
-          <Marker key={nodeId} position={coordinates}>
-            <Popup>
-              <span>Child node<br/>id: {nodeId}.</span>
-            </Popup>
-          </Marker>
-        );
-      });
-      return markers;
-    }
+  nodeToMarker = (nodeId) => {
+    let name = this.props.nodeNameGetter(nodeId.toString());
+    let coordinates = this.props.getNodeCoordinates(nodeId.toString());
+    return (
+      <Marker key={nodeId} position={coordinates}>
+        <Popup>
+          <span>{name}</span>
+        </Popup>
+      </Marker>
+    )
   }
 
-  getBounds = (tree) => {
-    var upperLeft = [1, 1];
-    var lowerRight = [0, 0];
-
-    // Tree exists and is not empty
-    if (tree.get(0)) {
-      let nodeId = tree.get(0).get('node_id').toString();
-      let coordinates = this.props.getNodeCoordinates(nodeId);
-      upperLeft = coordinates.slice();
-      lowerRight = coordinates.slice();
-
-
-      for (var i = 0; i < tree.get(0).get('children').size; ++i) {
-        let nodeId = tree.get(0).get('children').get(i).get('node_id').toString();
-        let coordinates = this.props.getNodeCoordinates(nodeId);
-        upperLeft[0] = Math.max(upperLeft[0], coordinates[0]);
-        upperLeft[1] = Math.min(upperLeft[1], coordinates[1]);
-        lowerRight[0] = Math.min(lowerRight[0], coordinates[0]);
-        lowerRight[1] = Math.max(lowerRight[1], coordinates[1]);
+  mapTreeToMarkers = (tree) => {
+    let activeNodes = []
+    if (tree) {
+      activeNodes.push(tree.get('node_id'))
+      if (tree.get('children')) {
+        tree.get('children').forEach((childTree) => {
+          activeNodes.push(childTree.get('node_id'));
+        })
       }
     }
 
+    return activeNodes.map((nodeId) => this.nodeToMarker(nodeId))
+  }
+
+  getBounds = (tree) => {
+    let bounds = []
+
+    // Tree exists and is not empty
+    if (tree) {
+      bounds.push(this.props.getNodeCoordinates(tree.get('node_id').toString()))
+      if (tree.get('children')) {
+        tree.get('children').forEach((childTree) => {
+          bounds.push(this.props.getNodeCoordinates(childTree.get('node_id').toString()))
+        })
+      }
+
     // If no tree is active, just render default bounds (for WARSAW_COORDS)
-    else {
-      upperLeft = WARSAW_COORDS.slice();
-      lowerRight = WARSAW_COORDS.slice();
-      upperLeft[0] += 0.1;
-      upperLeft[1] -= 0.1;
-      lowerRight[0] -= 0.1;
-      lowerRight[1] += 0.1;
+    } else {
+      // create bounds for Warsaw because adding only one point causes render error
+      bounds.push({lat: WARSAW_COORDS.lat - 0.1, lng: WARSAW_COORDS.lng + 0.1})
+      bounds.push({lat: WARSAW_COORDS.lat + 0.1, lng: WARSAW_COORDS.lng + 0.1})
     }
 
-    return [upperLeft, lowerRight];
+    return bounds
+  }
+
+  getCenter = (tree) => {
+    if (tree) {
+      return this.props.getNodeCoordinates(tree.get('node_id').toString())
+    } else {
+      return WARSAW_COORDS
+    }
   }
 
   render() {
-    let nodeId = this.props.tree.get(0, fromJS({})).get('node_id', null)
-    let center = null
-    if (nodeId != null) {
-      center = this.props.getNodeCoordinates(this.props.tree.get(0, fromJS({})).get('node_id', null).toString())
-    }
-    if (center == null) {
-      center = WARSAW_COORDS;
-    }
+    let activeSubtree = this.props.activeSubtree.get(0)
     return (
       <div>
       <Map
         style={{height: "300px"}}
-        bounds={this.getBounds(this.props.tree)}
-        center={center}
+        bounds={this.getBounds(activeSubtree)}
+        center={this.getCenter(activeSubtree)}
         boundsOptions={{padding: config.mapPadding}}
       >
         <TileLayer
@@ -100,7 +87,7 @@ class MapPage extends React.Component {
           id={config.mapTileLayerId}
           accessToken={config.openStreetMapAccessToken}
         />
-        {this.mapTreeToMarkers(this.props.tree)}
+        {this.mapTreeToMarkers(activeSubtree)}
       </Map>
       <DataBoxGrid/>
       </div>
@@ -109,8 +96,9 @@ class MapPage extends React.Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  tree: selectActiveSubtree,
-  getNodeCoordinates: selectNodeCoordinates
+  activeSubtree: selectActiveSubtree,
+  getNodeCoordinates: selectNodeCoordinates,
+  nodeNameGetter: selectNodeName
 });
 
 // Wrap the component to inject dispatch and state into it
