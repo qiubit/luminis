@@ -63,12 +63,12 @@ class TestWebSocketRequestProcessing(unittest.TestCase):
             self.processor.process_new_request({'request_id': 1, 'type': 'fake_request', 'params': {}})
 
     def test_run_requests(self):
-        self.assertEqual([1, 2], self.processor.run_requests())
+        self.assertEqual([1, 2], list(self.processor.run_requests()))
         self.handler1.assert_called_once_with()
         self.handler2.assert_called_once_with()
 
     def test_cancel_request_and_then_run(self):
         self.handler1.to_be_removed = True
-        self.assertEqual([2], self.processor.run_requests())
+        self.assertEqual([2], list(self.processor.run_requests()))
         self.handler1.assert_not_called()
         self.handler2.assert_called_once_with()

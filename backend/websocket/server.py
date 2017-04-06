@@ -24,8 +24,8 @@ class WSHandler(WebSocketHandler):
         return True  # TODO we really should make sure that request is from our website to prevent XSS
 
     def _run_callback(self):
-        response = self._processor.run_requests()
-        self.write_message(json.dumps(response))
+        for response in self._processor.run_requests():
+            self.write_message(json.dumps(response))
 
     def open(self, *args, **kwargs):
         print("Connection created")

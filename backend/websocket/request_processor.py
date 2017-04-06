@@ -1,5 +1,5 @@
 import threading
-from typing import List, Dict, Any
+from typing import Dict, Any, Iterable
 from voluptuous import Schema, Required, Any
 
 from websocket.handlers import NewChartRequestHandler, NewLiveDataRequestHandler
@@ -31,14 +31,12 @@ class RequestProcessor(object):
         finally:
             self._lock.release()
 
-    def run_requests(self) -> List[Dict[str, Any]]:
+    def run_requests(self) -> Iterable[Dict[str, Any]]:
         self._cleanup()
-        responses = []
         for key in self._requests:
             response = self._requests[key]()
             if response:
-                responses.append(response)
-        return responses
+                yield response
 
     def process_new_request(self, payload: dict):
         self._lock.acquire()
