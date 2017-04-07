@@ -2,12 +2,12 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import RefreshIcon from 'material-ui/svg-icons/action/cached'
+import { Link } from 'react-router';
 
 import BoxWrapper from './BoxWrapper';
 import BoxHeader from './BoxHeader';
 import BoxContent from './BoxContent';
 import DataRow from './DataRow';
-import Link from './Link';
 
 import { PENDING_STATE } from '../../containers/RequestManager/constants'
 import { DATA_ERROR } from '../../containers/DataBox/constants'
@@ -20,6 +20,15 @@ const style = {
   margin: 20,
   display: 'inline-block',
 };
+
+const linkStyle = {
+  textDecoration: 'none',
+  color: 'black',
+};
+
+const refreshIconStyle = {
+  cursor: 'pointer',
+}
 
 function DataBox(props) {
   let metrics = props.measurements.map(measurement => {
@@ -35,11 +44,11 @@ function DataBox(props) {
     <Paper style={style} zDepth={5}>
     <BoxWrapper>
       <BoxHeader>
-        <Link href={NODE_URL + "/" + props.nodeId.toString()}>{props.name}</Link>
-        {props.refreshCallback && <RefreshIcon color="black" onClick={props.refreshCallback}/>}
+        <Link to={NODE_URL + "/" + props.nodeId.toString()} style={linkStyle}>{props.name}</Link>
+        {props.refreshCallback && <RefreshIcon style={refreshIconStyle} color="black" onClick={props.refreshCallback}/>}
       </BoxHeader>
       <BoxContent>
-        <Link href={NODE_URL + "/" + props.nodeId.toString()}>{metrics}</Link>
+        <Link to={NODE_URL + "/" + props.nodeId.toString()} style={linkStyle}>{metrics}</Link>
       </BoxContent>
     </BoxWrapper>
     </Paper>
