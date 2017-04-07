@@ -1,11 +1,9 @@
-import React from 'react';
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
-import { Link } from 'react-router'
+import React from 'react'
+import { createStructuredSelector } from 'reselect'
+import { connect } from 'react-redux'
 
 import DataBox from '../DataBox/index'
 import { selectDrawerOpen, selectActiveSubtree } from '../App/selectors'
-
 
 function DataBoxGrid(props) {
   let activeNodes = []

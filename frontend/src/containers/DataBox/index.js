@@ -91,6 +91,7 @@ class DataBox extends React.Component {
         measurements={formattedMeasurements}
         name={this.props.nodeName}
         refreshCallback={refreshObj.refreshFlag ? this.refreshCallback : undefined}
+        nodeId={this.props.nodeId}
       />
     )
   }
@@ -106,6 +107,7 @@ const mapStateToProps = (state, ownProps) => {
     measurementIds: measurementIds,
     measurementNameGetter: getMeasurementName,
     activeRequests: selectActiveRequests(state),
+    nodeId: ownProps.nodeId,
   }
 }
 

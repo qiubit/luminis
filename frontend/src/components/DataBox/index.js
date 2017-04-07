@@ -7,9 +7,12 @@ import BoxWrapper from './BoxWrapper';
 import BoxHeader from './BoxHeader';
 import BoxContent from './BoxContent';
 import DataRow from './DataRow';
+import Link from './Link';
 
 import { PENDING_STATE } from '../../containers/RequestManager/constants'
 import { DATA_ERROR } from '../../containers/DataBox/constants'
+import { NODE_URL } from '../../containers/NodePage/constants'
+
 
 const style = {
   height: 200,
@@ -31,8 +34,13 @@ function DataBox(props) {
 	return (
     <Paper style={style} zDepth={5}>
     <BoxWrapper>
-      <BoxHeader>{props.name}{props.refreshCallback && <RefreshIcon color="black" onClick={props.refreshCallback}/>}</BoxHeader>
-      <BoxContent>{metrics}</BoxContent>
+      <BoxHeader>
+        <Link href={NODE_URL + "/" + props.nodeId.toString()}>{props.name}</Link>
+        {props.refreshCallback && <RefreshIcon color="black" onClick={props.refreshCallback}/>}
+      </BoxHeader>
+      <BoxContent>
+        <Link href={NODE_URL + "/" + props.nodeId.toString()}>{metrics}</Link>
+      </BoxContent>
     </BoxWrapper>
     </Paper>
 	);
@@ -43,6 +51,7 @@ DataBox.propTypes = {
   measurements: React.PropTypes.array.isRequired,
   name: React.PropTypes.string,
   refreshCallback: React.PropTypes.func,
+  nodeId: React.PropTypes.number.isRequired,
 }
 
 export default DataBox;
