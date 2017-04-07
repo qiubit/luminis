@@ -10,7 +10,7 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router, browserHistory, IndexRoute, Route } from 'react-router';
+import { Router, browserHistory, IndexRoute, Route, Redirect } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import configureStore from './store';
 import './index.css';
@@ -30,9 +30,11 @@ const history = syncHistoryWithStore(browserHistory, store, {
 import App from './containers/App/index';
 import LandingPage from './components/LandingPage/index';
 import MapPage from './containers/MapPage/index';
+import NodePage from './containers/NodePage/index';
 import WebsocketConnection from './containers/WebsocketConnection/index';
 import TreeProvider from './containers/TreeProvider/index';
 import { MAP_URL } from './containers/MapPage/constants';
+import { NODE_ID_URL } from './containers/NodePage/constants';
 import config from './config'
 
 ReactDOM.render(
@@ -45,6 +47,8 @@ ReactDOM.render(
           <Route path="/" component={App}>
             <IndexRoute component={LandingPage}/>
             <Route path={MAP_URL} component={MapPage}/>
+            <Route path={NODE_ID_URL} component={NodePage}/>
+            <Redirect from='*' to={MAP_URL}/>
           </Route>
         </Router>
       </div>
