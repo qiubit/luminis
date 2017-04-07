@@ -7,6 +7,9 @@ import { Card, CardTitle, CardText } from 'material-ui/Card';
 import { List, ListItem } from 'material-ui/List';
 import Paper from 'material-ui/Paper';
 import Subheader from 'material-ui/Subheader';
+import DatePicker from 'material-ui/DatePicker';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 import { selectDrawerOpen, selectNodesMetadata } from '../App/selectors';
 import { drawerChange } from '../App/actions';
@@ -61,7 +64,41 @@ class NodePage extends React.Component {
       <Card>
         <CardTitle title="Chart"/>
         <CardText>
-          Chart placeholder
+          Data interval
+          {/* using any of these controls should send new request to RequestManager */}
+          <div>
+            {/* default aggregations: */}
+            {/* 1 minute (Live chart should show 1 day) */}
+            <RaisedButton label="Live"/>
+            {/* 1 minute */}
+            <RaisedButton label="1D"/>
+            {/* 30 minutes */}
+            <RaisedButton label="1M"/>
+            {/* 1 day */}
+            <RaisedButton label="1Y"/>
+            {/* 1 day */}
+            <RaisedButton label="MAX"/>
+            {/* 1 day (?) clicking should reveal date pickers */}
+            <RaisedButton label="CUSTOM"/>
+          </div>
+          Custom interval picker
+          <div>
+            <DatePicker floatingLabelText="Custom interval start"/>
+            <DatePicker floatingLabelText="Custom interval end"/>
+          </div>
+          Aggregation
+          <div>
+            <RaisedButton label="1m"/>
+            <RaisedButton label="30m"/>
+            <RaisedButton label="24h"/>
+            <RaisedButton label="CUSTOM"/>
+          </div>
+          Custom aggregation picker
+          <div>
+            <TextField
+              hintText="(e.g 1M, 5H, 4D)"
+            />
+          </div>
         </CardText>
       </Card>
     );
