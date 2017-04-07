@@ -13,16 +13,10 @@ import { drawerChange } from '../App/actions';
 
 class NodePage extends React.Component {
   componentWillMount() {
-    this.drawerCloseSignalSent = false;
+    this.props.sendCloseDrawer();
   }
 
   render() {
-    // Close drawer on first render (when user enters the page)
-    if (!this.drawerCloseSignalSent) {
-      this.props.sendCloseDrawer();
-      this.drawerCloseSignalSent = true;
-    }
-
     // Define chart and right bar styles
     const chartStyle = {
       width: 800,
