@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import { createStructuredSelector } from 'reselect';
-import { fromJS } from 'immutable'
 
 
 import config from './config';
@@ -50,6 +49,16 @@ class MapPage extends React.Component {
         tree.get('children').forEach((childTree) => {
           bounds.push(this.props.getNodeCoordinates(childTree.get('node_id').toString()))
         })
+        // No children, create bounds based on parent node location
+        if (bounds.length === 1) {
+          bounds.push(this.props.getNodeCoordinates(tree.get('node_id').toString()))
+          const nodeLat = bounds[0].lat
+          const nodeLng = bounds[0].lng
+          bounds[0].lat = nodeLat - 0.1
+          bounds[0].lng = nodeLng + 0.1
+          bounds[1].lat = nodeLat + 0.1
+          bounds[1].lng = nodeLng + 0.1
+        }
       }
 
     // If no tree is active, just render default bounds (for WARSAW_COORDS)
