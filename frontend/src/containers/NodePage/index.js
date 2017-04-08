@@ -1,17 +1,20 @@
 import React from 'react';
 import MediaQuery from 'react-responsive';
-import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import { List, ListItem } from 'material-ui/List';
 import Paper from 'material-ui/Paper';
 import Subheader from 'material-ui/Subheader';
-import DatePicker from 'material-ui/DatePicker';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox'
 
-import { selectDrawerOpen, selectNodesMetadata } from '../App/selectors';
+import {
+  selectDrawerOpen,
+  selectNodesMetadata,
+  selectNodeName,
+  selectNodeMeasurements,
+  selectMeasurementName,
+} from '../App/selectors';
 import { drawerChange } from '../App/actions';
 import ChartCard from '../ChartCard/index'
 
@@ -55,10 +58,10 @@ class NodePage extends React.Component {
     const RightBar = (props) => (
       <List>
         <Subheader>{nodeMetadata.get("name")}</Subheader>
-        <ListItem primaryText="Measurement1"/>
-        <ListItem primaryText="Measurement2"/>
-        <ListItem primaryText="Measurement3"/>
-        <ListItem primaryText="Measurement4"/>
+        {props.measurementIds &&
+          props.measurementIds.map((id) =>
+            <ListItem leftCheckbox={<Checkbox/>} key={id} primaryText={props.measurementNameGetter(id.toString())}/>)
+        }
       </List>
     )
 
@@ -66,7 +69,7 @@ class NodePage extends React.Component {
       <div>
         <MediaQuery minWidth={1050}>
           <Paper style={rightBarStyle} zDepth={3}>
-            <RightBar/>
+            <RightBar {...this.props}/>
           </Paper>
           <Paper style={chartStyle} zDepth={3}>
             <ChartCard/>
@@ -74,7 +77,7 @@ class NodePage extends React.Component {
         </MediaQuery>
         <MediaQuery maxWidth={1049}>
           <Paper zDepth={3}>
-            <RightBar/>
+            <RightBar {...this.props}/>
           </Paper>
           <Paper zDepth={3} style={{ margin: 20 }}>
             <ChartCard/>
@@ -91,9 +94,18 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-const mapStateToProps = createStructuredSelector({
-  drawerOpen: selectDrawerOpen,
-  nodesMetadata: selectNodesMetadata,
-});
+const mapStateToProps = (state, ownProps) => {
+  let nodeId = ownProps.params.nodeId.toString()
+  let name = selectNodeName(state)(nodeId)
+  let measurementIds = selectNodeMeasurements(state)(nodeId)
+  let getMeasurementName = selectMeasurementName(state)
+  return {
+    nodeName: name,
+    drawerOpen: selectDrawerOpen(state),
+    nodesMetadata: selectNodesMetadata(state),
+    measurementIds: measurementIds,
+    measurementNameGetter: getMeasurementName,
+  }
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(NodePage);
+export default connect(mapStateToProps, mapDispatchToProps)(NodePage)
