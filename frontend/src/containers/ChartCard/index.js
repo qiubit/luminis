@@ -1,7 +1,9 @@
 import React from 'react'
+import Dygraph from 'dygraphs'
 
 import { Card, CardTitle, CardText } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
+import 'dygraphs/dist/dygraph.css'
 
 import {
   DATA_RANGE_LIVE,
@@ -28,6 +30,16 @@ class ChartCard extends React.Component {
     this.onAggregationChange = this.onAggregationChange.bind(this)
   }
 
+  componentDidMount() {
+    this.graph = new Dygraph(
+      document.getElementById("graphdiv"),
+      "Date,Temperature\n" +
+      "2008-05-07,75\n" +
+      "2008-05-08,70\n" +
+      "2008-05-09,80\n"
+    )
+  }
+
   onDataRangeChange = (dataRange) => () => {
     console.log("Time to change dataRange to " + dataRange)
     this.setState({ dataRange })
@@ -44,6 +56,7 @@ class ChartCard extends React.Component {
         <CardTitle title="Chart"/>
         <CardText>
           <div>
+            <div style={{ background: "#F0FFFF", color: "black", width: "100%" }} id="graphdiv"></div>
             <p>Data Range</p>
             <RaisedButton
               onClick={this.onDataRangeChange(DATA_RANGE_LIVE)}

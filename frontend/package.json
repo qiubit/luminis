@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.22.0",
+    "dygraphs": "^2.0.0",
     "immutable": "^3.8.1",
     "leaflet": "^1.0.2",
     "material-ui": "^0.16.4",
