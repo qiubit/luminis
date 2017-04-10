@@ -5,6 +5,7 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import globalReducer from './containers/App/reducer';
 import treeListReducer from './containers/TreeList/reducer';
 import requestManagerReducer from './containers/RequestManager/reducer'
+import nodePageReducer from './containers/NodePage/reducer'
 
 /*
  * routeReducer
@@ -38,5 +39,6 @@ export default function createReducer() {
     App: globalReducer,
     TreeList: treeListReducer,
     RequestManager: requestManagerReducer,
+    NodePage: nodePageReducer,
   });
 }
