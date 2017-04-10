@@ -133,6 +133,7 @@ class TreeHandler(Handler):
 
     def get(self, ident=None):
         if ident:
+            # TODO this data is also cached, we can retrieve it from there
             mapped_measurements = {ser_attr.id: ser_attr.to_tree_dict()
                                    for ser_attr in get_all(self.session, SeriesAttribute)}
             tree_model = get_one(self.session, Entity, id=ident)
