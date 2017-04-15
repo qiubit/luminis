@@ -2,6 +2,7 @@
 
 import configparser
 import json
+import urllib.parse
 
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application
@@ -19,9 +20,11 @@ class WSHandler(WebSocketHandler):
         self._callback = None
         self._processor = RequestProcessor()
         self._push_interval = kwargs['push_interval']
+        self._allowed_origins = None if kwargs['allowed_origins'] == 'ALL' else kwargs['allowed_origins'].split(',')
 
     def check_origin(self, origin):
-        return True  # TODO we really should make sure that request is from our website to prevent XSS
+        parsed_origin = urllib.parse.urlparse(origin)
+        return self._allowed_origins is None or parsed_origin.netloc.lower() in self._allowed_origins
 
     def _run_callback(self):
         for response in self._processor.run_requests():
@@ -61,14 +64,14 @@ def get_config(filename):
     config = configparser.ConfigParser()
     config.read(filename)
 
-    params = {"push_interval": int, "port": int}
+    params = {"push_interval": int, "port": int, "allowed_origins": str}
     for param in params:
         result[param] = params[param](config.get("websocket", param))
     return result
 
 
 def main():
-    config = get_config("config/websocket.ini")
+    config = get_config("config/servers.ini")
 
     # start our application - we need only one handler for websocket interface only
     application = Application([
