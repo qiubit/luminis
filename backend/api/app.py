@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import configparser
 
 from pycnic.core import WSGI
 
@@ -7,6 +8,13 @@ from api.meta_attribute import MetaAttributeHandler
 from api.series_attribute import SeriesAttributeHandler
 from api.tag_attribute import TagAttributeHandler
 from api.tree import EntityHandler, TreeHandler
+
+
+def get_allowed_origin(config_file='config/servers.ini'):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    return config.get('api', 'allowed_origin')
 
 
 class Application(WSGI):
@@ -26,6 +34,9 @@ class Application(WSGI):
         (r'/entity_type/(\d+)/series/(\d+)', SeriesAttributeHandler()),
         (r'/entity_type/(\d+)/meta', MetaAttributeHandler()),
         (r'/entity_type/(\d+)/meta/(\d+)', MetaAttributeHandler()),
+    ]
+    headers = [
+        ('Access-Control-Allow-Origin', get_allowed_origin()),
     ]
 
 if __name__ == "__main__":
