@@ -35,7 +35,6 @@ import App from './containers/App/index';
 import LandingPage from './components/LandingPage/index';
 import MapPage from './containers/MapPage/index';
 import NodePage from './containers/NodePage/index';
-import WebsocketConnection from './containers/WebsocketConnection/index';
 import TreeProvider from './containers/TreeProvider/index';
 import { MAP_URL } from './containers/MapPage/constants';
 import { NODE_ID_URL } from './containers/NodePage/constants';
