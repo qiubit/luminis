@@ -11,7 +11,10 @@ export const selectNodeCoordinates = createSelector(
     if (x == null || y == null) {
       return null;
     } else {
-      return [x, y]
+      return {
+        lat: Number(x),
+        lng: Number(y)
+      }
     }
   }
 );

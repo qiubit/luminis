@@ -6,9 +6,7 @@ import createReducer from './reducers';
 import websocketSagas from './containers/WebsocketConnection/sagas';
 import treeProviderSagas from './containers/TreeProvider/sagas';
 import appSagas from './containers/App/sagas';
-import dataBoxManagerSagas from './containers/DataBoxManager/sagas'
-import chartManagerSagas from './containers/ChartManager/sagas'
-
+import requestManagerSagas from './containers/RequestManager/sagas'
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -45,8 +43,7 @@ export default function configureStore(initialState = {}, history) {
   websocketSagas.map(store.runSaga);
   treeProviderSagas.map(store.runSaga);
   appSagas.map(store.runSaga);
-  dataBoxManagerSagas.map(store.runSaga);
-  chartManagerSagas.map(store.runSaga);
+  requestManagerSagas.map(store.runSaga)
 
   return store;
 }

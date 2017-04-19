@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { fromJS } from 'immutable';
 
 export const selectRequestManager = (state) => state.get('RequestManager');
 

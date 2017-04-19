@@ -3,10 +3,9 @@ import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import globalReducer from './containers/App/reducer';
-import websocketReducer from './containers/WebsocketConnection/reducer';
 import treeListReducer from './containers/TreeList/reducer';
-import dataBoxManagerReducer from './containers/DataBoxManager/reducer';
-import chartManagerReducer from './containers/ChartManager/reducer'
+import requestManagerReducer from './containers/RequestManager/reducer'
+import nodePageReducer from './containers/NodePage/reducer'
 
 /*
  * routeReducer
@@ -38,9 +37,8 @@ export default function createReducer() {
   return combineReducers({
     route: routeReducer,
     App: globalReducer,
-    WebsocketConnection: websocketReducer,
     TreeList: treeListReducer,
-    DataBoxManager: dataBoxManagerReducer,
-    ChartManager: chartManagerReducer,
+    RequestManager: requestManagerReducer,
+    NodePage: nodePageReducer,
   });
 }

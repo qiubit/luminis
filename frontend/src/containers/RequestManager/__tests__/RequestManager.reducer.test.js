@@ -187,6 +187,15 @@ describe('RequestManager reducer', () => {
     expect(state.get('activeRequests').get(2).get('state')).toBe(PENDING_STATE)
   })
 
+  it('does not subscribe to null requests on cancelRequest', () => {
+    const cancelRequestAction = cancelRequest(1)
+    let state = reducer(initialState, cancelRequestAction)
+    expect(state.get('activeRequests').size).toBe(0)
+    const sendCancelRequest = sendRequest(cancelRequestAction)
+    state = reducer(state, sendCancelRequest)
+    expect(state.get('activeRequests').size).toBe(0)
+  })
+
   it('drops requests on SEND_REQUEST_FAIL from WebSocket', () => {
     const sendMessage1Request = sendRequest(message1Request)
     const sendMessage2Request = sendRequest(message2Request)
