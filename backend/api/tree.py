@@ -73,6 +73,10 @@ class EntityHandler(Handler):
         data = self.request.data
         entity = get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
 
+        if 'parent_id' in data:
+            parent_entity = get_one(self.session, Entity, id=data['parent_id'])
+            entity.parent = parent_entity
+
         # add tags and meta
         for key in data:
             if 'tag_' in key:

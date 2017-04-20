@@ -226,22 +226,22 @@ def entity_type_update(manager, ident):
         print('Meta: {}'.format(', '.join('{} ({})'.format(meta['id'], meta['name']) for meta in t['meta'])))
 
         process_prompt('Command? (h for help) ', (
-            ('a', attribute_add),
-            ('dt (\d+)', lambda attr_ident: delete_attribute(TagAttributeManager, attr_ident)),
-            ('dm (\d+)', lambda attr_ident: delete_attribute(MetaAttributeManager, attr_ident)),
-            ('ds (\d+)', lambda attr_ident: delete_attribute(SeriesAttributeManager, attr_ident)),
-            ('em (\d+)', meta_edit),
-            ('h', lambda: print(ENTITY_TYPE_EDIT_COMMANDS), True),
-            ('n', edit_name),
-            ('q', back),
+            ('\s*a', attribute_add),
+            ('\s*dt\s*(\d+)\s*', lambda attr_ident: delete_attribute(TagAttributeManager, attr_ident)),
+            ('\s*dm\s*(\d+)\s*', lambda attr_ident: delete_attribute(MetaAttributeManager, attr_ident)),
+            ('\s*ds\s*(\d+)\s*', lambda attr_ident: delete_attribute(SeriesAttributeManager, attr_ident)),
+            ('\s*em\s*(\d+)\s*', meta_edit),
+            ('\s*h\s*', lambda: print(ENTITY_TYPE_EDIT_COMMANDS), True),
+            ('\s*n\s*', edit_name),
+            ('\s*q\s*', back),
         ))
 
 
 def entity_type_delete(manager, ident):
     print(ENTITY_TYPE_REMOVE_WARNING)
     process_prompt(CONTINUE_PROMPT, (
-        ('y', lambda: manager.delete(ident)),
-        ('n?', lambda: None)
+        ('\s*y\s*', lambda: manager.delete(ident)),
+        ('\s*n?\s*', lambda: None)
     ))
 
 
@@ -252,17 +252,17 @@ def entity_add(manager, entity_type_manager, ident):
         print('{} -> {}'.format(k, v['name']))
     print()
     process_prompt('Entity type ID? ', (
-        ('(\d+)', lambda entity_type_id: data.update({'entity_type_id': int(entity_type_id)})),
+        ('\s*(\d+)\s*', lambda entity_type_id: data.update({'entity_type_id': int(entity_type_id)})),
     ))
     entity_type = entity_type_manager.get(data['entity_type_id'])
     if entity_type:
         for tag in entity_type['tags']:
             process_prompt('Value for tag {}? '.format(tag['name']), (
-                ('(.+)', lambda value: data.update({'tag_{}'.format(tag['id']): value})),
+                ('^(.+)$', lambda value: data.update({'tag_{}'.format(tag['id']): value})),
             ))
         for meta in entity_type['meta']:
             process_prompt('Value for meta {}? '.format(meta['name']), (
-                ('(.+)', lambda value: data.update({'meta_{}'.format(meta['id']): value})),
+                ('^(.+)$', lambda value: data.update({'meta_{}'.format(meta['id']): value})),
             ))
         manager.add(**data)
     else:
@@ -274,15 +274,15 @@ def entity_edit(manager, entity_type_manager, ident):
     entity_type = entity_type_manager.get(node['entity_type_id'])
     data = dict()
     process_prompt('New parent ID or empty if no change? ', (
-        ('(\d*)', lambda parent_id: data.update({'parent_id': int(parent_id)} if parent_id else {}))
+        ('\s*(\d*)\s*', lambda parent_id: data.update({'parent_id': int(parent_id)} if parent_id else {})),
     ))
     for tag in entity_type['tags']:
         process_prompt('Value for tag {} or empty if no change? '.format(tag['name']), (
-            ('.*', lambda value: data.update({'tag_{}'.format(tag['id']): value} if value else {}))
+            ('^(.*)$', lambda value: data.update({'tag_{}'.format(tag['id']): value} if value else {})),
         ))
     for meta in entity_type['meta']:
         process_prompt('Value for meta {} or empty if no change? '.format(meta['name']), (
-            ('.*', lambda value: data.update({'meta_{}'.format(meta['id']): value} if value else {}))
+            ('^(.*)$', lambda value: data.update({'meta_{}'.format(meta['id']): value} if value else {})),
         ))
     manager.update(ident, **data)
 
@@ -312,11 +312,11 @@ def entity_type_main():
             print('{} -> {}'.format(k, v['name']))
         print()
         process_prompt(COMMAND_PROMPT, (
-            ('a', lambda: entity_type_add(manager)),
-            ('e (\d+)', try_update),
-            ('d (\d+)', try_delete),
-            ('h', lambda: print(ENTITY_TYPE_COMMANDS), True),
-            ('q', back),
+            ('\s*a\s*', lambda: entity_type_add(manager)),
+            ('\s*e\s*(\d+)\s*', try_update),
+            ('\s*d\s*(\d+)\s*', try_delete),
+            ('\s*h\s*', lambda: print(ENTITY_TYPE_COMMANDS), True),
+            ('\s*q\s*', back),
         ))
 
 
@@ -378,13 +378,13 @@ def entity_main():
             print_nodes(current_node[0])
 
         process_prompt(COMMAND_PROMPT, (
-            ('a(?: (\d+))?', try_add),
-            ('e (\d+)', try_edit),
-            ('d (\d+)', try_delete),
-            ('p', go_parent),
-            ('g (\d+)', go_to),
-            ('h', lambda: print(ENTITY_COMMANDS), True),
-            ('q', back)
+            ('\s*a(?:\s*(\d+))?\s*', try_add),
+            ('\s*e\s*(\d+)\s*', try_edit),
+            ('\s*d\s*(\d+)\s*', try_delete),
+            ('\s*p\s*', go_parent),
+            ('\s*g\s*(\d+)\s*', go_to),
+            ('\s*h\s*', lambda: print(ENTITY_COMMANDS), True),
+            ('\s*q\s*', back)
         ))
 
 
@@ -398,10 +398,10 @@ def main():
     while not to_exit[0]:
         try:
             process_prompt(COMMAND_PROMPT, (
-                ('t', entity_type_main),
-                ('e', entity_main),
-                ('h', lambda: print(MAIN_TYPES_OF_OBJECTS), True),
-                ('q', exit_main),
+                ('\s*t\s*', entity_type_main),
+                ('\s*e\s*', entity_main),
+                ('\s*h\s*', lambda: print(MAIN_TYPES_OF_OBJECTS), True),
+                ('\s*q\s*', exit_main),
             ))
         except (EOFError, KeyboardInterrupt):
             break
