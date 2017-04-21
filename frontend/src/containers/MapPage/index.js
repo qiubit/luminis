@@ -54,10 +54,10 @@ class MapPage extends React.Component {
           bounds.push(this.props.getNodeCoordinates(tree.get('node_id').toString()))
           const nodeLat = bounds[0].lat
           const nodeLng = bounds[0].lng
-          bounds[0].lat = nodeLat - 0.1
-          bounds[0].lng = nodeLng + 0.1
-          bounds[1].lat = nodeLat + 0.1
-          bounds[1].lng = nodeLng + 0.1
+          bounds[0].lat = nodeLat - 0.0001
+          bounds[0].lng = nodeLng + 0.0001
+          bounds[1].lat = nodeLat + 0.0001
+          bounds[1].lng = nodeLng + 0.0001
         }
       }
 
@@ -88,11 +88,11 @@ class MapPage extends React.Component {
         bounds={this.getBounds(activeSubtree)}
         center={this.getCenter(activeSubtree)}
         boundsOptions={{padding: config.mapPadding}}
+        maxZoom={config.mapMaxZoom}
       >
         <TileLayer
           url={'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}'}
           attribution={'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'}
-          maxZoom={config.mapMaxZoom}
           id={config.mapTileLayerId}
           accessToken={config.openStreetMapAccessToken}
         />
