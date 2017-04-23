@@ -148,9 +148,9 @@ class EntityManager(object):
         do_request('/node', method='POST', data=kwargs)
         self.reload_data()
 
-    @staticmethod
-    def update(ident, **kwargs):
+    def update(self, ident, **kwargs):
         do_request('/node/{}'.format(ident), method='PUT', data=kwargs)
+        self.reload_data()
 
     def delete(self, ident):
         do_request('/node/{}'.format(ident), method='DELETE')

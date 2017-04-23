@@ -75,7 +75,7 @@ class EntityHandler(Handler):
 
         if 'parent_id' in data:
             parent_entity = get_one(self.session, Entity, id=data['parent_id'])
-            entity.parent = parent_entity
+            entity.parent_id_fk = data['parent_id']
 
         # add tags and meta
         for key in data:
