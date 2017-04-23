@@ -13,13 +13,16 @@ class EntityHandler(Handler):
     def __init__(self):
         self.session = Session()
 
-    def get(self, ident):
-        return get_one(self.session, Entity, id=ident).to_dict(deep=False)
+    def get(self, ident=None):
+        if ident is None:
+            return [entity.to_dict(deep=False) for entity in get_all(self.session, Entity)]
+        else:
+            return get_one(self.session, Entity, id=ident).to_dict(deep=False)
 
     @staticmethod
     def _assert_got_all_needed_tag_and_meta_ids(entity_type, tag_ids, meta_ids):
-        expected_tag_ids = sorted(tag.id for tag in entity_type.tags)
-        expected_meta_ids = sorted(meta.id for meta in entity_type.meta)
+        expected_tag_ids = sorted(tag.id for tag in entity_type.tags if tag.delete_ts is None)
+        expected_meta_ids = sorted(meta.id for meta in entity_type.meta if meta.delete_ts is None)
         if tag_ids != expected_tag_ids:
             raise HTTP_400('Expected tag IDs {}, got {}'.format(expected_tag_ids, tag_ids))
         if meta_ids != expected_meta_ids:
@@ -69,6 +72,10 @@ class EntityHandler(Handler):
     def put(self, ident):
         data = self.request.data
         entity = get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
+
+        if 'parent_id' in data:
+            parent_entity = get_one(self.session, Entity, id=data['parent_id'])
+            entity.parent_id_fk = data['parent_id']
 
         # add tags and meta
         for key in data:

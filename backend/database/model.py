@@ -136,7 +136,7 @@ class Entity(Base):
     def to_dict(self, deep=False):
         result = {
             "id": self.id,
-            "entity_type": self.entity_type_id_fk,
+            "entity_type_id": self.entity_type_id_fk,
             "parent_id": self.parent_id_fk,
             "tags": {tag.attribute.name: tag.value for tag in self.tags if _is_not_deleted(tag)},
             "meta": {meta.attribute.name: meta.value for meta in self.meta if _is_not_deleted(meta)},
