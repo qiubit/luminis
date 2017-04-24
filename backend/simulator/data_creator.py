@@ -8,11 +8,13 @@ def create_data_timestamp(ts):
         dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond
     )
 
-def generate_data(previous_ts, current_ts, node_id, measurement_ids, measurement_series, data_dir):
+def generate_data(previous_ts, current_ts, entity_id, measurement_ids, measurement_series, data_dir):
     """
-    Generates all data between previous_ts and current_ts for entity with id node_id and
-    measurements with ids measurement_ids and saves it into data_dir.
-    measurement_series should contain map from measurement_id to series_function.
+    Generates all data between previous_ts and current_ts for entity with entity_id and
+    measurements with measurement_ids and saves it into data_dir.
+    measurement_series should contain map from measurement_id to series_function object.
+
+    All series_functions in measurement_series should have the same update_period.
     """
     if not measurement_ids:
         return
@@ -33,5 +35,5 @@ def generate_data(previous_ts, current_ts, node_id, measurement_ids, measurement
             line += str(measurements[measurement_id][pt][1])
         line += "\n"
         measurementsStr += line
-    with open(data_dir + "/node{0:d}_{1:s}_OK".format(node_id, create_data_timestamp(current_ts)), "w") as f:
+    with open(data_dir + "/entity{0:d}_{1:s}_OK".format(entity_id, create_data_timestamp(current_ts)), "w") as f:
         f.write(measurementsStr)
