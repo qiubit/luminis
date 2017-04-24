@@ -151,7 +151,7 @@ class NewLiveDataRequestHandler(AbstractRequestHandler):
         if result:
             self._last_data_timestamp = int(result[0]['time'])
             return {
-                'value': result[0]['value'],
+                'value': self._measurement.transform(result[0]['value']),
                 'timestamp': self._last_data_timestamp,
             }
         else:
