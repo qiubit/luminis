@@ -96,8 +96,10 @@ class SeriesAttribute(Base):
             return None
         elif self.type == 'real':
             return float(value)
-        else:
+        elif self.type == 'enum':
             return self._enum_val_dict().get(int(value), None)
+        else:
+            raise ValueError('Unexpected type: {}'.format(self.type))
 
     def to_tree_dict(self):
         return {
