@@ -4,6 +4,7 @@ import configparser
 from pycnic.core import WSGI
 
 from api.entity_type import EntityTypeHandler
+from api.global_metadata import TimestampHandler, PingHandler
 from api.meta_attribute import MetaAttributeHandler
 from api.series_attribute import SeriesAttributeHandler
 from api.tag_attribute import TagAttributeHandler
@@ -34,6 +35,10 @@ class Application(WSGI):
         (r'/entity_type/(\d+)/series/(\d+)', SeriesAttributeHandler()),
         (r'/entity_type/(\d+)/meta', MetaAttributeHandler()),
         (r'/entity_type/(\d+)/meta/(\d+)', MetaAttributeHandler()),
+
+        # global metadata and utils
+        (r'/meta/timestamp', TimestampHandler()),
+        (r'/meta/ping', PingHandler()),
     ]
     headers = [
         ('Access-Control-Allow-Origin', get_allowed_origin()),

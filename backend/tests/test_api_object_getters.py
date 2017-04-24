@@ -60,6 +60,7 @@ class TestApiObjectGetters(unittest.TestCase):
         self.assertEqual(result, MockedEntity().to_dict())
 
     @patch('api.tree.get_all', new=mocked_get_all)
+    @patch('api.tree.get_one', new=mocked_get_one)
     def test_tree_get_without_id_returns_all_trees(self):
         result = get_handler(TreeHandler).get()
 
@@ -71,6 +72,7 @@ class TestApiObjectGetters(unittest.TestCase):
                                   'parent': None,
                                   'position': {'x': None, 'y': None}}},
             'tree': [MockedEntity().tree_structure_dict()],
+            'timestamp': 10000,
             'measurements_metadata': {sa.id: sa.to_tree_dict() for sa in MockedEntityType().series},
         })
 
@@ -87,5 +89,6 @@ class TestApiObjectGetters(unittest.TestCase):
                                   'parent': None,
                                   'position': {'x': None, 'y': None}}},
             'tree': MockedEntity().tree_structure_dict(),
+            'timestamp': 10000,
             'measurements_metadata': {sa.id: sa.to_tree_dict() for sa in MockedEntityType().series},
         })

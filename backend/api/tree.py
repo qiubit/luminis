@@ -4,8 +4,9 @@ from pycnic.errors import HTTP_400
 from pycnic.utils import requires_validation
 from voluptuous import Schema, Required, Or, ALLOW_EXTRA
 
-from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType, SeriesAttribute
-from database.helpers import get_all, get_one
+from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType, \
+     SeriesAttribute, GlobalMetadata
+from database.helpers import get_all, get_one, update_last_data_modification_ts
 
 
 class EntityHandler(Handler):
@@ -63,7 +64,7 @@ class EntityHandler(Handler):
                 ))
 
         self.session.commit()
-
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': entity.id,
@@ -87,6 +88,7 @@ class EntityHandler(Handler):
                 meta.value = data[key]
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {
             'success': True,
             'ID': entity.id,
@@ -104,6 +106,7 @@ class EntityHandler(Handler):
             child.parent = entity.parent
 
         self.session.commit()
+        update_last_data_modification_ts(self.session)
         return {'success': True}
 
 
@@ -122,6 +125,7 @@ class TreeHandler(Handler):
                 "tree_metadata": tree_model.map_nodes(),
                 "tree": tree_model.tree_structure_dict(),
                 "measurements_metadata": mapped_measurements,
+                "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
             }
         else:
             roots = [root for root in get_all(self.session, Entity) if root.parent is None]
@@ -132,4 +136,5 @@ class TreeHandler(Handler):
                 "tree_metadata": mapped_nodes,
                 "tree": [root.tree_structure_dict() for root in roots],
                 "measurements_metadata": mapped_measurements,
+                "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
             }

@@ -100,18 +100,25 @@ class MockedEntity(object):
     tree_structure_dict = Entity.tree_structure_dict
 
 
+class MockedGlobalMetadata(object):
+    def __getattr__(self, it):
+        return {'id': 1, 'last_data_modification_ts': 10000, 'delete_ts': None}.get(it)
+
+
 def mocked_get_one(session, cls, **kwargs):
     c = cls.__name__
     return {'EntityType': MockedEntityType(), 'TagAttribute': MockedEntityType().tags[0],
             'MetaAttribute': MockedEntityType().meta[0], 'SeriesAttribute': MockedEntityType().series[0],
-            'Entity': MockedEntity(), 'EntityTag': MockedEntity().tags[0], 'EntityMeta': MockedEntity().meta[0]}.get(c)
+            'Entity': MockedEntity(), 'EntityTag': MockedEntity().tags[0], 'EntityMeta': MockedEntity().meta[0],
+            'GlobalMetadata': MockedGlobalMetadata()}.get(c)
 
 
 def mocked_get_all(session, cls, **kwargs):
     c = cls.__name__
     return {'EntityType': [MockedEntityType()], 'TagAttribute': MockedEntityType().tags,
             'MetaAttribute': MockedEntityType().meta, 'SeriesAttribute': MockedEntityType().series,
-            'Entity': [MockedEntity()], 'EntityTag': MockedEntity().tags, 'EntityMeta': MockedEntity().meta}.get(c)
+            'Entity': [MockedEntity()], 'EntityTag': MockedEntity().tags, 'EntityMeta': MockedEntity().meta,
+            'GlobalMetadata': MockedGlobalMetadata()}.get(c)
 
 
 def get_handler(cls, payload=None):

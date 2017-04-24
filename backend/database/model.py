@@ -32,6 +32,14 @@ Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
 
+class GlobalMetadata(Base):
+    __tablename__ = 'Global_Metadata'
+
+    id = Column(Integer, primary_key=True)  # fake key, because mappers need to have PK
+    last_data_modification_ts = Column(Integer, nullable=False, default=0)
+    delete_ts = Column(Integer, nullable=True, default=None)
+
+
 class EntityType(Base):
     __tablename__ = 'Entity_Types'
 
