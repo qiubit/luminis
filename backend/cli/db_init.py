@@ -33,7 +33,7 @@ def get_attributes(api_address, entity_type_id):
     meta_ids = sorted(meta['id'] for meta in response['meta'])
     tag_attributes = ['tag_{}'.format(tag_id) for tag_id in tag_ids]
     meta_attributes = ['meta_{}'.format(meta_id) for meta_id in meta_ids]
-    return tag_attributes + meta_attributes
+    return meta_attributes + tag_attributes
 
 
 def create_entity(api_address, line):
