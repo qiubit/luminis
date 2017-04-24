@@ -114,12 +114,28 @@ class TreeHandler(Handler):
 
     def __init__(self):
         self.session = Session()
+        self._cached_tree = dict()
+        self._update_cache()
+
+    def _update_cache(self):
+        mapped_measurements = {ser_attr.id: ser_attr.to_tree_dict()
+                               for ser_attr in get_all(self.session, SeriesAttribute)}
+        roots = [root for root in get_all(self.session, Entity) if root.parent is None]
+        mapped_nodes = {}
+        for root in roots:
+            root.add_nodes_rec(mapped_nodes)
+        self._cached_tree = {
+            "tree_metadata": mapped_nodes,
+            "tree": [root.tree_structure_dict() for root in roots],
+            "measurements_metadata": mapped_measurements,
+            "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
+        }
 
     def get(self, ident=None):
-        mapped_measurements = { ser_attr.id: ser_attr.to_tree_dict()
-                                for ser_attr in get_all(self.session, SeriesAttribute) }
-
         if ident:
+            # TODO this data is also cached, we can retrieve it from there
+            mapped_measurements = {ser_attr.id: ser_attr.to_tree_dict()
+                                   for ser_attr in get_all(self.session, SeriesAttribute)}
             tree_model = get_one(self.session, Entity, id=ident)
             return {
                 "tree_metadata": tree_model.map_nodes(),
@@ -128,13 +144,8 @@ class TreeHandler(Handler):
                 "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
             }
         else:
-            roots = [root for root in get_all(self.session, Entity) if root.parent is None]
-            mapped_nodes = {}
-            for root in roots:
-                root.add_nodes_rec(mapped_nodes)
-            return {
-                "tree_metadata": mapped_nodes,
-                "tree": [root.tree_structure_dict() for root in roots],
-                "measurements_metadata": mapped_measurements,
-                "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
-            }
+            last_update_ts = get_one(self.session, GlobalMetadata).last_data_modification_ts
+            if last_update_ts > self._cached_tree['timestamp']:
+                self._update_cache()
+
+            return self._cached_tree
