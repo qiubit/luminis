@@ -5,8 +5,8 @@ from pycnic.utils import requires_validation
 from voluptuous import Schema, Required, Or, ALLOW_EXTRA
 
 from database.model import Entity, Session, EntityTag, EntityMeta, TagAttribute, MetaAttribute, EntityType, \
-     SeriesAttribute, GlobalMetadata
-from database.helpers import get_all, get_one, update_last_data_modification_ts
+     SeriesAttribute
+from database.helpers import get_all, get_one, update_last_data_modification_ts, get_last_data_modification_ts
 
 
 class EntityHandler(Handler):
@@ -75,7 +75,7 @@ class EntityHandler(Handler):
         entity = get_one(self.session, Entity, id=ident)  # to ensure that the entity exists
 
         if 'parent_id' in data:
-            parent_entity = get_one(self.session, Entity, id=data['parent_id'])
+            get_one(self.session, Entity, id=data['parent_id'])
             entity.parent_id_fk = data['parent_id']
 
         # add tags and meta
@@ -128,7 +128,7 @@ class TreeHandler(Handler):
             "tree_metadata": mapped_nodes,
             "tree": [root.tree_structure_dict() for root in roots],
             "measurements_metadata": mapped_measurements,
-            "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
+            "timestamp": get_last_data_modification_ts(self.session),
         }
 
     def get(self, ident=None):
@@ -141,10 +141,10 @@ class TreeHandler(Handler):
                 "tree_metadata": tree_model.map_nodes(),
                 "tree": tree_model.tree_structure_dict(),
                 "measurements_metadata": mapped_measurements,
-                "timestamp": get_one(self.session, GlobalMetadata).last_data_modification_ts,
+                "timestamp": get_last_data_modification_ts(self.session),
             }
         else:
-            last_update_ts = get_one(self.session, GlobalMetadata).last_data_modification_ts
+            last_update_ts = get_last_data_modification_ts(self.session)
             if last_update_ts > self._cached_tree['timestamp']:
                 self._update_cache()
 

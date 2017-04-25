@@ -1,7 +1,7 @@
 from pycnic.core import Handler
 
-from database.helpers import get_one
-from database.model import Session, GlobalMetadata
+from database.helpers import get_last_data_modification_ts
+from database.model import Session
 
 
 class TimestampHandler(Handler):
@@ -12,7 +12,7 @@ class TimestampHandler(Handler):
     def get(self):
         return {
             'success': True,
-            'timestamp': get_one(self.session, GlobalMetadata).last_data_modification_ts,
+            'timestamp': get_last_data_modification_ts(self.session),
         }
 
 
