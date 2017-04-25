@@ -21,6 +21,17 @@ def get_one(session, cls, **kwargs):
         return result[0]
 
 
+def get_last_data_modification_ts(session):
+    result = session.query(GlobalMetadata).all()
+    if not result:
+        metadata = GlobalMetadata()
+        session.add(metadata)
+        session.commit()
+        return 0
+    else:
+        return result[0].last_data_modification_ts
+
+
 def update_last_data_modification_ts(session):
     result = session.query(GlobalMetadata).all()
     if not result:
