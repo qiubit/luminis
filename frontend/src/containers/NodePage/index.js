@@ -1,7 +1,7 @@
 import React from 'react';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
-import { Map, fromJS } from 'immutable'
+import { Map, fromJS, Set} from 'immutable'
 
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import { List, ListItem } from 'material-ui/List';
@@ -171,7 +171,7 @@ class NodePage extends React.Component {
             <RightBar {...this.props}/>
           </Paper>
           <Paper style={chartStyle} zDepth={3}>
-            <ChartCard/>
+            <ChartCard {...this.props} chartMeasurementIds={new Set(this.props.measurementIdsShown.filter((isShown) => isShown).keys())}/>
           </Paper>
         </MediaQuery>
         <MediaQuery maxWidth={1049}>
@@ -179,7 +179,7 @@ class NodePage extends React.Component {
             <RightBar {...this.props}/>
           </Paper>
           <Paper zDepth={3} style={{ margin: 20 }}>
-            <ChartCard/>
+            <ChartCard {...this.props} chartMeasurementIds={new Set(this.props.measurementIdsShown.filter((isShown) => isShown).keys())}/>
           </Paper>
         </MediaQuery>
       </div>
