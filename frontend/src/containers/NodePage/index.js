@@ -96,7 +96,7 @@ class RightBar extends React.Component {
               this.props.activeRequests.get(this.state.measurementRequestMap.get(id))
             let val = null
             if (request && request.get('state') !== PENDING_STATE) {
-              val = request.get('data').get('value')
+              val = request.get('data').value
             }
             return (<ListItem
               leftCheckbox={
@@ -171,7 +171,7 @@ class NodePage extends React.Component {
             <RightBar {...this.props}/>
           </Paper>
           <Paper style={chartStyle} zDepth={3}>
-            <ChartCard {...this.props} chartMeasurementIds={new Set(this.props.measurementIdsShown.filter((isShown) => isShown).keys())}/>
+            <ChartCard {...this.props}/>
           </Paper>
         </MediaQuery>
         <MediaQuery maxWidth={1049}>
@@ -179,7 +179,7 @@ class NodePage extends React.Component {
             <RightBar {...this.props}/>
           </Paper>
           <Paper zDepth={3} style={{ margin: 20 }}>
-            <ChartCard {...this.props} chartMeasurementIds={new Set(this.props.measurementIdsShown.filter((isShown) => isShown).keys())}/>
+            <ChartCard {...this.props}/>
           </Paper>
         </MediaQuery>
       </div>

@@ -36,25 +36,35 @@ class Graph extends React.Component {
     return false
   }
 
-  createGraph(data, labels) {
+  createGraph(data, labels, visibility) {
     if (data.length > 0) {
       return new Dygraph(
         document.getElementById("graphdiv"),
         data,
         {
-          labels
+          labels,
+          visibility
         }
       )
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.data !== nextProps.data) {
-      this.graph = this.createGraph(nextProps.data, nextProps.labels)
-    }
-  }
   componentDidMount() {
-    this.graph = this.createGraph(this.props.data, this.props.labels)
+    this.graph = this.createGraph(this.props.data, this.props.labels, this.props.visibility)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.graph) {
+      if (this.props.data !== nextProps.data || this.props.labels !== nextProps.labels || this.props.visibility !== nextProps.visibility) {
+        this.graph.updateOptions({
+          'labels': nextProps.labels,
+          'visibility': nextProps.visibility,
+          'file': nextProps.data
+        })
+      }
+    } else {
+      this.graph = this.createGraph(this.props.data, this.props.labels, this.props.visibility)
+    }
   }
 
   render() {
@@ -86,11 +96,11 @@ class ChartCard extends React.Component {
       aggregation: initAggregation,
       requestDataRange: fromJS({}),
       requestAggregation: fromJS({}),
-      measurementRequestMap: new Map(),
-      measurementDataMap: new Map(),
+      chartRequestId: null,
+      chartRequestData: null,
       data: [],
       labels: [],
-
+      visibility: [],
     }
     this.onDataRangeChange = this.onDataRangeChange.bind(this)
     this.onAggregationChange = this.onAggregationChange.bind(this)
@@ -99,136 +109,103 @@ class ChartCard extends React.Component {
   }
 
 
-  // merge plots to one list of points
-  makeData(plotsList) {
-    let data = []
-    let length = 0
-    plotsList.forEach((plot) => {
-      if (plot) {
-        length = plot.size
-      }
-    })
-
-    if (plotsList.size > 0) {
-      for(var i = 0; i < length; ++i) {
-        let dataPoint = []
-        plotsList.forEach((plot) => {
-          if (plot) {
-            if (dataPoint.length === 0) {
-              dataPoint.push(new Date(plot.get(i).get('x') * 1000))
-            }
-            dataPoint.push(plot.get(i).get('y'))
-          }
-        })
-        data.push(dataPoint)
-      }
+  makeData(chartData) {
+    let newData = chartData.slice()
+    for (var i = 0; i < chartData.length; ++i) {
+      newData[i] = newData[i].slice()
+      newData[i][0] = new Date(newData[i][0]  * 1000)
     }
-    return data
+    return newData
   }
 
   makeLabels(measurementDataMap){
     let newLabels = []
     newLabels.push("Time")
-    measurementDataMap.forEach((data, measurementId) => {
-      if (data) {
-        newLabels.push(this.props.measurementNameGetter(measurementId.toString()))
-      }
+    measurementDataMap.forEach((measurementId) => {
+      newLabels.push(this.props.measurementNameGetter(measurementId.toString()))
     })
     return newLabels
   }
 
+  makeVisibility(measurementIds, measurementIdsShown) {
+    let newVisibility = []
+    measurementIds.forEach((measurementId) => {
+      newVisibility.push(measurementIdsShown.get(measurementId))
+    })
+    return newVisibility
+  }
+
+
 
   componentWillUpdate() {
-    let newMeasurementDataMap = new Map()
-    this.state.measurementRequestMap.forEach((requestId, measurementId) => {
-      const request = this.props.activeRequests.get(requestId)
-      let plot = null
-      if (request && request.get('state') !== PENDING_STATE) {
-        plot = request.get('data').get('plot_data')
-      }
-      newMeasurementDataMap = newMeasurementDataMap.set(measurementId, plot)
-    })
+    let request = this.props.activeRequests.get(this.state.chartRequestId)
+    let newChartRequestData = null
+    if (request && request.get('state') !== PENDING_STATE) {
+      newChartRequestData = request.get('data').plot_data
+    }
 
-    if (!this.state.measurementDataMap.equals(newMeasurementDataMap)) {
-      this.setState({measurementDataMap: newMeasurementDataMap, data: this.makeData(newMeasurementDataMap.toList()), labels: this.makeLabels(newMeasurementDataMap)})
+    if (newChartRequestData && this.state.chartRequestData !== newChartRequestData) {
+      this.setState({chartRequestData: newChartRequestData, data: this.makeData(newChartRequestData)})
     }
   }
 
-  makeRequest(nodeId, measurementId) {
+  makeRequest(nodeId, measurementIds) {
     let beginTs = Math.floor(this.state.dataRange.get('begin').valueOf() / 1000)
     let endTs = Math.floor(this.state.dataRange.get('end').valueOf() / 1000)
     let updateData = false
     let aggregationLength = this.state.aggregation.get('value')
     let aggregationType = 'mean'
-    return requestNewChart(nodeId, measurementId, beginTs, endTs, updateData, aggregationLength, aggregationType)
+    return requestNewChart(nodeId, measurementIds.toJS(), beginTs, endTs, updateData, aggregationLength, aggregationType)
   }
 
 
-  updateSubscriptions(newChartMeasurementIds, mounting = false) {
+  updateSubscriptions(newMeasurementIds, mounting = false) {
     const nodeId = this.props.params.nodeId
     // If measurements have changed, we should drop current subscriptions and make new ones
-    if (this.state.requestDataRange !== this.state.dataRange || this.state.requestAggregation !== this.state.aggregation || mounting) {
-      console.log('siema')
-      const subscriptions = this.state.measurementRequestMap
-      let cancelRequestActions = []
-      subscriptions.forEach((requestId, measurementId) => {
-        cancelRequestActions.push(cancelRequest(requestId))
-      })
-      cancelRequestActions.forEach((action) => this.props.dispatch(action))
+    if ((!newMeasurementIds.equals(this.props.measurementIds)) || this.state.requestDataRange !== this.state.dataRange || this.state.requestAggregation !== this.state.aggregation || mounting) {
 
-      let newMeasurementRequestMap = new Map()
-      let subscriptionRequestActions = []
-      newChartMeasurementIds.forEach((measurementId) => {
-        const subscriptionRequestAction = this.makeRequest(nodeId, measurementId)
-        newMeasurementRequestMap =
-          newMeasurementRequestMap.set(measurementId, subscriptionRequestAction.message.request_id)
-        subscriptionRequestActions.push(subscriptionRequestAction)
-      })
+      if (this.state.chartRequestId) {
+        this.props.dispatch(cancelRequest(this.state.chartRequestId))
+      }
+
+      let newChartRequest = this.makeRequest(nodeId, newMeasurementIds)
+      this.props.dispatch(newChartRequest)
+
       this.setState({
-        measurementRequestMap: newMeasurementRequestMap,
+        chartRequestId: newChartRequest.message.request_id,
         requestDataRange: this.state.dataRange,
-        requestAggregation: this.state.aggregation
+        requestAggregation: this.state.aggregation,
       })
-      subscriptionRequestActions.forEach((action) => this.props.dispatch(action))
+    }
+  }
 
-    } else if (!newChartMeasurementIds.equals(this.props.chartMeasurementIds)) {
-      // Drop current subscriptions
-      const subscriptions = this.state.measurementRequestMap
-      let cancelRequestActions = []
-      subscriptions.forEach((requestId, measurementId) => {
-        if (!newChartMeasurementIds.has(measurementId)) {
-          cancelRequestActions.push(cancelRequest(requestId))
-        }
+  updateLabels(newMeasurementIds, mounting = false) {
+    if (!newMeasurementIds.equals(this.props.measurementIds) || mounting) {
+      this.setState({
+        labels: this.makeLabels(newMeasurementIds)
       })
-      cancelRequestActions.forEach((action) => this.props.dispatch(action))
+    }
+  }
 
-      // Create new ones
-      let newMeasurementRequestMap = new Map()
-      let subscriptionRequestActions = []
-      newChartMeasurementIds.forEach((measurementId) => {
-        if (!subscriptions.has(measurementId)) {
-          const subscriptionRequestAction = this.makeRequest(nodeId, measurementId)
-          newMeasurementRequestMap =
-            newMeasurementRequestMap.set(measurementId, subscriptionRequestAction.message.request_id)
-          subscriptionRequestActions.push(subscriptionRequestAction)
-        } else {
-          newMeasurementRequestMap =
-            newMeasurementRequestMap.set(measurementId, subscriptions.get(measurementId))
-        }
-
+  updateVisibility(newMeasurementIds, newMeasurementIdsShown, mounting = false) {
+    if (!newMeasurementIds.equals(this.props.measurementIds) || !newMeasurementIdsShown.equals(this.props.measurementIdsShown) || mounting) {
+      this.setState({
+        visibility: this.makeVisibility(newMeasurementIds, newMeasurementIdsShown)
       })
-      this.setState({ measurementRequestMap: newMeasurementRequestMap })
-      subscriptionRequestActions.forEach((action) => this.props.dispatch(action))
     }
   }
 
   // Subscribe to live data on mount
   componentWillMount() {
-    this.updateSubscriptions(this.props.chartMeasurementIds, true)
+    this.updateSubscriptions(this.props.measurementIds, true)
+    this.updateLabels(this.props.measurementIds, true)
+    this.updateVisibility(this.props.measurementIds, this.props.measurementIdsShown, true)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.updateSubscriptions(nextProps.chartMeasurementIds)
+    this.updateSubscriptions(nextProps.measurementIds)
+    this.updateLabels(nextProps.measurementIds)
+    this.updateVisibility(nextProps.measurementIds, nextProps.measurementIdsShown)
   }
 
   componentWillUnmount() {
@@ -254,14 +231,13 @@ class ChartCard extends React.Component {
   }
 
   render() {
-    //console.log(this.state.measurementRequestMap.toJS())
     const nodeMetadata = this.props.nodesMetadata.get(this.props.params.nodeId)
     return (
       <Card>
         <CardTitle title={nodeMetadata.get('name')}/>
         <CardText>
           <div>
-            <Graph data={this.state.data} labels={this.state.labels}/>
+            <Graph data={this.state.data} labels={this.state.labels} visibility={this.state.visibility}/>
             <p>Data Range</p>
             <RaisedButton
               onClick={this.onDataRangeChange(DATA_RANGE_LIVE, (new MomentDate()).subtract(1, 'day'), new MomentDate())}

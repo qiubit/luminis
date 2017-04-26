@@ -23,9 +23,9 @@ export function setupWebsocket(dispatch, reconnectInterval = 5000) {
     }
     const onMessage = (evt) => {
       const dataString = evt.data
-      // RequestManager expects, that the answers passed will be immutable
-      const immutableRequestMessage = fromJS(JSON.parse(dataString))
-      dispatch(messageFromServer(immutableRequestMessage))
+
+      const requestMessage = JSON.parse(dataString)
+      dispatch(messageFromServer(requestMessage))
     }
     const onClose = () => {
       dispatch(websocketDisconnected())
