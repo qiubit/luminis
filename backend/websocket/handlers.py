@@ -66,7 +66,7 @@ class NewChartRequestHandler(AbstractRequestHandler):
     SCHEMA = Schema({
         Required('node_id'): int,
         Required('begin_ts'): int,
-        Required('requested_data'): dict,
+        Required('requested_data'): [dict],
         Required('end_ts'): int,
         Required('update_data'): bool,
         Required('aggregation_length'): int,
@@ -77,10 +77,10 @@ class NewChartRequestHandler(AbstractRequestHandler):
         super().__init__(request_id, payload)
         session = Session()
         self._entity = get_one(session, Entity, id=self._raw_payload.node_id, exception_cls=ValueError)
-        self._requested_data = create_measurement_handler(self._raw_payload.node_id,
-                                                          self._raw_payload.aggregation_length,
-                                                          self._raw_payload.aggregation_type,
-                                                          self._raw_payload.requested_data)
+        self._requested_data = [create_measurement_handler(self._raw_payload.node_id,
+                                                           self._raw_payload.aggregation_length,
+                                                           self._raw_payload.aggregation_type,
+                                                           data) for data in self._raw_payload.requested_data]
         self._run_assertions()
 
     @property
@@ -92,7 +92,10 @@ class NewChartRequestHandler(AbstractRequestHandler):
 
     def _run_assertions(self):
         measurements_for_entity = self._entity.entity_type.series
-        for measurement in self._requested_data.measurements:
+        measurements_in_data = set()
+        for handler in self._requested_data:
+            measurements_in_data |= handler.measurements
+        for measurement in measurements_in_data:
             if measurement not in measurements_for_entity:
                 raise ValueError('Requested entity does not support requested measurement')
 
@@ -104,11 +107,18 @@ class NewChartRequestHandler(AbstractRequestHandler):
         now = int(time.time())
         self._raw_payload.begin_ts = begin_ts + (now - end_ts)
         self._raw_payload.end_ts = now
-        results = self._requested_data.evaluate(begin_ts, end_ts)
+        results = dict()
+        for i in range(len(self._requested_data)):
+            for ts, val in self._requested_data[i].evaluate(begin_ts, end_ts):
+                if ts in results:
+                    results[ts][i] = val
+                else:
+                    results[ts] = dict({i: val})
+
         if not self._raw_payload.update_data:
             self.remove()
         return {
-            'plot_data': [{'x': r[0], 'y': r[1]} for r in results]
+            'plot_data': [[ts] + [results[ts].get(i) for i in range(len(self._requested_data))] for ts in results]
         }
 
 
