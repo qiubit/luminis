@@ -137,7 +137,7 @@ def should_retrieve_previous_state() -> bool:
         parsed user answer as bool
     """
     should_retrieve = get_input(STATE_RETRIEVE_PROMPT)
-    should_retrieve.strip().lower()
+    should_retrieve = should_retrieve.strip().lower()
     return should_retrieve != 'n'
 
 
@@ -148,7 +148,7 @@ def should_create_initial_data() -> bool:
         parsed user answer as bool
     """
     should_create = get_input(INITIAL_DATA_PROMPT)
-    should_create.strip().lower()
+    should_create = should_create.strip().lower()
     return should_create == 'y'
 
 
