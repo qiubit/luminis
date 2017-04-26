@@ -11,7 +11,7 @@ import time
 from simulator.random_series_functions import RandomSinSeries, RandomConstantSeries
 from simulator.data_creator import generate_data
 
-BASE_URL = 'http://localhost:8080'
+BASE_URL = ''
 
 STATE_RETRIEVE_PROMPT = '''
 Try to retrieve previous state? [Y/n] '''
