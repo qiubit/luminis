@@ -91,12 +91,12 @@ class NewChartRequestHandler(AbstractRequestHandler):
         self.SCHEMA(payload)
 
     def _run_assertions(self):
-        measurements_for_entity = self._entity.entity_type.series
+        measurements_for_entity = [s.id for s in self._entity.entity_type.series]
         measurements_in_data = set()
         for handler in self._requested_data:
-            measurements_in_data |= handler.measurements
+            measurements_in_data |= handler.measurements()
         for measurement in measurements_in_data:
-            if measurement not in measurements_for_entity:
+            if measurement.id not in measurements_for_entity:
                 raise ValueError('Requested entity does not support requested measurement')
 
     def _handle_request(self) -> Optional[Dict[str, Any]]:
@@ -118,7 +118,8 @@ class NewChartRequestHandler(AbstractRequestHandler):
         if not self._raw_payload.update_data:
             self.remove()
         return {
-            'plot_data': [[ts] + [results[ts].get(i) for i in range(len(self._requested_data))] for ts in results]
+            'plot_data': sorted([[ts] + [results[ts].get(i) for i in range(len(self._requested_data))]
+                                 for ts in results])
         }
 
 
