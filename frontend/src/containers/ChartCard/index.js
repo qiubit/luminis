@@ -3,6 +3,7 @@ import Dygraph from 'dygraphs'
 import { Map, fromJS } from 'immutable'
 import MomentDate from 'moment'
 import DateTimePicker from 'react-datetime'
+import NumericInput from  'react-numeric-input'
 
 
 import { Card, CardTitle, CardText, Paper } from 'material-ui/Card'
@@ -69,6 +70,63 @@ class DatePickerBar extends React.Component {
   }
 }
 
+
+function StyledInput(props) {
+  return (
+    <NumericInput
+      {...props}
+      style = {{input: {
+        'color': 'white',
+        'backgroundColor': 'rgb(48, 48, 48)',
+        'fontSize': '16px',
+        'boxShadow': 'rgba(0, 0, 0, 0.2) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+        'height': '37px',
+        'textAlign': 'center',
+        'border': '0px',
+      }}}/>
+  )
+}
+
+class AggregationPickerBar extends React.Component {
+  constructor(props) {
+    super(props)
+    let sec = this.props.aggregationLength
+    let min = 0
+    let hours = 0
+
+    min = Math.floor(sec / 60)
+    sec = sec - min * 60
+
+    hours = Math.floor(min / 60)
+    min = min - hours * 60
+    this.state = {
+      aggregationHours: hours,
+      aggregationMinutes: min,
+      aggregationSeconds: sec
+    }
+    this.getAggregationLength = this.getAggregationLength.bind(this)
+  }
+
+  getAggregationLength() {
+    return this.state.aggregationSeconds + 60 * this.state.aggregationMinutes + 3600 * this.state.aggregationHours
+  }
+
+  render() {
+    return (
+      <div>
+      <StyledInput min={0} format={(num) => num + 'h'} value={this.state.aggregationHours} onChange={(value) => {this.setState({aggregationHours: value})}}/>
+      <StyledInput min={0} max={59} format={(num) => num + 'm'} value={this.state.aggregationMinutes} onChange={(value) => {this.setState({aggregationMinutes: value})}}/>
+      <StyledInput min={0} max={59} format={(num) => num + 's'} value={this.state.aggregationSeconds} onChange={(value) => {this.setState({aggregationSeconds: value})}}/>
+      <RaisedButton
+        onClick={this.props.onSubmit(this.getAggregationLength())}
+        primary={true}
+        label="SUBMIT"
+      />
+      </div>
+    )
+  }
+}
+
 class Graph extends React.Component {
 
   shouldComponentUpdate(nextProps) {
@@ -125,28 +183,27 @@ class ChartCard extends React.Component {
       begin,
       end
     })
-    let initAggregation = fromJS({
-      label: AGGREGATION_1M,
-      value: 60
-    })
     this.state = {
       dataRange: initDataRange,
-      aggregation: initAggregation,
+      aggregationLength: 60,
       requestDataRange: fromJS({}),
-      requestAggregation: fromJS({}),
+      requestAggregationLength: null,
       chartRequestId: null,
       chartRequestData: null,
       data: [],
       labels: [],
       visibility: [],
       showDatePickers: false,
-      activeDataRangeButton: DATA_RANGE_LIVE
+      showAggregationPicker: false,
+      activeDataRangeButton: DATA_RANGE_LIVE,
+      activeAggregationButton: AGGREGATION_1M
     }
     this.onDataRangeChange = this.onDataRangeChange.bind(this)
     this.onAggregationChange = this.onAggregationChange.bind(this)
     this.updateSubscriptions = this.updateSubscriptions.bind(this)
     this.makeRequest = this.makeRequest.bind(this)
-    this.onSubmit = this.onSubmit.bind(this)
+    this.onDataRangeSubmit = this.onDataRangeSubmit.bind(this)
+    this.onAggregationSubmit = this.onAggregationSubmit.bind(this)
   }
 
 
@@ -195,7 +252,7 @@ class ChartCard extends React.Component {
     let beginTs = Math.floor(this.state.dataRange.get('begin').valueOf() / 1000)
     let endTs = Math.floor(this.state.dataRange.get('end').valueOf() / 1000)
     let updateData = false
-    let aggregationLength = this.state.aggregation.get('value')
+    let aggregationLength = this.state.aggregationLength
     let aggregationType = 'mean'
     return requestNewChart(parseInt(nodeId), requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType)
   }
@@ -204,7 +261,7 @@ class ChartCard extends React.Component {
   updateSubscriptions(newMeasurementIds, mounting = false) {
     const nodeId = this.props.params.nodeId
     // If measurements have changed, we should drop current subscriptions and make new ones
-    if ((!newMeasurementIds.equals(this.props.measurementIds)) || this.state.requestDataRange !== this.state.dataRange || this.state.requestAggregation !== this.state.aggregation || mounting) {
+    if ((!newMeasurementIds.equals(this.props.measurementIds)) || this.state.requestDataRange !== this.state.dataRange || this.state.requestAggregationLength !== this.state.aggregationLength || mounting) {
 
       if (this.state.chartRequestId) {
         this.props.dispatch(cancelRequest(this.state.chartRequestId))
@@ -216,7 +273,7 @@ class ChartCard extends React.Component {
       this.setState({
         chartRequestId: newChartRequest.message.request_id,
         requestDataRange: this.state.dataRange,
-        requestAggregation: this.state.aggregation,
+        requestAggregationLength: this.state.aggregationLength,
       })
     }
   }
@@ -267,20 +324,23 @@ class ChartCard extends React.Component {
     }
   }
 
-  onSubmit = (newBegin, newEnd) => () => {
+  onDataRangeSubmit = (newBegin, newEnd) => () => {
     let newDataRange = this.state.dataRange
     newDataRange = newDataRange.set('begin', newBegin).set('end', newEnd)
     this.setState({dataRange: newDataRange})
   }
 
+  onAggregationSubmit = (aggregationLength) => () => {
+    this.setState({aggregationLength})
+  }
 
 
-  onAggregationChange = (label, value) => () => {
-    let newAggregation = fromJS({
-      label,
-      value
-    })
-    this.setState({ aggregation: newAggregation })
+  onAggregationChange = (label, value, showAggregationPicker) => () => {
+    if (value) {
+      this.setState({ aggregationLength: value, activeAggregationButton: label, showAggregationPicker })
+    } else {
+      this.setState({ activeAggregationButton: label, showAggregationPicker })
+    }
   }
 
   render() {
@@ -296,7 +356,7 @@ class ChartCard extends React.Component {
                 <DatePickerBar
                   begin={this.state.dataRange.get('begin')}
                   end={this.state.dataRange.get('end')}
-                  onSubmit={this.onSubmit}
+                  onSubmit={this.onDataRangeSubmit}
                 />
             }
             <p>Data Range</p>
@@ -329,25 +389,32 @@ class ChartCard extends React.Component {
           <div>
             <p>Aggregation</p>
             <RaisedButton
-              onClick={this.onAggregationChange(AGGREGATION_1M, 60)}
-              primary={this.state.aggregation.get('label') === AGGREGATION_1M}
+              onClick={this.onAggregationChange(AGGREGATION_1M, 60, false)}
+              primary={this.state.activeAggregationButton === AGGREGATION_1M}
               label="1M"
             />
             <RaisedButton
-              onClick={this.onAggregationChange(AGGREGATION_30M, 30 * 60)}
-              primary={this.state.aggregation.get('label') === AGGREGATION_30M}
+              onClick={this.onAggregationChange(AGGREGATION_30M, 30 * 60, false)}
+              primary={this.state.activeAggregationButton === AGGREGATION_30M}
               label="30M"
             />
             <RaisedButton
-              onClick={this.onAggregationChange(AGGREGATION_24H, 24 * 60 * 60)}
-              primary={this.state.aggregation.get('label') === AGGREGATION_24H}
+              onClick={this.onAggregationChange(AGGREGATION_24H, 24 * 60 * 60, false)}
+              primary={this.state.activeAggregationButton === AGGREGATION_24H}
               label="24H"
             />
             <RaisedButton
-              onClick={this.onAggregationChange(AGGREGATION_CUSTOM, 30)}
-              primary={this.state.aggregation.get('label') === AGGREGATION_CUSTOM}
+              onClick={this.onAggregationChange(AGGREGATION_CUSTOM, null, true)}
+              primary={this.state.activeAggregationButton === AGGREGATION_CUSTOM}
               label="CUSTOM"
             />
+            {
+              this.state.showAggregationPicker &&
+                <AggregationPickerBar
+                  aggregationLength={this.state.aggregationLength}
+                  onSubmit={this.onAggregationSubmit}
+                />
+            }
           </div>
         </CardText>
       </Card>
