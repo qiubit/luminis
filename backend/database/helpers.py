@@ -22,7 +22,7 @@ def get_one(session, cls, **kwargs):
 
 
 def get_last_data_modification_ts(session):
-    result = session.query(GlobalMetadata).all()
+    result = get_all(session, GlobalMetadata)
     if not result:
         metadata = GlobalMetadata()
         session.add(metadata)
@@ -33,7 +33,7 @@ def get_last_data_modification_ts(session):
 
 
 def update_last_data_modification_ts(session):
-    result = session.query(GlobalMetadata).all()
+    result = get_all(session, GlobalMetadata)
     if not result:
         metadata = GlobalMetadata()
         session.add(metadata)
