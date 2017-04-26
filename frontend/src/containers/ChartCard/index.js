@@ -150,12 +150,13 @@ class ChartCard extends React.Component {
   }
 
   makeRequest(nodeId, measurementIds) {
+    let requestedData = measurementIds.map((measurementId) => Object({measurement_id: measurementId})).toJS()
     let beginTs = Math.floor(this.state.dataRange.get('begin').valueOf() / 1000)
     let endTs = Math.floor(this.state.dataRange.get('end').valueOf() / 1000)
     let updateData = false
     let aggregationLength = this.state.aggregation.get('value')
     let aggregationType = 'mean'
-    return requestNewChart(nodeId, measurementIds.toJS(), beginTs, endTs, updateData, aggregationLength, aggregationType)
+    return requestNewChart(nodeId, requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType)
   }
 
 

@@ -25,14 +25,14 @@ export function requestNewLiveData(nodeId, measurementId) {
   }
 }
 
-export function requestNewChart(nodeId, measurementIds, beginTs, endTs, updateData, aggregationLength, aggregationType) {
+export function requestNewChart(nodeId, requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType) {
   let requestId = getNextRequestId();
   let message = {
     request_id: requestId,
     type: 'new_chart',
     params: {
       node_id: nodeId,
-      requested_data: measurementIds,
+      requested_data: requestedData,
       begin_ts: beginTs,
       end_ts: endTs,
       update_data: updateData,
