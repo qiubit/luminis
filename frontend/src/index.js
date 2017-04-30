@@ -44,7 +44,7 @@ ReactDOM.render(
   (
     <Provider store={store}>
       <div>
-        <TreeProvider url={config.apiUrl} refreshTime={config.fetchTreeRefreshTime}/>
+        <TreeProvider timestampUrl={config.timestampUrl} treeUrl={config.treeUrl} refreshTime={config.fetchTreeRefreshTime}/>
         <Router history={history}>
           <Route path="/" component={App}>
             <IndexRoute component={LandingPage}/>
