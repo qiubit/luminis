@@ -1,12 +1,12 @@
 import React from 'react'
 import Dygraph from 'dygraphs'
-import { Map, fromJS } from 'immutable'
+import { fromJS } from 'immutable'
 import MomentDate from 'moment'
 import DateTimePicker from 'react-datetime'
 import NumericInput from  'react-numeric-input'
 
 
-import { Card, CardTitle, CardText, Paper } from 'material-ui/Card'
+import { Card, CardTitle, CardText} from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import 'dygraphs/dist/dygraph.css'
 
@@ -22,7 +22,6 @@ import {
   DATA_RANGE_1D,
   DATA_RANGE_30D,
   DATA_RANGE_1Y,
-  DATA_RANGE_MAX,
   DATA_RANGE_CUSTOM,
 
   AGGREGATION_1M,
@@ -75,7 +74,7 @@ function StyledInput(props) {
   return (
     <NumericInput
       {...props}
-      style = {{input: {
+      style={{input: {
         'color': 'white',
         'backgroundColor': 'rgb(48, 48, 48)',
         'fontSize': '16px',
@@ -95,10 +94,10 @@ class AggregationPickerBar extends React.Component {
     let hours = 0
 
     min = Math.floor(sec / 60)
-    sec = sec - min * 60
+    sec -= min * 60
 
     hours = Math.floor(min / 60)
-    min = min - hours * 60
+    min -= hours * 60
     this.state = {
       aggregationHours: hours,
       aggregationMinutes: min,
@@ -200,10 +199,13 @@ class ChartCard extends React.Component {
     }
     this.onDataRangeChange = this.onDataRangeChange.bind(this)
     this.onAggregationChange = this.onAggregationChange.bind(this)
-    this.updateSubscriptions = this.updateSubscriptions.bind(this)
-    this.makeRequest = this.makeRequest.bind(this)
     this.onDataRangeSubmit = this.onDataRangeSubmit.bind(this)
     this.onAggregationSubmit = this.onAggregationSubmit.bind(this)
+
+    this.updateSubscriptions = this.updateSubscriptions.bind(this)
+    this.updateLabels = this.updateLabels.bind(this)
+    this.updateVisibility = this.updateVisibility.bind(this)
+    this.updateAll = this.updateAll.bind(this)
   }
 
 
@@ -233,10 +235,65 @@ class ChartCard extends React.Component {
     return newVisibility
   }
 
+  makeRequest(nodeId, measurementIds, dataRange, aggregationLength) {
+    let requestedData = measurementIds.map((measurementId) => Object({measurement_id: measurementId})).toJS()
+    let beginTs = Math.floor(dataRange.get('begin').valueOf() / 1000)
+    let endTs = Math.floor(dataRange.get('end').valueOf() / 1000)
+    let updateData = false
+    let aggregationType = 'mean'
+    return requestNewChart(parseInt(nodeId, 10), requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType)
+  }
 
+  updateSubscriptions(newMeasurementIds, newDataRange, newAggregationLength) {
+    if (this.state.chartRequestId) {
+      this.props.dispatch(cancelRequest(this.state.chartRequestId))
+    }
 
-  componentWillUpdate() {
-    let request = this.props.activeRequests.get(this.state.chartRequestId)
+    let newChartRequest = this.makeRequest(this.props.params.nodeId, newMeasurementIds, newDataRange, newAggregationLength)
+    this.props.dispatch(newChartRequest)
+
+    this.setState({
+      chartRequestId: newChartRequest.message.request_id,
+      requestDataRange: newDataRange,
+      requestAggregationLength: newAggregationLength,
+    })
+  }
+
+  updateLabels(newMeasurementIds) {
+    this.setState({
+      labels: this.makeLabels(newMeasurementIds)
+    })
+  }
+
+  updateVisibility(newMeasurementIds, newMeasurementIdsShown) {
+    this.setState({
+      visibility: this.makeVisibility(newMeasurementIds, newMeasurementIdsShown)
+    })
+  }
+
+  updateAll(newMeasurementIds, newMeasurementIdsShown, newRequestDataRange, newAggregationLength) {
+    this.updateSubscriptions(newMeasurementIds, newRequestDataRange, newAggregationLength)
+    this.updateLabels(newMeasurementIds)
+    this.updateVisibility(newMeasurementIds, newMeasurementIdsShown)
+  }
+
+  // Subscribe to live data on mount
+  componentWillMount() {
+    this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(cancelRequest(this.state.chartRequestId))
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.measurementIds.equals(nextProps.measurementIds)) {
+      this.updateAll(nextProps.measurementIds, nextProps.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
+    } else if (!this.props.measurementIdsShown.equals(nextProps.measurementIdsShown)) {
+      this.updateVisibility(nextProps.measurementIds, nextProps.measurementIdsShown)
+    }
+
+    let request = nextProps.activeRequests.get(this.state.chartRequestId)
     let newChartRequestData = null
     if (request && request.get('state') !== PENDING_STATE) {
       newChartRequestData = request.get('data').plot_data
@@ -247,71 +304,6 @@ class ChartCard extends React.Component {
     }
   }
 
-  makeRequest(nodeId, measurementIds) {
-    let requestedData = measurementIds.map((measurementId) => Object({measurement_id: measurementId})).toJS()
-    let beginTs = Math.floor(this.state.dataRange.get('begin').valueOf() / 1000)
-    let endTs = Math.floor(this.state.dataRange.get('end').valueOf() / 1000)
-    let updateData = false
-    let aggregationLength = this.state.aggregationLength
-    let aggregationType = 'mean'
-    return requestNewChart(parseInt(nodeId), requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType)
-  }
-
-
-  updateSubscriptions(newMeasurementIds, mounting = false) {
-    const nodeId = this.props.params.nodeId
-    // If measurements have changed, we should drop current subscriptions and make new ones
-    if ((!newMeasurementIds.equals(this.props.measurementIds)) || this.state.requestDataRange !== this.state.dataRange || this.state.requestAggregationLength !== this.state.aggregationLength || mounting) {
-
-      if (this.state.chartRequestId) {
-        this.props.dispatch(cancelRequest(this.state.chartRequestId))
-      }
-
-      let newChartRequest = this.makeRequest(nodeId, newMeasurementIds)
-      this.props.dispatch(newChartRequest)
-
-      this.setState({
-        chartRequestId: newChartRequest.message.request_id,
-        requestDataRange: this.state.dataRange,
-        requestAggregationLength: this.state.aggregationLength,
-      })
-    }
-  }
-
-  updateLabels(newMeasurementIds, mounting = false) {
-    if (!newMeasurementIds.equals(this.props.measurementIds) || mounting) {
-      this.setState({
-        labels: this.makeLabels(newMeasurementIds)
-      })
-    }
-  }
-
-  updateVisibility(newMeasurementIds, newMeasurementIdsShown, mounting = false) {
-    if (!newMeasurementIds.equals(this.props.measurementIds) || !newMeasurementIdsShown.equals(this.props.measurementIdsShown) || mounting) {
-      this.setState({
-        visibility: this.makeVisibility(newMeasurementIds, newMeasurementIdsShown)
-      })
-    }
-  }
-
-  // Subscribe to live data on mount
-  componentWillMount() {
-    this.updateSubscriptions(this.props.measurementIds, true)
-    this.updateLabels(this.props.measurementIds, true)
-    this.updateVisibility(this.props.measurementIds, this.props.measurementIdsShown, true)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.updateSubscriptions(nextProps.measurementIds)
-    this.updateLabels(nextProps.measurementIds)
-    this.updateVisibility(nextProps.measurementIds, nextProps.measurementIdsShown)
-  }
-
-  componentWillUnmount() {
-    // Calling updateSubscriptions with empty measurementIds list will result in request cleanup
-    this.updateSubscriptions(fromJS([]))
-  }
-
   onDataRangeChange = (button, begin, end, showDatePickers) => () => {
     if (begin && end) {
       let newDataRange = fromJS({
@@ -319,6 +311,7 @@ class ChartCard extends React.Component {
         end,
       })
       this.setState({dataRange: newDataRange, activeDataRangeButton: button, showDatePickers})
+      this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, newDataRange, this.state.aggregationLength)
     } else {
       this.setState({activeDataRangeButton: button, showDatePickers})
     }
@@ -328,18 +321,21 @@ class ChartCard extends React.Component {
     let newDataRange = this.state.dataRange
     newDataRange = newDataRange.set('begin', newBegin).set('end', newEnd)
     this.setState({dataRange: newDataRange})
+    this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
   }
 
-  onAggregationSubmit = (aggregationLength) => () => {
-    this.setState({aggregationLength})
+  onAggregationSubmit = (newAggregationLength) => () => {
+    this.setState({aggregationLength: newAggregationLength})
+    this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, newAggregationLength)
   }
 
 
-  onAggregationChange = (label, value, showAggregationPicker) => () => {
-    if (value) {
-      this.setState({ aggregationLength: value, activeAggregationButton: label, showAggregationPicker })
+  onAggregationChange = (newActiveAggregationButton, newAggregationLength, showAggregationPicker) => () => {
+    if (newAggregationLength) {
+      this.setState({ aggregationLength: newAggregationLength, activeAggregationButton: newActiveAggregationButton, showAggregationPicker })
+      this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, newAggregationLength)
     } else {
-      this.setState({ activeAggregationButton: label, showAggregationPicker })
+      this.setState({ activeAggregationButton: newActiveAggregationButton, showAggregationPicker })
     }
   }
 
