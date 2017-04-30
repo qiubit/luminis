@@ -180,7 +180,8 @@ class ChartCard extends React.Component {
     let end = new MomentDate()
     let initDataRange = fromJS({
       begin,
-      end
+      end,
+      live: true
     })
     this.state = {
       dataRange: initDataRange,
@@ -239,7 +240,7 @@ class ChartCard extends React.Component {
     let requestedData = measurementIds.map((measurementId) => Object({measurement_id: measurementId})).toJS()
     let beginTs = Math.floor(dataRange.get('begin').valueOf() / 1000)
     let endTs = Math.floor(dataRange.get('end').valueOf() / 1000)
-    let updateData = false
+    let updateData = dataRange.get('live')
     let aggregationType = 'mean'
     return requestNewChart(parseInt(nodeId, 10), requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType)
   }
@@ -304,11 +305,12 @@ class ChartCard extends React.Component {
     }
   }
 
-  onDataRangeChange = (button, begin, end, showDatePickers) => () => {
+  onDataRangeChange = (button, begin, end, live, showDatePickers) => () => {
     if (begin && end) {
       let newDataRange = fromJS({
         begin,
         end,
+        live
       })
       this.setState({dataRange: newDataRange, activeDataRangeButton: button, showDatePickers})
       this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, newDataRange, this.state.aggregationLength)
@@ -319,7 +321,7 @@ class ChartCard extends React.Component {
 
   onDataRangeSubmit = (newBegin, newEnd) => () => {
     let newDataRange = this.state.dataRange
-    newDataRange = newDataRange.set('begin', newBegin).set('end', newEnd)
+    newDataRange = newDataRange.set('begin', newBegin).set('end', newEnd).set('live', false)
     this.setState({dataRange: newDataRange})
     this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
   }
@@ -357,27 +359,27 @@ class ChartCard extends React.Component {
             }
             <p>Data Range</p>
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_LIVE, (new MomentDate()).subtract(1, 'day'), new MomentDate(), false)}
+              onClick={this.onDataRangeChange(DATA_RANGE_LIVE, (new MomentDate()).subtract(1, 'day'), new MomentDate(), true, false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_LIVE}
               label="LIVE"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_1D, (new MomentDate()).subtract(1, 'day'), new MomentDate(), false)}
+              onClick={this.onDataRangeChange(DATA_RANGE_1D, (new MomentDate()).subtract(1, 'day'), new MomentDate(), false, false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_1D}
               label="1D"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_30D, (new MomentDate()).subtract(30, 'day'), new MomentDate(), false)}
+              onClick={this.onDataRangeChange(DATA_RANGE_30D, (new MomentDate()).subtract(30, 'day'), new MomentDate(), false, false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_30D}
               label="30D"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_1Y, (new MomentDate()).subtract(1, 'year'), new MomentDate(), false)}
+              onClick={this.onDataRangeChange(DATA_RANGE_1Y, (new MomentDate()).subtract(1, 'year'), new MomentDate(), false, false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_1Y}
               label="1Y"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_CUSTOM, null, null, true)}
+              onClick={this.onDataRangeChange(DATA_RANGE_CUSTOM, null, null, false, true)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_CUSTOM}
               label="CUSTOM"
             />
