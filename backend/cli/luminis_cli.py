@@ -4,6 +4,7 @@ import urllib.request
 import urllib.error
 import json
 import re
+import configparser
 
 
 # configuration
@@ -398,6 +399,8 @@ def entity_main():
 
 
 def main():
+    global BASE_URL
+
     config = get_config("config/cli.ini")
     BASE_URL = config["api_url"]
 

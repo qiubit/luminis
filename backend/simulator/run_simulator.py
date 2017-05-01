@@ -356,6 +356,8 @@ def data_generator(ss: SimulatorState, sensor_update_interval: float, data_dir: 
 
 
 def main():
+    global BASE_URL
+
     # Fetch simulator config
     config = get_config("config/simulator.ini")
 
