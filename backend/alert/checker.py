@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import time
 from typing import Callable, Iterable, Any
 

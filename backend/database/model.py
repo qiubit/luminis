@@ -260,3 +260,14 @@ class Alert(Base):
 
     entity = relationship('Entity', backref='alerts', primaryjoin='Entity.id == Alert.entity_id_fk')
     series = relationship('SeriesAttribute', backref='alerts', primaryjoin='SeriesAttribute.id == Alert.series_id_fk')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'entity_id': self.entity_id_fk,
+            'series_id': self.series_id_fk,
+            'alert_predicate_type': self.alert_predicate_type,
+            'value': self.value,
+            'is_enabled': self.is_enabled,
+            'alert_recipient_email': self.alert_recipient_email,
+        }

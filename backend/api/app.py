@@ -3,6 +3,7 @@ import configparser
 
 from pycnic.core import WSGI
 
+from api.alert import AlertHandler
 from api.entity_type import EntityTypeHandler
 from api.global_metadata import TimestampHandler, PingHandler
 from api.meta_attribute import MetaAttributeHandler
@@ -39,6 +40,10 @@ class Application(WSGI):
         # global metadata and utils
         (r'/meta/timestamp', TimestampHandler()),
         (r'/meta/ping', PingHandler()),
+
+        # alerts
+        (r'/alert', AlertHandler()),
+        (r'/alert/(\d+)', AlertHandler()),
     ]
     headers = [
         ('Access-Control-Allow-Origin', get_allowed_origin()),
