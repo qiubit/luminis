@@ -1,0 +1,34 @@
+.pagination {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+.pagination-list {
+    list-style-type: none;
+    display: inline-block;
+}
+
+.page {
+	float: left;
+	border: 1px solid #ddd;
+    margin: 0 4px;
+    text-decoration: none;
+    padding: 8px 16px;
+    color: black;
+    transition: background-color .3s;
+}
+
+.page-active {
+    background-color: #333333;
+    color: white;
+    border: 1px solid #333333;
+}
+
+.disabled {
+	visibility: hidden;
+}
+
+a.page-link:hover {
+	cursor: pointer;
+}
