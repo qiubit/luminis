@@ -476,13 +476,13 @@ def alert_main():
 
     def deactivate(ident):
         if alert_manager.get(ident):
-            alert_manager.update(ident, is_active=False)
+            alert_manager.update(ident, is_enabled=False)
         else:
             print('ERROR: alert does not exist')
 
     def activate(ident):
         if alert_manager.get(ident):
-            alert_manager.update(ident, is_active=True)
+            alert_manager.update(ident, is_enabled=True)
         else:
             print('ERROR: alert does not exist')
 
