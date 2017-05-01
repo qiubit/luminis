@@ -2,14 +2,17 @@ This README assumes that PostgreSQL and InfluxDB databases are up and running on
 ports, which can be done by following the `README.md` file in root directory. It describes how to run backend deamons and services needed for running Luminis frontend. Optional instructions show how to add sample data to databases, which can be useful for testing.
 
 ## Instructions
- 1. Before doing anything, PostgreSQL migrations must be executed. If you haven't done this already, run:
-```sh
-$ alembic -c config/alembic.ini upgrade head
-```
- 2. You need to setup `virtualenv` to install all Python dependencies. 
+ 1. You need to setup `virtualenv` to install all Python dependencies. 
 ```sh
 $ virtualenv -p python3 venv
+$ . venv/bin/activate
 $ pip install -r requirements.txt
+```
+ 2. Before doing anything, PostgreSQL migrations must be executed. If you haven't done this already, run:
+```sh
+$ . venv/bin/activate
+$ export PYTHONPATH=.
+$ alembic -c config/alembic.ini upgrade head
 ```
  3. Run Rest API for street light metadata. To do that, we supply helper script which gets your `virtalenv` name. To use it, you must `cd` into `backend` directory, and run e.g. `./start_api.sh venv`.
  4. Run WebSocket server. You can use helper script `./start_ws_server.sh` e.g. by running `./start_ws_server.sh venv`
