@@ -1,4 +1,4 @@
-s README assumes that PostgreSQL and InfluxDB databases are up and running on standard
+This README assumes that PostgreSQL and InfluxDB databases are up and running on standard
 ports, which can be done by following the `README.md` file in root directory. It describes how to run backend deamons and services needed for running Luminis frontend. Optional instructions show how to add sample data to databases, which can be useful for testing.
 
 ## Instructions
@@ -29,4 +29,8 @@ $ ./cli/db_init.py http://localhost:8080 ./cli/db_init_sample/asfaltowa.meta
 
 For production, use `backend/cli/luminis_cli.py` which allows you to insert nodes one by one.
 To run it, you can use `./start_cli.sh` helper script available in `backend` directory. (It works the same way as previous helper scripts).
+
+## Additional configuration
+In production environment you might want to tune some parameters, such as InfluxDB port or PostgreSQL db name. All
+scripts described above use configuration files available at `backend/config`, which can be modified as needed.
 
