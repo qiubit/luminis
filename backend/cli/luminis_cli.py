@@ -162,6 +162,15 @@ class EntityManager(object):
     def lists(self):
         return self._cache
 
+def get_config(filename):
+    result = {}
+    config = configparser.ConfigParser()
+    config.read(filename)
+
+    params = {"api_url": str}
+    for param in params:
+        result[param] = params[param](config.get("cli", param))
+    return result
 
 def get_input(text):
     return ' '.join(input(text).lower().split())
@@ -389,6 +398,9 @@ def entity_main():
 
 
 def main():
+    config = get_config("config/cli.ini")
+    BASE_URL = config["api_url"]
+
     def exit_main():
         to_exit[0] = True
 

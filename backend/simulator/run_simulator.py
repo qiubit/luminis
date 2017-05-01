@@ -98,7 +98,7 @@ def get_config(filename):
     config = configparser.ConfigParser()
     config.read(filename)
 
-    params = {"data_dir": str, "pkl_dir": str, "sensor_update_interval": float}
+    params = {"data_dir": str, "pkl_dir": str, "sensor_update_interval": float, "api_url": str}
     for param in params:
         result[param] = params[param](config.get("simulator", param))
     return result
@@ -367,6 +367,7 @@ def main():
     if not os.path.isdir(pkl_dir):
         os.makedirs(pkl_dir)
     sensor_update_interval = config["sensor_update_interval"]
+    BASE_URL = config["api_url"]
 
     print("Fetching metadata...")
 
