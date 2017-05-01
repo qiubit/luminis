@@ -11,7 +11,7 @@ $ alembic -c config/alembic.ini upgrade head
 $ virtualenv -p python3 venv
 $ pip install -r requirements.txt
 ```
- 3. Run Rest API for street light metadata. To do that, we supply helper script which gets your `virtalenv` name. To use it, you must `cd` into `backend` directory, and run e.g. `./run_api.sh venv`.
+ 3. Run Rest API for street light metadata. To do that, we supply helper script which gets your `virtalenv` name. To use it, you must `cd` into `backend` directory, and run e.g. `./start_api.sh venv`.
  4. Run WebSocket server. You can use helper script `./start_ws_server.sh` e.g. by running `./start_ws_server.sh venv`
  5. All services and deamons should be now up and running!
  
@@ -28,5 +28,5 @@ $ ./cli/db_init.py http://localhost:8080 ./cli/db_init_sample/asfaltowa.meta
 ```
 
 For production, use `backend/cli/luminis_cli.py` which allows you to insert nodes one by one.
-To run it, you can use `./run_cli.sh` helper script available in `backend` directory.
+To run it, you can use `./start_cli.sh` helper script available in `backend` directory. (It works the same way as previous helper scripts).
 
