@@ -1,4 +1,5 @@
 import configparser
+import email.utils
 from email.mime.text import MIMEText
 from smtplib import SMTP, SMTP_SSL
 from typing import Tuple
@@ -35,5 +36,6 @@ def send_mail(alert: Alert, message: str):
     msg['Subject'] = 'Luminis alert'
     msg['From'] = sender
     msg['To'] = alert.alert_recipient_email
+    msg['Date'] = email.utils.formatdate(localtime=True)
     connection.send_message(msg)
     connection.quit()
