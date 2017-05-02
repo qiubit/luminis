@@ -56,7 +56,7 @@ class DatePickerBar extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{display: 'flex', justifyContent: 'space-between'}}>
       <DateTimePicker onChange={this.setBegin} open={false} dateFormat={'DD.MM.YYYY'} timeFormat={'HH:mm:ss'} defaultValue={this.props.begin}/>
       <RaisedButton
         onClick={this.props.onSubmit(this.state.begin, this.state.end)}
