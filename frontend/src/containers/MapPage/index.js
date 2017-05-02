@@ -98,7 +98,7 @@ class MapPage extends React.Component {
         />
         {this.mapTreeToMarkers(activeSubtree)}
       </Map>
-      <DataBoxGrid/>
+      <DataBoxGrid perPage={8}/>
       </div>
     );
   }
