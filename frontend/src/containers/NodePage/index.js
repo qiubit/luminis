@@ -46,7 +46,7 @@ class RightBar extends React.Component {
   }
 
   updateSubscriptions(newMeasurementIds, mounting = false) {
-    const nodeId = parseInt(this.props.params.nodeId)
+    const nodeId = parseInt(this.props.params.nodeId, 10)
     // If measurements have changed, we should drop current subscriptions and make new ones
     if (!newMeasurementIds.equals(this.props.measurementIds) || mounting) {
       // Drop current subscriptions
