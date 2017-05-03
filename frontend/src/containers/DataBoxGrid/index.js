@@ -52,7 +52,6 @@ class DataBoxGrid extends React.Component {
               marginPagesDisplayed={2}
               pageRangeDisplayed={5}
               onPageChange={this.handlePageClick}
-              breakClassName={"break"}
               pageClassName={"page"}
               previousClassName={this.state.offset === 0 ? "disabled page" : "page"}
               nextClassName={currentPage >= pageCount ? "disabled page" : "page"}
