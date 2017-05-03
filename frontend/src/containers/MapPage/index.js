@@ -1,21 +1,21 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-import { createStructuredSelector } from 'reselect';
+import React from 'react'
+import { connect } from 'react-redux'
+import { Map, Marker, Popup, TileLayer } from 'react-leaflet'
+import { createStructuredSelector } from 'reselect'
 
 
-import config from './config';
-import { selectActiveSubtree, selectNodeName } from '../App/selectors';
-import { selectNodeCoordinates } from './selectors';
-import { WARSAW_COORDS } from './constants';
+import config from './config'
+import { selectActiveSubtree, selectNodeName } from '../App/selectors'
+import { selectNodeCoordinates } from './selectors'
+import { WARSAW_COORDS } from './constants'
 
 import DataBoxGrid from '../DataBoxGrid/index'
 
 class MapPage extends React.Component {
 
   nodeToMarker = (nodeId) => {
-    let name = this.props.nodeNameGetter(nodeId.toString());
-    let coordinates = this.props.getNodeCoordinates(nodeId.toString());
+    let name = this.props.nodeNameGetter(nodeId.toString())
+    let coordinates = this.props.getNodeCoordinates(nodeId.toString())
     return (
       <Marker key={nodeId} position={coordinates}>
         <Popup>
@@ -31,7 +31,7 @@ class MapPage extends React.Component {
       activeNodes.push(tree.get('node_id'))
       if (tree.get('children')) {
         tree.get('children').forEach((childTree) => {
-          activeNodes.push(childTree.get('node_id'));
+          activeNodes.push(childTree.get('node_id'))
         })
       }
     }
@@ -83,24 +83,24 @@ class MapPage extends React.Component {
     let activeSubtree = this.props.activeSubtree.get(0)
     return (
       <div>
-      <Map
-        style={{height: "300px"}}
-        bounds={this.getBounds(activeSubtree)}
-        center={this.getCenter(activeSubtree)}
-        boundsOptions={{padding: config.mapPadding}}
-        maxZoom={config.mapMaxZoom}
-      >
-        <TileLayer
-          url={'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}'}
-          attribution={'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'}
-          id={config.mapTileLayerId}
-          accessToken={config.openStreetMapAccessToken}
-        />
-        {this.mapTreeToMarkers(activeSubtree)}
-      </Map>
-      <DataBoxGrid perPage={8}/>
+        <Map
+          style={{height: "300px"}}
+          bounds={this.getBounds(activeSubtree)}
+          center={this.getCenter(activeSubtree)}
+          boundsOptions={{padding: config.mapPadding}}
+          maxZoom={config.mapMaxZoom}
+        >
+          <TileLayer
+            url={'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}'}
+            attribution={'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'}
+            id={config.mapTileLayerId}
+            accessToken={config.openStreetMapAccessToken}
+          />
+          {this.mapTreeToMarkers(activeSubtree)}
+        </Map>
+        <DataBoxGrid perPage={8}/>
       </div>
-    );
+    )
   }
 }
 
@@ -108,7 +108,7 @@ const mapStateToProps = createStructuredSelector({
   activeSubtree: selectActiveSubtree,
   getNodeCoordinates: selectNodeCoordinates,
   nodeNameGetter: selectNodeName
-});
+})
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps)(MapPage);
+export default connect(mapStateToProps)(MapPage)

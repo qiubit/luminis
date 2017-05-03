@@ -10,7 +10,7 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router, browserHistory, IndexRoute, Route, Redirect } from 'react-router';
+import { Router, browserHistory, IndexRedirect, Route, Redirect } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import configureStore from './store';
 import './index.css';
@@ -32,7 +32,6 @@ import { setupWebsocket } from './containers/WebsocketConnection/websocket'
 setupWebsocket(store.dispatch)
 
 import App from './containers/App/index';
-import LandingPage from './components/LandingPage/index';
 import MapPage from './containers/MapPage/index';
 import NodePage from './containers/NodePage/index';
 import TreeProvider from './containers/TreeProvider/index';
@@ -47,7 +46,7 @@ ReactDOM.render(
         <TreeProvider timestampUrl={config.timestampUrl} treeUrl={config.treeUrl} refreshTime={config.fetchTreeRefreshTime}/>
         <Router history={history}>
           <Route path="/" component={App}>
-            <IndexRoute component={LandingPage}/>
+            <IndexRedirect to={MAP_URL}/>
             <Route path={MAP_URL} component={MapPage}/>
             <Route path={NODE_ID_URL} component={NodePage}/>
             <Redirect from='*' to={MAP_URL}/>
