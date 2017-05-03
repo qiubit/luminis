@@ -115,6 +115,8 @@ class EntityTypeHandler(Handler):
             tag.delete_ts = now
         for series in entity_type.series:
             series.delete_ts = now
+            for alert in series.alerts:
+                alert.delete_ts = now
         for meta in entity_type.meta:
             meta.delete_ts = now
         for entity in entity_type.nodes:

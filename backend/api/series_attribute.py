@@ -40,9 +40,12 @@ class SeriesAttributeHandler(Handler):
         }
 
     def delete(self, entity_type_id, ident):
+        now = time.time()
         entity_type = get_one(self.session, EntityType, id=entity_type_id)  # check if route is correct
         series = get_one(self.session, SeriesAttribute, entity_type=entity_type, id=ident)
-        series.delete_ts = time.time()
+        series.delete_ts = now
+        for alert in series.alerts:
+            alert.delete_ts = now
 
         self.session.commit()
         update_last_data_modification_ts(self.session)

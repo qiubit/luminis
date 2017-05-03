@@ -37,3 +37,13 @@ To run it, you can use `./start_cli.sh` helper script available in `backend` dir
 In production environment you might want to tune some parameters, such as InfluxDB port or PostgreSQL db name. All
 scripts described above use configuration files available at `backend/config`, which can be modified as needed.
 
+# Alerts
+
+### How to start:
+* set connection settings of your SMTP server in `config/alert.ini`
+* use `./start_alert_checker.sh` to start server
+
+### When emails are sent:
+* on first check of new alert
+* when alert status is OK, but was not on last check
+* when alert status was OK on last check, but is not now

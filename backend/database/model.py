@@ -1,6 +1,6 @@
 import configparser
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Float
 from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -241,4 +241,33 @@ class EntityMeta(Base):
         return {
             self.attribute.name: self.value,
             "entity_id": self.entity_id_fk,
+        }
+
+
+class Alert(Base):
+    __tablename__ = 'Alerts'
+
+    id = Column(Integer, primary_key=True)
+    entity_id_fk = Column(Integer, ForeignKey('Entities.id'), nullable=False)
+    series_id_fk = Column(Integer, ForeignKey('Series_Attributes.id'), nullable=False)
+    alert_predicate_type = Column(Enum('data_delay', 'value_too_low', 'value_too_high', name='alert_predicate_type'),
+                                  nullable=False)
+    value = Column(Float, nullable=False)
+    is_enabled = Column(Boolean, nullable=False, default=False)
+    last_check_status = Column(Boolean, nullable=True)
+    alert_recipient_email = Column(String(255), nullable=True)
+    delete_ts = Column(Integer, nullable=True, default=None)
+
+    entity = relationship('Entity', backref='alerts', primaryjoin='Entity.id == Alert.entity_id_fk')
+    series = relationship('SeriesAttribute', backref='alerts', primaryjoin='SeriesAttribute.id == Alert.series_id_fk')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'entity_id': self.entity_id_fk,
+            'series_id': self.series_id_fk,
+            'alert_predicate_type': self.alert_predicate_type,
+            'value': self.value,
+            'is_enabled': self.is_enabled,
+            'alert_recipient_email': self.alert_recipient_email,
         }

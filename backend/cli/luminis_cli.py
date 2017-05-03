@@ -42,9 +42,20 @@ h      -> print this command list
 q      -> go back
 '''
 
+ALERT_COMMANDS = '''Available commands:
+a      -> add new alert
+d <ID> -> delete selected alert, e.g. "d 1" -> delete alert #1
+e <ID> -> edit selected alert, e.g. "e 1" -> edit alert #1
+- <ID> -> disable selected alert
++ <ID> -> enable selected alert
+h      -> print this command list
+q      -> go back
+'''
+
 MAIN_TYPES_OF_OBJECTS = '''Select type of objects to modify:
 e -> entities
 t -> entity types
+a -> alerts
 h -> print this help
 q -> goodbye
 '''
@@ -132,6 +143,35 @@ class MetaAttributeManager(object):
 
     def delete(self, ident):
         do_request('/entity_type/{}/meta/{}'.format(self._entity_type_id, ident), method='DELETE')
+
+
+class AlertManager(object):
+    def __init__(self):
+        self._cache = dict()
+        self.reload_data()
+
+    def reload_data(self):
+        self._cache = dict()
+        for item in do_request('/alert'):
+            self._cache[item['id']] = item
+
+    def add(self, **kwargs):
+        do_request('/alert', method='POST', data=kwargs)
+        self.reload_data()
+
+    def update(self, ident, **kwargs):
+        do_request('/alert/{}'.format(ident), method='PUT', data=kwargs)
+        self.reload_data()
+
+    def delete(self, ident):
+        do_request('/alert/{}'.format(ident), method='DELETE')
+        self.reload_data()
+
+    def get(self, ident):
+        return self._cache.get(int(ident))
+
+    def lists(self):
+        return self._cache
 
 
 class EntityManager(object):
@@ -297,6 +337,23 @@ def entity_edit(manager, entity_type_manager, ident):
     manager.update(ident, **data)
 
 
+def alert_add(alert_manager):
+    entity_id = int(get_input('ID of entity? '))
+    series_id = int(get_input('ID of series? '))
+    alert_predicate_type = get_input('Type of alert (one of data_delay, value_too_low, value_too_high? ')
+    value = []
+    process_prompt('Value of alert? ', (
+        ('\s*(\d+\.?\d*)\s*', lambda v: value.append(float(v))),
+    ))
+    is_enabled = []
+    process_prompt('Is enabled (y/n)? ', (
+        ('\s*([YNyn])\s*', lambda v: is_enabled.append(v in ('y', 'Y'))),
+    ))
+    alert_recipient_email = get_input('Alert recipient email? ')
+    alert_manager.add(entity_id=entity_id, series_id=series_id, alert_predicate_type=alert_predicate_type,
+                      value=value[0], is_enabled=is_enabled[0], alert_recipient_email=alert_recipient_email)
+
+
 def entity_type_main():
     def try_update(ident):
         if manager.get(ident):
@@ -398,6 +455,72 @@ def entity_main():
         ))
 
 
+def alert_main():
+    def try_update(ident):
+        if alert_manager.get(ident):
+            value = float(get_input('New value? '))
+            alert_manager.update(ident, value=value)
+        else:
+            print('ERROR: alert does not exist')
+
+    def try_delete(ident):
+        if alert_manager.get(ident):
+            alert_manager.delete(ident)
+        else:
+            print('ERROR: alert does not exist')
+
+    def format_alert(alert):
+        entity = entity_manager.get(alert['entity_id'])
+        entity_type = entity_type_manager.get(entity['entity_type_id'])
+        series = list(filter(lambda s: s['id'] == alert['series_id'], entity_type['series']))[0]
+        return '{} of series {} ({}) of entity {} ({}) {} {}{}'.format(
+            'Data delay' if alert['alert_predicate_type'] == 'data_delay' else 'Value',
+            alert['series_id'],
+            series['name'],
+            alert['entity_id'],
+            entity['meta'].get('name', 'UNKNOWN'),
+            '<' if alert['alert_predicate_type'] == 'value_too_low' else '>',
+            alert['value'],
+            ' (not active)' if not alert['is_enabled'] else '',
+        )
+
+    def deactivate(ident):
+        if alert_manager.get(ident):
+            alert_manager.update(ident, is_enabled=False)
+        else:
+            print('ERROR: alert does not exist')
+
+    def activate(ident):
+        if alert_manager.get(ident):
+            alert_manager.update(ident, is_enabled=True)
+        else:
+            print('ERROR: alert does not exist')
+
+    def back():
+        go_back[0] = True
+
+    entity_type_manager = EntityTypeManager()
+    entity_manager = EntityManager()
+    alert_manager = AlertManager()
+    go_back = [False]  # enables modification in inner function
+
+    while not go_back[0]:
+        print('Alerts:')
+        for k, v in alert_manager.lists().items():
+            print('{} -> {}'.format(k, format_alert(v)))
+        print()
+
+        process_prompt(COMMAND_PROMPT, (
+            ('\s*a\s*', lambda: alert_add(alert_manager)),
+            ('\s*e\s*(\d+)\s*', try_update),
+            ('\s*d\s*(\d+)\s*', try_delete),
+            ('\s*-\s*(\d+)\s*', deactivate),
+            ('\s*\+\s*(\d+)\s*', activate),
+            ('\s*h\s*', lambda: print(ALERT_COMMANDS), True),
+            ('\s*q\s*', back)
+        ))
+
+
 def main():
     global BASE_URL
 
@@ -415,6 +538,7 @@ def main():
             process_prompt(COMMAND_PROMPT, (
                 ('\s*t\s*', entity_type_main),
                 ('\s*e\s*', entity_main),
+                ('\s*a\s*', alert_main),
                 ('\s*h\s*', lambda: print(MAIN_TYPES_OF_OBJECTS), True),
                 ('\s*q\s*', exit_main),
             ))

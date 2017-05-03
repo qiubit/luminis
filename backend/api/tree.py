@@ -102,6 +102,8 @@ class EntityHandler(Handler):
             tag.delete_ts = now
         for meta in entity.meta:
             meta.delete_ts = now
+        for alert in entity.alerts:
+            alert.delete_ts = now
         for child in entity.children:
             child.parent = entity.parent
 
