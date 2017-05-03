@@ -16,6 +16,7 @@ ENTITY_TYPE_COMMANDS = '''Available commands:
 a      -> add new entity type
 d <ID> -> delete selected entity type, e.g. "d 1" -> delete entity type #1
 e <ID> -> edit selected entity type, e.g. "e 1" -> edit entity type #1
+? <ID> -> print information about selected entity type
 h      -> print this command list
 q      -> go back
 '''
@@ -38,6 +39,7 @@ e <ID> -> edit selected node
 d <ID> -> delete node
 p      -> go to parent node in tree visualization
 g <ID> -> go to selected node in tree visualization
+? <ID> -> print information about selected node
 h      -> print this command list
 q      -> go back
 '''
@@ -182,7 +184,7 @@ class EntityManager(object):
     def reload_data(self):
         self._cache = dict()
         for node in do_request('/node'):
-            del node['series'], node['tags']
+            del node['series']
             self._cache[node['id']] = node
 
     def add(self, **kwargs):
@@ -245,6 +247,15 @@ def entity_type_add(manager):
     manager.add(name=name, tags=attributes['tag'], meta=attributes['meta'], series=attributes['series'])
 
 
+def entity_type_print(manager, ident):
+    t = manager.get(ident)
+    print('Name: {}'.format(t['name']))
+    print('Tags: {}'.format(', '.join('{} ({})'.format(tag['id'], tag['name']) for tag in t['tags'])))
+    print('Series: {}'.format(', '.join('{} ({})'.format(series['id'], series['name']) for series in t['series'])))
+    print('Meta: {}'.format(', '.join('{} ({})'.format(meta['id'], meta['name']) for meta in t['meta'])))
+    print()
+
+
 def entity_type_update(manager, ident):
     def attribute_add():
         attributes = get_attributes()
@@ -269,12 +280,7 @@ def entity_type_update(manager, ident):
     go_back = [False]
 
     while not go_back[0]:
-        t = manager.get(ident)
-        print('Name: {}'.format(t['name']))
-        print('Tags: {}'.format(', '.join('{} ({})'.format(tag['id'], tag['name']) for tag in t['tags'])))
-        print('Series: {}'.format(', '.join('{} ({})'.format(series['id'], series['name']) for series in t['series'])))
-        print('Meta: {}'.format(', '.join('{} ({})'.format(meta['id'], meta['name']) for meta in t['meta'])))
-
+        entity_type_print(manager, ident)
         process_prompt('Command? (h for help) ', (
             ('\s*a', attribute_add),
             ('\s*dt\s*(\d+)\s*', lambda attr_ident: delete_attribute(TagAttributeManager, attr_ident)),
@@ -382,6 +388,7 @@ def entity_type_main():
             ('\s*a\s*', lambda: entity_type_add(manager)),
             ('\s*e\s*(\d+)\s*', try_update),
             ('\s*d\s*(\d+)\s*', try_delete),
+            ('\s*\?\s*(\d+)\s*', lambda ident: entity_type_print(manager, ident), True),
             ('\s*h\s*', lambda: print(ENTITY_TYPE_COMMANDS), True),
             ('\s*q\s*', back),
         ))
@@ -423,6 +430,13 @@ def entity_main():
         else:
             print('ERROR: entity does not exist')
 
+    def print_node(ident):
+        node = manager.get(ident)
+        print('Parent ID: {}'.format(node['parent_id']))
+        print('Tags: {}'.format(', '.join('{}: {}'.format(k, v) for k, v in node['tags'].items())))
+        print('Meta: {}'.format(', '.join('{}: {}'.format(k, v) for k, v in node['meta'].items())))
+        print()
+
     def print_nodes(ident):
         node = manager.get(ident)
         print('{}: {}'.format(ident, node['meta'].get('name', '')))
@@ -450,6 +464,7 @@ def entity_main():
             ('\s*d\s*(\d+)\s*', try_delete),
             ('\s*p\s*', go_parent),
             ('\s*g\s*(\d+)\s*', go_to),
+            ('\s*\?\s*(\d+)\s*', print_node, True),
             ('\s*h\s*', lambda: print(ENTITY_COMMANDS), True),
             ('\s*q\s*', back)
         ))
