@@ -41,6 +41,26 @@ class SeriesAttributeHandler(Handler):
             'ID': series.id
         }
 
+    @requires_validation(Schema({
+        'refresh_time': Or(int, None),
+        'is_favourite': bool,
+    }))
+    def put(self, entity_type_id, ident):
+        data = self.request.data
+        entity_type = get_one(self.session, EntityType, id=entity_type_id)
+        series = get_one(self.session, SeriesAttribute, entity_type=entity_type, id=ident)
+        if 'refresh_time' in data:
+            series.refresh_time = data['refresh_time']
+        if 'is_favourite' in data:
+            series.is_favourite = data['is_favourite']
+
+        self.session.commit()
+        update_last_data_modification_ts(self.session)
+        return {
+            'success': True,
+            'ID': series.id
+        }
+
     def delete(self, entity_type_id, ident):
         now = time.time()
         entity_type = get_one(self.session, EntityType, id=entity_type_id)  # check if route is correct
