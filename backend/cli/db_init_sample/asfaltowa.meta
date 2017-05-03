@@ -1,0 +1,75 @@
+EntityType
+lamp
+power,brightness
+name,position_x,position_y
+
+
+EntityType
+grouping node
+activity
+name,position_x,position_y
+
+
+Entity
+2,,asfaltowa,52.2059564,21.00775838
+
+Entity
+1,1,asfaltowa 1,52.20727794,21.00684643
+
+Entity
+1,1,asfaltowa 2,52.20714644,21.00697517
+
+Entity
+1,1,asfaltowa 3,52.2070544,21.00697517
+
+Entity
+1,1,asfaltowa 4,52.2069492,21.00701809
+
+Entity
+1,1,asfaltowa 5,52.20687031,21.00710392
+
+Entity
+1,1,asfaltowa 6,52.20671251,21.00712538
+
+Entity
+1,1,asfaltowa 7,52.20659416,21.00725412
+
+Entity
+1,1,asfaltowa 8,52.20644952,21.00727558
+
+Entity
+1,1,asfaltowa 9,52.20634432,21.00729704
+
+Entity
+1,1,asfaltowa 10,52.20617338,21.00738287
+
+Entity
+1,1,asfaltowa 11,52.20598928,21.00740433
+
+Entity
+1,1,asfaltowa 12,52.20585778,21.00751162
+
+Entity
+1,1,asfaltowa 13,52.20569998,21.00759745
+
+Entity
+1,1,asfaltowa 14,52.20560793,21.00766182
+
+Entity
+1,1,asfaltowa 15,52.20548958,21.00774765
+
+Entity
+1,1,asfaltowa 16,52.20533178,21.00772619
+
+Entity
+1,1,asfaltowa 17,52.20518713,21.00785494
+
+Entity
+1,1,asfaltowa 18,52.20508193,21.00794077
+
+Entity
+1,1,asfaltowa 19,52.20505563,21.00791931
+
+Entity
+1,1,asfaltowa 20,52.20491098,21.0080266
+

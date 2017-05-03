@@ -1,0 +1,423 @@
+EntityType
+lamp
+power,brightness
+name,position_x,position_y
+
+
+EntityType
+grouping node
+activity
+name,position_x,position_y
+
+
+Entity
+2,,mokotowskie,52.211775,20.998478
+
+Entity
+2,,banacha,52.210302,20.98187
+
+Entity
+2,,pasteura,52.211709,20.981988
+
+Entity
+1,1,mokotowskie 1,52.210447,20.988328
+
+Entity
+1,1,mokotowskie 2,52.210605,20.988801
+
+Entity
+1,1,mokotowskie 3,52.210697,20.98923
+
+Entity
+1,1,mokotowskie 4,52.210789,20.989659
+
+Entity
+1,1,mokotowskie 5,52.210881,20.990088
+
+Entity
+1,1,mokotowskie 6,52.210907,20.990517
+
+Entity
+1,1,mokotowskie 7,52.210933,20.990946
+
+Entity
+1,1,mokotowskie 8,52.21092,20.992727
+
+Entity
+1,1,mokotowskie 9,52.210999,20.993607
+
+Entity
+1,1,mokotowskie 10,52.211131,20.994101
+
+Entity
+1,1,mokotowskie 11,52.211236,20.994551
+
+Entity
+1,1,mokotowskie 12,52.211341,20.995002
+
+Entity
+1,1,mokotowskie 13,52.211446,20.995474
+
+Entity
+1,1,mokotowskie 14,52.211551,20.995946
+
+Entity
+1,1,mokotowskie 15,52.211656,20.996418
+
+Entity
+1,1,mokotowskie 16,52.211762,20.996912
+
+Entity
+1,1,mokotowskie 17,52.211814,20.997427
+
+Entity
+1,1,mokotowskie 18,52.211933,20.99792
+
+Entity
+1,1,mokotowskie 19,52.211998,20.998499
+
+Entity
+1,1,mokotowskie 20,52.21209,20.999036
+
+Entity
+1,1,mokotowskie 21,52.212169,20.999615
+
+Entity
+1,1,mokotowskie 22,52.212222,21.000216
+
+Entity
+1,1,mokotowskie 23,52.212314,21.000817
+
+Entity
+1,1,mokotowskie 24,52.212393,21.001418
+
+Entity
+1,1,mokotowskie 25,52.212472,21.002018
+
+Entity
+1,1,mokotowskie 26,52.212551,21.002619
+
+Entity
+1,1,mokotowskie 27,52.212629,21.00322
+
+Entity
+1,1,mokotowskie 28,52.212708,21.003778
+
+Entity
+1,1,mokotowskie 29,52.212787,21.004336
+
+Entity
+1,1,mokotowskie 30,52.212866,21.004894
+
+Entity
+1,1,mokotowskie 31,52.212945,21.005452
+
+Entity
+1,2,banacha 1,52.210999,20.976763
+
+Entity
+1,2,banacha 2,52.210776,20.977449
+
+Entity
+1,2,banacha 3,52.210697,20.977921
+
+Entity
+1,2,banacha 4,52.210618,20.978394
+
+Entity
+1,2,banacha 5,52.210618,20.978844
+
+Entity
+1,2,banacha 6,52.210618,20.979295
+
+Entity
+1,2,banacha 7,52.210618,20.979745
+
+Entity
+1,2,banacha 8,52.210618,20.980196
+
+Entity
+1,2,banacha 9,52.210618,20.980421
+
+Entity
+1,2,banacha 10,52.210618,20.980647
+
+Entity
+1,2,banacha 11,52.210618,20.980872
+
+Entity
+1,2,banacha 12,52.210618,20.981097
+
+Entity
+1,2,banacha 13,52.210618,20.981323
+
+Entity
+1,2,banacha 14,52.210618,20.981542
+
+Entity
+1,2,banacha 15,52.210618,20.98166
+
+Entity
+1,2,banacha 16,52.210618,20.981821
+
+Entity
+1,2,banacha 17,52.210618,20.98202
+
+Entity
+1,2,banacha 18,52.210618,20.982229
+
+Entity
+1,2,banacha 19,52.210614,20.982471
+
+Entity
+1,2,banacha 20,52.210611,20.982712
+
+Entity
+1,2,banacha 21,52.210595,20.982964
+
+Entity
+1,2,banacha 22,52.210578,20.983216
+
+Entity
+1,2,banacha 23,52.210562,20.983468
+
+Entity
+1,2,banacha 24,52.210545,20.98372
+
+Entity
+1,2,banacha 25,52.210522,20.983973
+
+Entity
+1,2,banacha 26,52.210508,20.984099
+
+Entity
+1,2,banacha 27,52.210496,20.984249
+
+Entity
+1,2,banacha 28,52.210486,20.984437
+
+Entity
+1,2,banacha 29,52.210476,20.984624
+
+Entity
+1,2,banacha 30,52.210467,20.984815
+
+Entity
+1,2,banacha 31,52.210457,20.985035
+
+Entity
+1,2,banacha 32,52.210447,20.985255
+
+Entity
+1,2,banacha 33,52.210435,20.985479
+
+Entity
+1,2,banacha 34,52.21043,20.985625
+
+Entity
+1,2,banacha 35,52.210414,20.985786
+
+Entity
+1,2,banacha 36,52.210404,20.985952
+
+Entity
+1,2,banacha 37,52.210394,20.986124
+
+Entity
+1,2,banacha 38,52.210384,20.986322
+
+Entity
+1,2,banacha 39,52.210375,20.986521
+
+Entity
+1,2,banacha 40,52.210365,20.986719
+
+Entity
+1,2,banacha 41,52.210352,20.986944
+
+Entity
+1,2,banacha 42,52.210342,20.987076
+
+Entity
+1,2,banacha 43,52.210332,20.987207
+
+Entity
+1,2,banacha 44,52.210321,20.987376
+
+Entity
+1,2,banacha 45,52.210315,20.987481
+
+Entity
+1,2,banacha 46,52.21031,20.987587
+
+Entity
+1,2,banacha 47,52.210303,20.987697
+
+Entity
+1,3,pasteura 1,52.210772,20.982465
+
+Entity
+1,3,pasteura 2,52.210841,20.982465
+
+Entity
+1,3,pasteura 3,52.210914,20.982465
+
+Entity
+1,3,pasteura 4,52.210986,20.982465
+
+Entity
+1,3,pasteura 5,52.211065,20.982454
+
+Entity
+1,3,pasteura 6,52.211144,20.982444
+
+Entity
+1,3,pasteura 7,52.211223,20.982433
+
+Entity
+1,3,pasteura 8,52.211297,20.982436
+
+Entity
+1,3,pasteura 9,52.211347,20.98243
+
+Entity
+1,3,pasteura 10,52.211418,20.982425
+
+Entity
+1,3,pasteura 11,52.211497,20.98243
+
+Entity
+1,3,pasteura 12,52.211574,20.982441
+
+Entity
+1,3,pasteura 13,52.211658,20.982433
+
+Entity
+1,3,pasteura 14,52.211745,20.982438
+
+Entity
+1,3,pasteura 15,52.211831,20.982438
+
+Entity
+1,3,pasteura 16,52.211913,20.982436
+
+Entity
+1,3,pasteura 17,52.211997,20.982414
+
+Entity
+1,3,pasteura 18,52.212085,20.982412
+
+Entity
+1,3,pasteura 19,52.212174,20.982409
+
+Entity
+1,3,pasteura 20,52.212263,20.982406
+
+Entity
+1,3,pasteura 21,52.212345,20.982406
+
+Entity
+1,3,pasteura 22,52.212429,20.982398
+
+Entity
+1,3,pasteura 23,52.212514,20.982382
+
+Entity
+1,3,pasteura 24,52.2126,20.982361
+
+Entity
+1,3,pasteura 25,52.212685,20.982326
+
+Entity
+1,3,pasteura 26,52.212771,20.982288
+
+Entity
+1,3,pasteura 27,52.212864,20.982261
+
+Entity
+1,3,pasteura 28,52.212958,20.982234
+
+Entity
+1,3,pasteura 29,52.213052,20.982208
+
+Entity
+1,3,pasteura 30,52.213145,20.982181
+
+Entity
+1,3,pasteura 31,52.213238,20.982146
+
+Entity
+1,3,pasteura 32,52.21333,20.982111
+
+Entity
+1,3,pasteura 33,52.213422,20.982079
+
+Entity
+1,3,pasteura 34,52.213514,20.982045
+
+Entity
+1,3,pasteura 35,52.213581,20.982012
+
+Entity
+1,3,pasteura 36,52.213696,20.981988
+
+Entity
+1,3,pasteura 37,52.213811,20.981977
+
+Entity
+1,3,pasteura 38,52.213926,20.981966
+
+Entity
+1,3,pasteura 39,52.214038,20.981974
+
+Entity
+1,3,pasteura 40,52.21415,20.981982
+
+Entity
+1,3,pasteura 41,52.214261,20.98199
+
+Entity
+1,3,pasteura 42,52.214373,20.981998
+
+Entity
+1,3,pasteura 43,52.214482,20.982013
+
+Entity
+1,3,pasteura 44,52.214598,20.982031
+
+Entity
+1,3,pasteura 45,52.214871,20.982079
+
+Entity
+1,3,pasteura 46,52.215029,20.982084
+
+Entity
+1,3,pasteura 47,52.215157,20.982095
+
+Entity
+1,3,pasteura 48,52.215285,20.982106
+
+Entity
+1,3,pasteura 49,52.21541,20.9821
+
+Entity
+1,3,pasteura 50,52.215469,20.98209
+
+Entity
+1,3,pasteura 51,52.21557,20.982108
+
+Entity
+1,3,pasteura 52,52.215658,20.982116
+
+Entity
+1,3,pasteura 53,52.215747,20.982125
+
+Entity
+1,3,pasteura 54,52.215847,20.982122
+
+Entity
+1,3,pasteura 55,52.215933,20.982122
+
+Entity
+1,3,pasteura 56,52.216023,20.98213
+

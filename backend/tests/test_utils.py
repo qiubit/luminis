@@ -118,7 +118,7 @@ def mocked_get_all(session, cls, **kwargs):
     return {'EntityType': [MockedEntityType()], 'TagAttribute': MockedEntityType().tags,
             'MetaAttribute': MockedEntityType().meta, 'SeriesAttribute': MockedEntityType().series,
             'Entity': [MockedEntity()], 'EntityTag': MockedEntity().tags, 'EntityMeta': MockedEntity().meta,
-            'GlobalMetadata': MockedGlobalMetadata()}.get(c)
+            'GlobalMetadata': [MockedGlobalMetadata()]}.get(c)
 
 
 def get_handler(cls, payload=None):

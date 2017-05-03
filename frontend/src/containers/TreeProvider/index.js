@@ -1,28 +1,30 @@
-import React from 'react';
+import React from 'react'
 import { connect } from 'react-redux'
 
 import { downloadTree } from './actions'
 
 export class TreeProvider extends React.Component {
   componentDidMount() {
-    this.props.downloadTree(this.props.url);
-    let refreshTimeInMs = this.props.refreshTime * 1000;
-    this.intervalId = setInterval(() => this.props.downloadTree(this.props.url), refreshTimeInMs);
+    this.props.downloadTree(this.props.timestampUrl, this.props.treeUrl)
+    let refreshTimeInMs = this.props.refreshTime * 1000
+    this.intervalId = setInterval(
+      () => this.props.downloadTree(this.props.timestampUrl, this.props.treeUrl), refreshTimeInMs
+    )
   }
 
   componentWillUnmount() {
-    clearInterval(this.intervalId);
+    clearInterval(this.intervalId)
   }
 
   render() {
-    return null;
+    return null
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    downloadTree: (url) => dispatch(downloadTree(url))
+    downloadTree: (timestampUrl, treeUrl) => dispatch(downloadTree(timestampUrl, treeUrl))
   }
 }
 
-export default connect(null, mapDispatchToProps)(TreeProvider);
+export default connect(null, mapDispatchToProps)(TreeProvider)

@@ -5,8 +5,14 @@ from .test_utils import mocked_get_one
 from websocket.arithmetic import MeasurementIdType
 from websocket.handlers import NewChartRequestHandler, NewLiveDataRequestHandler
 
-DEFAULT_NEW_CHART_REQUEST_PAYLOAD = {'node_id': 1, 'begin_ts': 2, 'requested_data': {'measurement_id': 1}, 'end_ts': 17,
-                                     'update_data': False, 'aggregation_length': 60, 'aggregation_type': 'min'}
+DEFAULT_NEW_CHART_REQUEST_PAYLOAD = {'node_id': 1, 'begin_ts': 2, 'requested_data': [{'measurement_id': 1}],
+                                     'end_ts': 17, 'update_data': False, 'aggregation_length': 60,
+                                     'aggregation_type': 'min'}
+
+NEW_CHART_REQUEST_PAYLOAD_TWO_MEASUREMENTS = {'node_id': 1, 'begin_ts': 2,
+                                              'requested_data': [{'measurement_id': 1}, {'measurement_id': 2}],
+                                              'end_ts': 17, 'update_data': False, 'aggregation_length': 60,
+                                              'aggregation_type': 'min'}
 
 DEFAULT_NEW_LIVE_DATA_REQUEST_PAYLOAD = {'node_id': 3, 'measurement_id': 17}
 
@@ -25,26 +31,46 @@ class TestWebSocketNewChartRequestHandler(unittest.TestCase):
 
     def testHandlerProperCreation(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, DEFAULT_NEW_CHART_REQUEST_PAYLOAD)
-        self.assertTrue(isinstance(self.handler._requested_data, MeasurementIdType))
+        self.assertTrue(isinstance(self.handler._requested_data[0], MeasurementIdType))
         assertions_mock.assert_called_once_with()
 
     def testHandlerProperProcessing(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, DEFAULT_NEW_CHART_REQUEST_PAYLOAD)
-        self.handler._requested_data.evaluate = MagicMock(return_value=[(1, 2), (3, 4)])
+        self.handler._requested_data[0].evaluate = MagicMock(return_value=[(1, 2), (3, 4)])
         result = self.handler()
-        self.handler._requested_data.evaluate.assert_called_once_with(2, 17)
+        self.handler._requested_data[0].evaluate.assert_called_once_with(2, 17)
         self.assertEqual(result, {'request_id': 1, 'type': 'new_chart',
-                                  'data': {'plot_data': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]}})
+                                  'data': {'plot_data': [[1, 2], [3, 4]]}})
+
+    def testHandlerProperProcessingOnMultipleRequestedData(self, assertions_mock):
+        self.handler = NewChartRequestHandler(1, NEW_CHART_REQUEST_PAYLOAD_TWO_MEASUREMENTS)
+        self.handler._requested_data[0].evaluate = MagicMock(return_value=[(1, 2), (3, 4)])
+        self.handler._requested_data[1].evaluate = MagicMock(return_value=[(1, 10), (3, 13)])
+        result = self.handler()
+        self.handler._requested_data[0].evaluate.assert_called_once_with(2, 17)
+        self.handler._requested_data[1].evaluate.assert_called_once_with(2, 17)
+        self.assertEqual(result, {'request_id': 1, 'type': 'new_chart',
+                                  'data': {'plot_data': [[1, 2, 10], [3, 4, 13]]}})
+
+    def testHandlerProperProcessingOnMultipleRequestedDataAndMissingFields(self, assertions_mock):
+        self.handler = NewChartRequestHandler(1, NEW_CHART_REQUEST_PAYLOAD_TWO_MEASUREMENTS)
+        self.handler._requested_data[0].evaluate = MagicMock(return_value=[(1, 2), (3, 4)])
+        self.handler._requested_data[1].evaluate = MagicMock(return_value=[(1, 10), ])
+        result = self.handler()
+        self.handler._requested_data[0].evaluate.assert_called_once_with(2, 17)
+        self.handler._requested_data[1].evaluate.assert_called_once_with(2, 17)
+        self.assertEqual(result, {'request_id': 1, 'type': 'new_chart',
+                                  'data': {'plot_data': [[1, 2, 10], [3, 4, None]]}})
 
     def testHandlerIsRemovedWhenUpdateDataIsFalse(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, DEFAULT_NEW_CHART_REQUEST_PAYLOAD)
-        self.handler._requested_data.evaluate = MagicMock()
+        self.handler._requested_data[0].evaluate = MagicMock()
         self.handler()
         self.assertTrue(self.handler.to_be_removed)
 
     def testHandlerIsNotRemovedWhenUpdateDataIsTrue(self, assertions_mock):
         self.handler = NewChartRequestHandler(1, _updated(DEFAULT_NEW_CHART_REQUEST_PAYLOAD, update_data=True))
-        self.handler._requested_data.evaluate = MagicMock()
+        self.handler._requested_data[0].evaluate = MagicMock()
         self.handler()
         self.assertFalse(self.handler.to_be_removed)
 

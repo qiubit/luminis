@@ -15,6 +15,7 @@ const initialState = fromJS({
   activeNodeId: null,
   nodesMetadata: {},
   treeStructure: [],
+  treeTimestamp: null,
   measurementsMetadata: {},
   requestedData: {},
 });
@@ -47,7 +48,8 @@ function appReducer(state = initialState, action) {
       return state
         .set('nodesMetadata', action.dataTree.get('tree_metadata'))
         .set('treeStructure', action.dataTree.get('tree'))
-        .set('measurementsMetadata', action.dataTree.get('measurements_metadata'));
+        .set('measurementsMetadata', action.dataTree.get('measurements_metadata'))
+        .set('treeTimestamp', action.dataTimestamp)
     case SAVE_MEASUREMENTDATA:
       let updatedRequestedData = updateRequestedData(state.get('requestedData'), action.requestedData)
       return state

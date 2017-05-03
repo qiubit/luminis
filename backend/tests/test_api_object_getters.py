@@ -61,6 +61,7 @@ class TestApiObjectGetters(unittest.TestCase):
 
     @patch('api.tree.get_all', new=mocked_get_all)
     @patch('api.tree.get_one', new=mocked_get_one)
+    @patch('database.helpers.get_all', new=mocked_get_all)
     def test_tree_get_without_id_returns_all_trees(self):
         result = get_handler(TreeHandler).get()
 
@@ -78,6 +79,7 @@ class TestApiObjectGetters(unittest.TestCase):
 
     @patch('api.tree.get_one', new=mocked_get_one)
     @patch('api.tree.get_all', new=mocked_get_all)
+    @patch('database.helpers.get_all', new=mocked_get_all)
     def test_tree_get_with_id_returns_one_tree(self):
         result = get_handler(TreeHandler).get(1)
 

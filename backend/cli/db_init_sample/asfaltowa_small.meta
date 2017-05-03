@@ -1,0 +1,28 @@
+EntityType
+lamp
+power,brightness
+name,position_x,position_y
+
+
+EntityType
+grouping node
+activity
+name,position_x,position_y
+
+
+Entity
+2,,asfaltowa,52.2059564,21.00775838
+
+Entity
+1,1,asfaltowa 1,52.20727794,21.00684643
+
+Entity
+1,1,asfaltowa 2,52.20714644,21.00697517
+
+Entity
+1,1,asfaltowa 3,52.2070544,21.00697517
+
+Entity
+1,1,asfaltowa 4,52.2069492,21.00701809
+
+

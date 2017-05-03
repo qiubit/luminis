@@ -2,8 +2,9 @@ sqlalchemy
 psycopg2
 influxdb
 tornado
-git+https://github.com/nullism/pycnic.git
+pycnic
 voluptuous
 nose
 coverage
 alembic
+numpy
