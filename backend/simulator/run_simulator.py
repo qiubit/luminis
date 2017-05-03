@@ -9,9 +9,10 @@ import pickle
 import time
 
 from simulator.random_series_functions import RandomSinSeries, RandomConstantSeries
-from simulator.data_creator import generate_data
+from simulator.data_creator import generate_data_to_file, generate_data_to_influx
 
 BASE_URL = ''
+TO_FILE = False
 
 STATE_RETRIEVE_PROMPT = '''
 Try to retrieve previous state? [Y/n] '''
@@ -98,9 +99,13 @@ def get_config(filename):
     config = configparser.ConfigParser()
     config.read(filename)
 
-    params = {"data_dir": str, "pkl_dir": str, "sensor_update_interval": float, "api_url": str}
+    params = {"data_dir": str, "pkl_dir": str, "sensor_update_interval": float, "api_url": str, "to_file": bool}
     for param in params:
-        result[param] = params[param](config.get("simulator", param))
+        # bool gets special treatment, as casting from string is non-trivial
+        if params[param] == bool:
+            result[param] = config.getboolean("simulator", param)
+        else:
+            result[param] = params[param](config.get("simulator", param))
     return result
 
 
@@ -223,10 +228,15 @@ def create_initial_data(state: SimulatorState, data_dir: str) -> None:
         state: current SimulatorState
         data_dir: directory where measurements should be saved
     """
+    global TO_FILE
+
     current_ts = time.time()
     for node in state.node_entity_types:
         if node not in state.entity_blacklist:
-            generate_data(state.create_ts, current_ts, node, state.entity_series[node], data_dir)
+            if TO_FILE:
+                generate_data_to_file(state.create_ts, current_ts, node, state.entity_series[node], data_dir)
+            else:
+                generate_data_to_influx(state.create_ts, current_ts, node, state.entity_series[node])
 
 
 def update_state(previous_state: SimulatorState,
@@ -343,6 +353,8 @@ def data_generator(ss: SimulatorState, sensor_update_interval: float, data_dir: 
         sensor_update_interval: how often data should be generated
         data_dir: directory, where data should be saved
     """
+    global TO_FILE
+
     print("Generating data every " + str(sensor_update_interval) + "s")
     ts = time.time()
     while True:
@@ -350,13 +362,17 @@ def data_generator(ss: SimulatorState, sensor_update_interval: float, data_dir: 
         current_ts = ts + 10.0
         for node in ss.node_entity_types:
             if node not in ss.entity_blacklist:
-                generate_data(ts, current_ts, node, ss.entity_series[node], data_dir)
+                if TO_FILE:
+                    generate_data_to_file(ts, current_ts, node, ss.entity_series[node], data_dir)
+                else:
+                    generate_data_to_influx(ts, current_ts, node, ss.entity_series[node])
         ts = current_ts
         print("Data generated")
 
 
 def main():
     global BASE_URL
+    global TO_FILE
 
     # Fetch simulator config
     config = get_config("config/simulator.ini")
@@ -370,6 +386,7 @@ def main():
         os.makedirs(pkl_dir)
     sensor_update_interval = config["sensor_update_interval"]
     BASE_URL = config["api_url"]
+    TO_FILE = config["to_file"]
 
     print("Fetching metadata...")
 
