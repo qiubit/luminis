@@ -24,12 +24,14 @@ class SeriesAttributeHandler(Handler):
         Required('name'): non_empty_string,
         'type': Or('real', 'enum'),
         'refresh_time': Or(int, None),
+        'is_favourite': bool,
     }))
     def post(self, entity_type_id):
         data = self.request.data
         entity_type = get_one(self.session, EntityType, id=entity_type_id)
         series = SeriesAttribute(entity_type=entity_type, name=data['name'],
-                                 type=data.get('type', 'real'), refresh_time=data.get('refresh_time'))
+                                 type=data.get('type', 'real'), refresh_time=data.get('refresh_time'),
+                                 is_favourite=data.get('is_favourite', False))
         self.session.add(series)
 
         self.session.commit()
