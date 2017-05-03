@@ -31,12 +31,12 @@ def convert_timestamp(timestamp):
 class SimulatorSource(PointSource):
     def __init__(self, entity_id, measurements):
         self._session = Session()
-        self._entity = get_one(session, Entity, id=entity_id)
+        self._entity = get_one(self._session, Entity, id=entity_id)
         self._measurements = measurements
         self._entity_measurement_names = {}
         for measurement_id in self._measurements:
             if measurement_id not in self._entity_measurement_names:
-                measurement_name = get_one(session, SeriesAttribute, id=measurement_id).name
+                measurement_name = get_one(self._session, SeriesAttribute, id=measurement_id).name
                 self._entity_measurement_names[measurement_id] = measurement_name
 
     def get_values(self) -> Iterable[dict]:
