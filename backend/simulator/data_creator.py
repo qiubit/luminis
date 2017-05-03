@@ -30,14 +30,23 @@ def convert_timestamp(timestamp):
 
 class SimulatorSource(PointSource):
     def __init__(self, entity_id, measurements):
-        self._session = Session()
-        self._entity = get_one(self._session, Entity, id=entity_id)
+        self._entity_id = entity_id
         self._measurements = measurements
+
+    def __enter__(self):
+        self._session = Session()
+        self._entity = get_one(self._session, Entity, id=self._entity_id)
         self._entity_measurement_names = {}
         for measurement_id in self._measurements:
             if measurement_id not in self._entity_measurement_names:
                 measurement_name = get_one(self._session, SeriesAttribute, id=measurement_id).name
                 self._entity_measurement_names[measurement_id] = measurement_name
+        return self
+
+    def __exit__(self, *args):
+        self._entity = None
+        self._entity_measurement_names = {}
+        self._session.close()
 
     def get_values(self) -> Iterable[dict]:
         result = []
@@ -139,7 +148,7 @@ def generate_data_to_influx(previous_ts: float, current_ts: float, entity_id: in
         return
 
     try:
-        point_source = SimulatorSource(entity_id, measurements)
-        InfluxWriter().write(PointGenerator(point_source.get_entity(), point_source).generate_points())
+        with SimulatorSource(entity_id, measurements) as point_source:
+            InfluxWriter().write(PointGenerator(point_source.get_entity(), point_source).generate_points())
     except Exception as err:
         logging.error(err)
