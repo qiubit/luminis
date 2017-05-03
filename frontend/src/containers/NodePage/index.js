@@ -1,7 +1,7 @@
 import React from 'react';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
-import { Map, fromJS} from 'immutable'
+import { Map, fromJS } from 'immutable'
 
 import { Card, CardTitle, CardText } from 'material-ui/Card';
 import { List, ListItem } from 'material-ui/List';

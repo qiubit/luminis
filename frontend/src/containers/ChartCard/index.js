@@ -6,7 +6,7 @@ import DateTimePicker from 'react-datetime'
 import NumericInput from  'react-numeric-input'
 
 
-import { Card, CardTitle, CardText} from 'material-ui/Card'
+import { Card, CardTitle, CardText } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import 'dygraphs/dist/dygraph.css'
 
@@ -56,14 +56,24 @@ class DatePickerBar extends React.Component {
 
   render() {
     return (
-      <div style={{display: 'flex', justifyContent: 'space-between'}}>
-      <DateTimePicker onChange={this.setBegin} open={false} dateFormat={'DD.MM.YYYY'} timeFormat={'HH:mm:ss'} defaultValue={this.props.begin}/>
-      <RaisedButton
-        onClick={this.props.onSubmit(this.state.begin, this.state.end)}
-        primary={true}
-        label="SUBMIT"
-      />
-      <DateTimePicker onChange={this.setEnd} open={false} dateFormat={'DD.MM.YYYY'} timeFormat={'HH:mm:ss'} defaultValue={this.props.end}/>
+      <div>
+        <DateTimePicker
+          onChange={this.setBegin}
+          open={false}
+          dateFormat={'DD.MM.YYYY'}
+          timeFormat={'HH:mm:ss'}
+          defaultValue={this.props.begin}/>
+        <RaisedButton
+          onClick={this.props.onSubmit(this.state.begin, this.state.end)}
+          primary={true}
+          label="SUBMIT"
+          />
+        <DateTimePicker
+          onChange={this.setEnd}
+          open={false}
+          dateFormat={'DD.MM.YYYY'}
+          timeFormat={'HH:mm:ss'}
+          defaultValue={this.props.end}/>
       </div>
     )
   }
@@ -113,14 +123,28 @@ class AggregationPickerBar extends React.Component {
   render() {
     return (
       <div>
-      <StyledInput min={0} format={(num) => num + 'h'} value={this.state.aggregationHours} onChange={(value) => {this.setState({aggregationHours: value})}}/>
-      <StyledInput min={0} max={59} format={(num) => num + 'm'} value={this.state.aggregationMinutes} onChange={(value) => {this.setState({aggregationMinutes: value})}}/>
-      <StyledInput min={0} max={59} format={(num) => num + 's'} value={this.state.aggregationSeconds} onChange={(value) => {this.setState({aggregationSeconds: value})}}/>
-      <RaisedButton
-        onClick={this.props.onSubmit(this.getAggregationLength())}
-        primary={true}
-        label="SUBMIT"
-      />
+        <StyledInput
+          min={0}
+          format={(num) => num + 'h'}
+          value={this.state.aggregationHours}
+          onChange={(value) => {this.setState({aggregationHours: value})}}/>
+        <StyledInput
+          min={0}
+          max={59}
+          format={(num) => num + 'm'}
+          value={this.state.aggregationMinutes}
+          onChange={(value) => {this.setState({aggregationMinutes: value})}}/>
+        <StyledInput
+          min={0}
+          max={59}
+          format={(num) => num + 's'}
+          value={this.state.aggregationSeconds}
+          onChange={(value) => {this.setState({aggregationSeconds: value})}}/>
+        <RaisedButton
+          onClick={this.props.onSubmit(this.getAggregationLength())}
+          primary={true}
+          label="SUBMIT"
+        />
       </div>
     )
   }
@@ -150,14 +174,22 @@ class Graph extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // Don't create new Graph object if it was already created
+    // update it instead
     if (this.graph) {
-      if (this.props.data !== nextProps.data || this.props.labels !== nextProps.labels || this.props.visibility !== nextProps.visibility) {
+
+      // update it only if something changed
+      if (this.props.data !== nextProps.data
+          || this.props.labels !== nextProps.labels
+          || this.props.visibility !== nextProps.visibility) {
+
         this.graph.updateOptions({
           'labels': nextProps.labels,
           'visibility': nextProps.visibility,
           'file': nextProps.data
         })
       }
+
     } else {
       this.graph = this.createGraph(this.props.data, this.props.labels, this.props.visibility)
     }
@@ -209,18 +241,26 @@ class ChartCard extends React.Component {
     this.updateAll = this.updateAll.bind(this)
   }
 
-
+  // maps Luminis data chart to format needed by Dygraphs
   makeData(chartData) {
+    // we don't want to change data stored inside RequestManager so
+    // make our own copy
     let newData = chartData.slice()
     for (var i = 0; i < chartData.length; ++i) {
+      // Luminis data is array of arrays so we also need to copy
+      // internal arrays
       newData[i] = newData[i].slice()
+      // Dygraphs exptects Date object so we're converting timestamp here
       newData[i][0] = new Date(newData[i][0]  * 1000)
     }
     return newData
   }
 
+
+  // create labels expected by Dygraphs
   makeLabels(measurementDataMap){
     let newLabels = []
+    // first element in point's array is always time
     newLabels.push("Time")
     measurementDataMap.forEach((measurementId) => {
       newLabels.push(this.props.measurementNameGetter(measurementId.toString()))
@@ -228,8 +268,10 @@ class ChartCard extends React.Component {
     return newLabels
   }
 
+  // create table of visibility (bool values) expected by Dygraphs
   makeVisibility(measurementIds, measurementIdsShown) {
     let newVisibility = []
+    // time is always visible and Dygraphs doesn't expect value for time
     measurementIds.forEach((measurementId) => {
       newVisibility.push(measurementIdsShown.get(measurementId))
     })
@@ -242,7 +284,14 @@ class ChartCard extends React.Component {
     let endTs = Math.floor(dataRange.get('end').valueOf() / 1000)
     let updateData = dataRange.get('live')
     let aggregationType = 'mean'
-    return requestNewChart(parseInt(nodeId, 10), requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType)
+    return requestNewChart(
+              parseInt(nodeId, 10),
+              requestedData,
+              beginTs,
+              endTs,
+              updateData,
+              aggregationLength,
+              aggregationType)
   }
 
   updateSubscriptions(newMeasurementIds, newDataRange, newAggregationLength) {
@@ -250,7 +299,8 @@ class ChartCard extends React.Component {
       this.props.dispatch(cancelRequest(this.state.chartRequestId))
     }
 
-    let newChartRequest = this.makeRequest(this.props.params.nodeId, newMeasurementIds, newDataRange, newAggregationLength)
+    let newChartRequest =
+      this.makeRequest(this.props.params.nodeId, newMeasurementIds, newDataRange, newAggregationLength)
     this.props.dispatch(newChartRequest)
 
     this.setState({
@@ -280,7 +330,11 @@ class ChartCard extends React.Component {
 
   // Subscribe to live data on mount
   componentWillMount() {
-    this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
+    this.updateAll(
+      this.props.measurementIds,
+      this.props.measurementIdsShown,
+      this.state.dataRange,
+      this.state.aggregationLength)
   }
 
   componentWillUnmount() {
@@ -289,7 +343,11 @@ class ChartCard extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (!this.props.measurementIds.equals(nextProps.measurementIds)) {
-      this.updateAll(nextProps.measurementIds, nextProps.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
+      this.updateAll(
+        nextProps.measurementIds,
+        nextProps.measurementIdsShown,
+        this.state.dataRange,
+        this.state.aggregationLength)
     } else if (!this.props.measurementIdsShown.equals(nextProps.measurementIdsShown)) {
       this.updateVisibility(nextProps.measurementIds, nextProps.measurementIdsShown)
     }
@@ -313,7 +371,10 @@ class ChartCard extends React.Component {
         live
       })
       this.setState({dataRange: newDataRange, activeDataRangeButton: button, showDatePickers})
-      this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, newDataRange, this.state.aggregationLength)
+      this.updateAll(
+        this.props.measurementIds,
+        this.props.measurementIdsShown,
+        newDataRange, this.state.aggregationLength)
     } else {
       this.setState({activeDataRangeButton: button, showDatePickers})
     }
@@ -323,19 +384,34 @@ class ChartCard extends React.Component {
     let newDataRange = this.state.dataRange
     newDataRange = newDataRange.set('begin', newBegin).set('end', newEnd).set('live', false)
     this.setState({dataRange: newDataRange})
-    this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, this.state.aggregationLength)
+    this.updateAll(
+      this.props.measurementIds,
+      this.props.measurementIdsShown,
+      this.state.dataRange,
+      this.state.aggregationLength)
   }
 
   onAggregationSubmit = (newAggregationLength) => () => {
     this.setState({aggregationLength: newAggregationLength})
-    this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, newAggregationLength)
+    this.updateAll(
+      this.props.measurementIds,
+      this.props.measurementIdsShown,
+      this.state.dataRange,
+      newAggregationLength)
   }
 
 
   onAggregationChange = (newActiveAggregationButton, newAggregationLength, showAggregationPicker) => () => {
     if (newAggregationLength) {
-      this.setState({ aggregationLength: newAggregationLength, activeAggregationButton: newActiveAggregationButton, showAggregationPicker })
-      this.updateAll(this.props.measurementIds, this.props.measurementIdsShown, this.state.dataRange, newAggregationLength)
+      this.setState({
+        aggregationLength: newAggregationLength,
+        activeAggregationButton: newActiveAggregationButton,
+        showAggregationPicker })
+      this.updateAll(
+        this.props.measurementIds,
+        this.props.measurementIdsShown,
+        this.state.dataRange,
+        newAggregationLength)
     } else {
       this.setState({ activeAggregationButton: newActiveAggregationButton, showAggregationPicker })
     }
@@ -359,22 +435,42 @@ class ChartCard extends React.Component {
             }
             <p>Data Range</p>
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_LIVE, (new MomentDate()).subtract(1, 'day'), new MomentDate(), true, false)}
+              onClick={this.onDataRangeChange(
+                        DATA_RANGE_LIVE,
+                        (new MomentDate()).subtract(1, 'day'),
+                        new MomentDate(),
+                        true,
+                        false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_LIVE}
               label="LIVE"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_1D, (new MomentDate()).subtract(1, 'day'), new MomentDate(), false, false)}
+              onClick={this.onDataRangeChange(
+                        DATA_RANGE_1D,
+                        (new MomentDate()).subtract(1, 'day'),
+                        new MomentDate(),
+                        false,
+                        false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_1D}
               label="1D"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_30D, (new MomentDate()).subtract(30, 'day'), new MomentDate(), false, false)}
+              onClick={this.onDataRangeChange(
+                        DATA_RANGE_30D,
+                        (new MomentDate()).subtract(30, 'day'),
+                        new MomentDate(),
+                        false,
+                        false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_30D}
               label="30D"
             />
             <RaisedButton
-              onClick={this.onDataRangeChange(DATA_RANGE_1Y, (new MomentDate()).subtract(1, 'year'), new MomentDate(), false, false)}
+              onClick={this.onDataRangeChange(
+                        DATA_RANGE_1Y,
+                        (new MomentDate()).subtract(1, 'year'),
+                        new MomentDate(),
+                        false,
+                        false)}
               primary={this.state.activeDataRangeButton === DATA_RANGE_1Y}
               label="1Y"
             />
