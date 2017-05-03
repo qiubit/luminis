@@ -67,15 +67,14 @@ def check_alert(alert: Alert) -> AlertStatus:
 
 def check_all_alerts(on_state_change: Iterable[Callable[[Alert, str], Any]]) -> None:
     session = Session()
-    for alert in get_all(session, Alert):
-        if alert.is_enabled:
-            status = check_alert(alert)
-            if status and not alert.last_check_status:
-                [callback(alert, str(status)) for callback in on_state_change]  # call all callbacks in on_state_change
-                alert.last_check_status = True
-            if alert.last_check_status is None or (not status and alert.last_check_status):
-                [callback(alert, str(status)) for callback in on_state_change]
-                alert.last_check_status = False
+    for alert in get_all(session, Alert, is_enabled=True):
+        status = check_alert(alert)
+        if status and not alert.last_check_status:
+            [callback(alert, str(status)) for callback in on_state_change]  # call all callbacks in on_state_change
+            alert.last_check_status = True
+        if alert.last_check_status is None or (not status and alert.last_check_status):
+            [callback(alert, str(status)) for callback in on_state_change]
+            alert.last_check_status = False
 
     session.commit()
     session.close()
