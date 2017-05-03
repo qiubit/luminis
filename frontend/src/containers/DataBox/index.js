@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 import { Map } from 'immutable'
 
 import DataBoxComponent from '../../components/DataBox/index';
-import { selectMeasurementName, selectNodeMeasurements, selectNodeName } from '../App/selectors';
+import { selectMeasurementName, selectNodeName } from '../App/selectors';
+import { selectNodeFavouriteMeasurements } from './selectors'
 import { requestNewLiveData, cancelRequest } from '../RequestManager/actions'
 import { selectActiveRequests } from '../RequestManager/selectors'
 import { STALE_STATE } from '../RequestManager/constants'
@@ -18,10 +19,10 @@ class DataBox extends React.Component {
     this.refreshCallback = this.refreshCallback.bind(this)
   }
 
-  createRequests() {
+  createRequests(measurementIds) {
     let dataRequests = new Map()
     let actionsToDispatch = []
-    this.props.measurementIds.forEach((measurementId) => {
+    measurementIds.forEach((measurementId) => {
       actionsToDispatch.push(requestNewLiveData(this.props.nodeId, measurementId))
     })
     // Save request ids and dispatch actions
@@ -41,7 +42,7 @@ class DataBox extends React.Component {
   }
 
   componentWillMount() {
-    this.createRequests()
+    this.createRequests(this.props.measurementIds)
   }
 
   componentWillUnmount() {
@@ -50,7 +51,14 @@ class DataBox extends React.Component {
 
   refreshCallback() {
     this.dropRequests()
-    this.createRequests()
+    this.createRequests(this.props.measurementIds)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.measurementIds.equals(nextProps.measurementIds)) {
+      this.dropRequests()
+      this.createRequests(nextProps.measurementIds)
+    }
   }
 
   // We set refreshObj.refreshFlag to true if some measurement has PENDING_STATE or DATA_ERROR
@@ -100,7 +108,7 @@ class DataBox extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   let nodeId = ownProps.nodeId.toString();
   let name = selectNodeName(state)(nodeId);
-  let measurementIds = selectNodeMeasurements(state)(nodeId);
+  let measurementIds = selectNodeFavouriteMeasurements(state)(nodeId);
   let getMeasurementName = selectMeasurementName(state);
   return {
     nodeName: name,
