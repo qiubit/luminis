@@ -26,7 +26,7 @@ function TreeList(props) {
           <span
             style={{marginLeft: node.get('children').size > 0 ? 30 : 0}}
           >
-            {node.get('node_id')}
+            {props.nodesMetadata.get(node.get('node_id').toString()).get('name')}
           </span>
         </ListItem>
       ));
