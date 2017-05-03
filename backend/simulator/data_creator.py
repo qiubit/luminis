@@ -17,7 +17,7 @@ def create_data_timestamp(ts: float) -> str:
     Returns:
         formatted timestamp
     """
-    dt = datetime.fromtimestamp(ts)
+    dt = datetime.utcfromtimestamp(ts)
     return "{0:04d}-{1:02d}-{2:02d} {3:02d}:{4:02d}:{5:02d}.{6:06d}".format(
         dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond
     )
@@ -30,7 +30,7 @@ def convert_timestamp(timestamp):
 
 class SimulatorSource(PointSource):
     def __init__(self, entity_id, measurements):
-        session = Session()
+        self._session = Session()
         self._entity = get_one(session, Entity, id=entity_id)
         self._measurements = measurements
         self._entity_measurement_names = {}
