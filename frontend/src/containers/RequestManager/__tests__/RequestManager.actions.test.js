@@ -29,15 +29,22 @@ describe('RequestManager actions', () => {
       node_id: 1,
       begin_ts: 1490989996,
       end_ts: 1490989999,
-      requested_data: {
+      requested_data: [{
         measurement_id: 2,
-      },
+      }],
       update_data: false,
       aggregation_length: 1,
       aggregation_type: "mean",
     }
 
-    const newChartRequest = requestNewChart(chartParams)
+    const newChartRequest = requestNewChart(
+                              chartParams.node_id,
+                              chartParams.requested_data,
+                              chartParams.begin_ts,
+                              chartParams.end_ts,
+                              chartParams.update_data,
+                              chartParams.aggregation_length,
+                              chartParams.aggregation_type)
     const protocolNewChartRequest = {
       request_id: 1,
       type: "new_chart",

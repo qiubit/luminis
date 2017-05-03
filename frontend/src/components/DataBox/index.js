@@ -19,6 +19,7 @@ const style = {
   width: 270,
   margin: 20,
   display: 'inline-block',
+  verticalAlign: 'top',
 };
 
 const linkStyle = {

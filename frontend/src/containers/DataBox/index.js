@@ -65,8 +65,8 @@ class DataBox extends React.Component {
         value: 0,
       }
       if (requestData) {
-        if (requestData.get('data') && requestData.get('data').get('value')) {
-          measurement.value = requestData.get('data').get('value')
+        if (requestData.get('data') && requestData.get('data').value) {
+          measurement.value = requestData.get('data').value
         }
         measurement.state = requestData.get('state')
         if (measurement.state === STALE_STATE) {

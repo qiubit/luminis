@@ -46,7 +46,7 @@ class RightBar extends React.Component {
   }
 
   updateSubscriptions(newMeasurementIds, mounting = false) {
-    const nodeId = this.props.params.nodeId
+    const nodeId = parseInt(this.props.params.nodeId, 10)
     // If measurements have changed, we should drop current subscriptions and make new ones
     if (!newMeasurementIds.equals(this.props.measurementIds) || mounting) {
       // Drop current subscriptions
@@ -96,7 +96,7 @@ class RightBar extends React.Component {
               this.props.activeRequests.get(this.state.measurementRequestMap.get(id))
             let val = null
             if (request && request.get('state') !== PENDING_STATE) {
-              val = request.get('data').get('value')
+              val = request.get('data').value
             }
             return (<ListItem
               leftCheckbox={
@@ -171,7 +171,7 @@ class NodePage extends React.Component {
             <RightBar {...this.props}/>
           </Paper>
           <Paper style={chartStyle} zDepth={3}>
-            <ChartCard/>
+            <ChartCard {...this.props}/>
           </Paper>
         </MediaQuery>
         <MediaQuery maxWidth={1049}>
@@ -179,7 +179,7 @@ class NodePage extends React.Component {
             <RightBar {...this.props}/>
           </Paper>
           <Paper zDepth={3} style={{ margin: 20 }}>
-            <ChartCard/>
+            <ChartCard {...this.props}/>
           </Paper>
         </MediaQuery>
       </div>

@@ -77,15 +77,15 @@ function requestManagerReducer(state = initialState, action) {
     case WEBSOCKET_MESSAGE_FROM_SERVER:
       let serverMessage = new Map({
         state: FRESH_STATE,
-        type: action.message.get('type'),
-        data: action.message.get('data'),
+        type: action.message.type,
+        data: action.message.data,
       })
       // In order to save incoming request data, we must have it subscribed
-      if (state.get('activeRequests').get(action.message.get('request_id'))) {
+      if (state.get('activeRequests').get(action.message.request_id)) {
         return state
-          .set('activeRequests', state.get('activeRequests').set(action.message.get('request_id'), serverMessage))
+          .set('activeRequests', state.get('activeRequests').set(action.message.request_id, serverMessage))
       }
-      return state  
+      return state
     default:
       return state
   }

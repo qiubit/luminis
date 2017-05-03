@@ -1,4 +1,4 @@
-import { fromJS } from 'immutable'
+import { Map } from 'immutable'
 
 import {
   HANDLE_REQUESTS,
@@ -31,14 +31,14 @@ describe('RequestManager reducer', () => {
       measurement_id: 1,
     },
   }
-  const message1 = fromJS({
+  const message1 = {
     request_id: 1,
     type: "new_live_data",
     data: {
       value: 42.01,
       timestamp: 1490610672,
     },
-  })
+  }
   const message2Request = {
     request_id: 2,
     type: 'new_live_data',
@@ -47,14 +47,14 @@ describe('RequestManager reducer', () => {
       measurement_id: 2,
     },
   }
-  const message2 = fromJS({
+  const message2 = {
     request_id: 2,
     type: "new_live_data",
     data: {
       value: 43.01,
       timestamp: 1490610695,
     },
-  })
+  }
 
   it('returns correct initial state', () => {
     expect(initialState.size).toBe(1)
@@ -98,8 +98,8 @@ describe('RequestManager reducer', () => {
     // message1 data and type field + one RequestManager field for saving "staleness"
     expect(state.get('activeRequests').get(1).size).toBe(3)
     expect(state.get('activeRequests').get(1).get('state')).toBe(FRESH_STATE)
-    expect(state.get('activeRequests').get(1).get('data')).toEqual(message1.get('data'))
-    expect(state.get('activeRequests').get(1).get('type')).toBe(message1.get('type'))
+    expect(state.get('activeRequests').get(1).get('data')).toEqual(message1.data)
+    expect(state.get('activeRequests').get(1).get('type')).toBe(message1.type)
     const sendMessage2Request = sendRequest(message2Request)
     state = reducer(state, sendMessage2Request)
     expect(state.get('activeRequests').size).toBe(2)
@@ -108,12 +108,12 @@ describe('RequestManager reducer', () => {
     expect(state.get('activeRequests').size).toBe(2)
     expect(state.get('activeRequests').get(1).size).toBe(3)
     expect(state.get('activeRequests').get(1).get('state')).toBe(FRESH_STATE)
-    expect(state.get('activeRequests').get(1).get('data')).toEqual(message1.get('data'))
-    expect(state.get('activeRequests').get(1).get('type')).toBe(message1.get('type'))
+    expect(state.get('activeRequests').get(1).get('data')).toEqual(message1.data)
+    expect(state.get('activeRequests').get(1).get('type')).toBe(message1.type)
     expect(state.get('activeRequests').get(2).size).toBe(3)
     expect(state.get('activeRequests').get(2).get('state')).toBe(FRESH_STATE)
-    expect(state.get('activeRequests').get(2).get('data')).toEqual(message2.get('data'))
-    expect(state.get('activeRequests').get(2).get('type')).toBe(message2.get('type'))
+    expect(state.get('activeRequests').get(2).get('data')).toEqual(message2.data)
+    expect(state.get('activeRequests').get(2).get('type')).toBe(message2.type)
   })
 
   it('updates subscribed requests on new data', () => {
@@ -122,17 +122,17 @@ describe('RequestManager reducer', () => {
     const messageFromServer1 = messageFromServer(message1)
     state = reducer(state, messageFromServer1)
 
-    let newMessage1 = message1
-    newMessage1 = newMessage1.set('data', newMessage1.get('data').set('value', 3.1415))
+    let newMessage1 = Object.assign({}, message1)
+    newMessage1.data = {value: 3.1415, timestamp: newMessage1.data.timestamp}
     const requestNewMessage1 = messageFromServer(newMessage1)
     state = reducer(state, requestNewMessage1)
     expect(state.size).toBe(1)
     expect(state.get('activeRequests').size).toBe(1)
     expect(state.get('activeRequests').get(1).size).toBe(3)
     expect(state.get('activeRequests').get(1).get('state')).toBe(FRESH_STATE)
-    expect(state.get('activeRequests').get(1).get('data')).not.toEqual(message1.get('data'))
-    expect(state.get('activeRequests').get(1).get('data')).toEqual(newMessage1.get('data'))
-    expect(state.get('activeRequests').get(1).get('type')).toBe(newMessage1.get('type'))
+    expect(state.get('activeRequests').get(1).get('data')).not.toEqual(message1.data)
+    expect(state.get('activeRequests').get(1).get('data')).toEqual(newMessage1.data)
+    expect(state.get('activeRequests').get(1).get('type')).toBe(newMessage1.type)
   })
 
   it('drops PENDING_STATE requests on WebSocket disconnection', () => {

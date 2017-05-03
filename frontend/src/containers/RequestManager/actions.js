@@ -25,12 +25,20 @@ export function requestNewLiveData(nodeId, measurementId) {
   }
 }
 
-export function requestNewChart(params) {
+export function requestNewChart(nodeId, requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType) {
   let requestId = getNextRequestId();
   let message = {
     request_id: requestId,
     type: 'new_chart',
-    params,
+    params: {
+      node_id: nodeId,
+      requested_data: requestedData,
+      begin_ts: beginTs,
+      end_ts: endTs,
+      update_data: updateData,
+      aggregation_length: aggregationLength,
+      aggregation_type: aggregationType
+    },
   }
   return {
     type: HANDLE_REQUEST,
