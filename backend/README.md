@@ -33,17 +33,17 @@ $ ./cli/db_init.py http://localhost:8080 ./cli/db_init_sample/asfaltowa.meta
 For production, use `backend/cli/luminis_cli.py` which allows you to insert nodes one by one.
 To run it, you can use `./start_cli.sh` helper script available in `backend` directory. (It works the same way as previous helper scripts).
 
+## Alerts
+Alert module is available to send emails when series data behave unexpectedly, in particular when some data delay happens or series value is lower or higher than expected.
+Before it can be started, you have to set up connection parameters to some SMTP server which will be used when sending email alerts. Config file location is `backend/config/alert.ini`.
+If valid configuration is provided, you can start module with helper script `./start_alert_checker.sh venv`.
+
+Initially, no alerts are set, you can use Luminis CLI (see section Inputting data) to create new ones.
+
+Emails will be sent on two situations:
+* Alert is checked for the first time
+* Alert status is other than the one on last check (for example, we have a delay now, but last time it was OK)
+
 ## Additional configuration
-In production environment you might want to tune some parameters, such as InfluxDB port or PostgreSQL db name. All
+In production environment you might want to tune some parameters, such as database users, locations, ports or names. All
 scripts described above use configuration files available at `backend/config`, which can be modified as needed.
-
-# Alerts
-
-### How to start:
-* set connection settings of your SMTP server in `config/alert.ini`
-* use `./start_alert_checker.sh` to start server
-
-### When emails are sent:
-* on first check of new alert
-* when alert status is OK, but was not on last check
-* when alert status was OK on last check, but is not now
