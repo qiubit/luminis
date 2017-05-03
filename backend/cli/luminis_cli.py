@@ -27,6 +27,7 @@ dt <ID> -> delete tag attribute
 dm <ID> -> delete meta attribute
 ds <ID> -> delete series attribute
 em <ID> -> edit meta attribute
+es <ID> -> edit series attribute
 h       -> print this command list
 n       -> edit name of entity type
 q       -> go back
@@ -129,6 +130,9 @@ class SeriesAttributeManager(object):
     def add(self, name):
         do_request('/entity_type/{}/series'.format(self._entity_type_id), method='POST', data={'name': name})
 
+    def update(self, ident, **params):
+        do_request('/entity_type/{}/series/{}'.format(self._entity_type_id, ident), method='PUT', data=params)
+
     def delete(self, ident):
         do_request('/entity_type/{}/series/{}'.format(self._entity_type_id, ident), method='DELETE')
 
@@ -205,6 +209,7 @@ class EntityManager(object):
     def lists(self):
         return self._cache
 
+
 def get_config(filename):
     result = {}
     config = configparser.ConfigParser()
@@ -214,6 +219,7 @@ def get_config(filename):
     for param in params:
         result[param] = params[param](config.get("cli", param))
     return result
+
 
 def get_input(text):
     return ' '.join(input(text).lower().split())
@@ -251,7 +257,9 @@ def entity_type_print(manager, ident):
     t = manager.get(ident)
     print('Name: {}'.format(t['name']))
     print('Tags: {}'.format(', '.join('{} ({})'.format(tag['id'], tag['name']) for tag in t['tags'])))
-    print('Series: {}'.format(', '.join('{} ({})'.format(series['id'], series['name']) for series in t['series'])))
+    print('Series: {}'.format(', '.join(
+              '{} ({}){}'.format(series['id'], series['name'], '*' if series['is_favourite'] else '')
+              for series in t['series'])))
     print('Meta: {}'.format(', '.join('{} ({})'.format(meta['id'], meta['name']) for meta in t['meta'])))
     print()
 
@@ -270,6 +278,16 @@ def entity_type_update(manager, ident):
         MetaAttributeManager(ident).update(meta_ident, name=name)
         manager.reload_data()
 
+    def series_edit(series_ident):
+        params = dict()
+        process_prompt('Refresh time or empty if no change? ', (
+            ('\s*(\d*)\s*', lambda t: params.update({'refresh_time': int(t) if t else None})),
+        ))
+        process_prompt('Should this series be favourite [y/n] (empty if no change)? ', (
+            ('\s*([yn]?)\s*', lambda t: params.update({'is_favourite': True if t == 'y' else False} if t else {})),
+        ))
+        SeriesAttributeManager(ident).update(series_ident, **params)
+
     def delete_attribute(manager_cls, attr_ident):
         manager_cls(ident).delete(attr_ident)
         manager.reload_data()
@@ -287,6 +305,7 @@ def entity_type_update(manager, ident):
             ('\s*dm\s*(\d+)\s*', lambda attr_ident: delete_attribute(MetaAttributeManager, attr_ident)),
             ('\s*ds\s*(\d+)\s*', lambda attr_ident: delete_attribute(SeriesAttributeManager, attr_ident)),
             ('\s*em\s*(\d+)\s*', meta_edit),
+            ('\s*es\s*(\d+)\s*', series_edit),
             ('\s*h\s*', lambda: print(ENTITY_TYPE_EDIT_COMMANDS), True),
             ('\s*n\s*', edit_name),
             ('\s*q\s*', back),

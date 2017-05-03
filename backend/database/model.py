@@ -85,6 +85,7 @@ class SeriesAttribute(Base):
     delete_ts = Column(Integer, nullable=True, default=None)
     type = Column(Enum('real', 'enum', name='series_type'), nullable=False, default='real')
     refresh_time = Column(Integer, nullable=True, default=None)
+    is_favourite = Column(Boolean, nullable=False, default=False)
 
     entity_type = relationship('EntityType', backref='series',
                                primaryjoin='EntityType.id == SeriesAttribute.entity_type_id_fk')
@@ -93,6 +94,9 @@ class SeriesAttribute(Base):
         return {
             "id": self.id,
             "name": self.name,
+            "is_favourite": self.is_favourite,
+            "type": self.type,
+            "refresh_time": self.refresh_time,
             "entity_type_id": self.entity_type_id_fk,
         }
 
@@ -113,6 +117,7 @@ class SeriesAttribute(Base):
         return {
             "measurement_id": self.id,
             "name": self.name,
+            "is_favourite": self.is_favourite,
             "type": self.type,
             "refresh_time": self.refresh_time,
         }

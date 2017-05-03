@@ -24,13 +24,35 @@ class SeriesAttributeHandler(Handler):
         Required('name'): non_empty_string,
         'type': Or('real', 'enum'),
         'refresh_time': Or(int, None),
+        'is_favourite': bool,
     }))
     def post(self, entity_type_id):
         data = self.request.data
         entity_type = get_one(self.session, EntityType, id=entity_type_id)
         series = SeriesAttribute(entity_type=entity_type, name=data['name'],
-                                 type=data.get('type', 'real'), refresh_time=data.get('refresh_time'))
+                                 type=data.get('type', 'real'), refresh_time=data.get('refresh_time'),
+                                 is_favourite=data.get('is_favourite', False))
         self.session.add(series)
+
+        self.session.commit()
+        update_last_data_modification_ts(self.session)
+        return {
+            'success': True,
+            'ID': series.id
+        }
+
+    @requires_validation(Schema({
+        'refresh_time': Or(int, None),
+        'is_favourite': bool,
+    }))
+    def put(self, entity_type_id, ident):
+        data = self.request.data
+        entity_type = get_one(self.session, EntityType, id=entity_type_id)
+        series = get_one(self.session, SeriesAttribute, entity_type=entity_type, id=ident)
+        if 'refresh_time' in data:
+            series.refresh_time = data['refresh_time']
+        if 'is_favourite' in data:
+            series.is_favourite = data['is_favourite']
 
         self.session.commit()
         update_last_data_modification_ts(self.session)
