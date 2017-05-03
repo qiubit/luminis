@@ -2,9 +2,10 @@ import {
   DOWNLOAD_TREE,
 } from './constants'
 
-export function downloadTree(url) {
+export function downloadTree(timestampUrl, treeUrl) {
   return {
     type: DOWNLOAD_TREE,
-    url: url
+    timestampUrl,
+    treeUrl,
   }
 }

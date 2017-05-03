@@ -64,6 +64,11 @@ export const selectTreeStructure = createSelector(
   (globalState) => globalState.get('treeStructure')
 );
 
+export const selectTreeTimestamp = createSelector(
+  selectApp,
+  (globalState) => globalState.get('treeTimestamp')
+);
+
 export const selectMeasurementsMetadata = createSelector(
   selectApp,
   (globalState) => globalState.get('measurementsMetadata')

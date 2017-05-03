@@ -22,9 +22,10 @@ export function drawerChange(drawerOpen) {
   };
 }
 
-export function saveTree(dataTree) {
+export function saveTree(dataTimestamp, dataTree) {
   return {
     type: SAVE_METADATA,
+    dataTimestamp,
     dataTree,
   };
 }

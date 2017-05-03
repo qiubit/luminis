@@ -6,6 +6,8 @@ services:
             - "8086:8086"
         volumes:
             - ./STORAGE/influxdb:/var/lib/influxdb
+        environment:
+            INFLUXDB_HTTP_MAX_ROW_LIMIT: 0
     db:
         image: postgres
         ports:

@@ -7,3 +7,4 @@ voluptuous
 nose
 coverage
 alembic
+numpy
