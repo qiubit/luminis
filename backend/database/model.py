@@ -103,7 +103,7 @@ class SeriesAttribute(Base):
         if value is None:
             return None
         elif self.type == 'real':
-            return float(value)
+            return round(float(value), 3)
         elif self.type == 'enum':
             return self._enum_val_dict().get(int(value), None)
         else:
