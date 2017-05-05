@@ -222,7 +222,7 @@ def get_config(filename):
 
 
 def get_input(text):
-    return ' '.join(input(text).lower().split())
+    return ' '.join(input(text).split())
 
 
 def process_prompt(prompt_text, handlers):
