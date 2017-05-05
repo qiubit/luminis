@@ -56,7 +56,7 @@ class DatePickerBar extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{display: 'flex', justifyContent: 'space-between'}}>
         <DateTimePicker
           onChange={this.setBegin}
           open={false}
