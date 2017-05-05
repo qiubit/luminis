@@ -11,7 +11,7 @@ import {
 
 // The initial state of the App
 const initialState = fromJS({
-  drawerOpen: false,
+  drawerOpen: true,
   activeNodeId: null,
   nodesMetadata: {},
   treeStructure: [],

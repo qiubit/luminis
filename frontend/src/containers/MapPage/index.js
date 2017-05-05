@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet'
+import { Map, Marker, Popup, TileLayer, ZoomControl } from 'react-leaflet'
 import { createStructuredSelector } from 'reselect'
 
 
@@ -89,7 +89,9 @@ class MapPage extends React.Component {
           center={this.getCenter(activeSubtree)}
           boundsOptions={{padding: config.mapPadding}}
           maxZoom={config.mapMaxZoom}
+          zoomControl={false}
         >
+          <ZoomControl position="topright"/>
           <TileLayer
             url={'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}'}
             attribution={'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'}
