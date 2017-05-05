@@ -26,6 +26,7 @@ class FileParser(PointSource):
             result.append({
                 'timestamp': convert_timestamp(fields[0]),
                 'measurements': [(s.name, float(value)) for s, value in
-                                 zip(self._entity.entity_type.series, fields[1:])]
+                                 zip(sorted(self._entity.entity_type.series, lambda s: s.id),
+                                     fields[1:])]
             })
         return result
