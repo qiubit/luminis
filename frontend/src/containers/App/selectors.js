@@ -94,33 +94,6 @@ export const selectMeasurementName = createSelector(
     (measurementId) => getMeasurementMetadata(measurementId).get('name', '')
 )
 
-export const selectRequestedData = createSelector(
-  selectApp,
-  (globalState) => globalState.get('requestedData')
-)
-
-export const selectRequestData = createSelector(
-  selectRequestedData,
-  (requestedData) => (requestId) => requestedData.get(requestId, fromJS({}))
-)
-
-export const selectRequestLiveData = createSelector(
-  selectRequestData,
-  (getRequestData) => (requestId) =>
-    getRequestData(requestId).get('type', '') === 'new_live_data' ?
-      getRequestData(requestId).get('data', fromJS({})) : fromJS({})
-)
-
-export const selectRequestLiveDataValue = createSelector(
-  selectRequestLiveData,
-  (getRequestLiveData) => (requestId) => getRequestLiveData(requestId).get('value', null)
-)
-
-export const selectRequestLiveDataTimestamp = createSelector(
-  selectRequestLiveData,
-  (getRequestLiveData) => (requestId) => getRequestLiveData(requestId).get('timestamp', null)
-)
-
 export const selectActiveNodeId = createSelector(
   selectApp,
   (globalState) => globalState.get('activeNodeId')
