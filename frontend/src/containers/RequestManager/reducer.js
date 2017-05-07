@@ -16,7 +16,7 @@
  *
  */
 
-import { Map } from 'immutable';
+import { Map } from 'immutable'
 
 import {
   HANDLE_REQUEST,
@@ -92,7 +92,9 @@ function requestManagerReducer(state = initialState, action) {
       // In order to save incoming request data, we must have it subscribed
       if (state.get('activeRequests').get(action.message.request_id)) {
         return state
-          .set('activeRequests', state.get('activeRequests').set(action.message.request_id, serverMessage))
+          .set(
+            'activeRequests',
+            state.get('activeRequests').set(action.message.request_id, serverMessage))
       }
       return state
     default:

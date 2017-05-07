@@ -7,7 +7,7 @@
  */
 
 
-import { Map } from 'immutable';
+import { Map } from 'immutable'
 
 import {
   SHOW_MEASUREMENT,
@@ -23,10 +23,14 @@ function nodePageReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_MEASUREMENT:
       return state
-        .set('measurementIdsShown', state.get('measurementIdsShown').set(action.measurementId, true))
+        .set(
+          'measurementIdsShown',
+          state.get('measurementIdsShown').set(action.measurementId, true))
     case HIDE_MEASUREMENT:
       return state
-        .set('measurementIdsShown', state.get('measurementIdsShown').set(action.measurementId, false))
+        .set(
+          'measurementIdsShown',
+          state.get('measurementIdsShown').set(action.measurementId, false))
     case CHANGE_SHOWN_MEASUREMENTS:
       let measurementIdsMap = new Map()
       action.measurementIdsShown.forEach((id) => {

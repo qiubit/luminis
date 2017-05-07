@@ -7,10 +7,10 @@
  */
 
 
-import React from 'react';
-import ListItem from 'material-ui/List/ListItem';
-import OpenIcon from 'material-ui/svg-icons/navigation/chevron-right';
-import CloseIcon from 'material-ui/svg-icons/navigation/expand-more';
+import React from 'react'
+import ListItem from 'material-ui/List/ListItem'
+import OpenIcon from 'material-ui/svg-icons/navigation/chevron-right'
+import CloseIcon from 'material-ui/svg-icons/navigation/expand-more'
 import IconButton from 'material-ui/IconButton'
 
 function TreeList(props) {
@@ -26,7 +26,9 @@ function TreeList(props) {
         >
           <IconButton
             style={{position: 'absolute', display: 'block', top: 0, left: 4}}
-            onTouchTap={props.handleNestedListToggle(node.get('node_id'), !props.isOpened.get(node.get('node_id')))}
+            onTouchTap={props.handleNestedListToggle(
+                          node.get('node_id'),
+                          !props.isOpened.get(node.get('node_id')))}
           >
             {node.get('children').size > 0 ?
             (props.isOpened.get(node.get('node_id')) ? <CloseIcon/> : <OpenIcon/>)
@@ -38,14 +40,14 @@ function TreeList(props) {
             {props.nodesMetadata.get(node.get('node_id').toString()).get('name')}
           </span>
         </ListItem>
-      ));
+      ))
     }
   }
   return(
     <div>
       {mapStructure(props.tree)}
     </div>
-  );
+  )
 }
 
 export default TreeList

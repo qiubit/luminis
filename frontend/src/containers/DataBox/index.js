@@ -11,8 +11,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Map } from 'immutable'
 
-import DataBoxComponent from '../../components/DataBox/index';
-import { selectMeasurementName, selectNodeName } from '../App/selectors';
+import DataBoxComponent from '../../components/DataBox/index'
+import { selectMeasurementName, selectNodeName } from '../App/selectors'
 import { selectNodeFavouriteMeasurements } from './selectors'
 import { requestNewLiveData, cancelRequest } from '../RequestManager/actions'
 import { selectActiveRequests } from '../RequestManager/selectors'
@@ -115,10 +115,10 @@ class DataBox extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  let nodeId = ownProps.nodeId.toString();
-  let name = selectNodeName(state)(nodeId);
-  let measurementIds = selectNodeFavouriteMeasurements(state)(nodeId);
-  let getMeasurementName = selectMeasurementName(state);
+  let nodeId = ownProps.nodeId.toString()
+  let name = selectNodeName(state)(nodeId)
+  let measurementIds = selectNodeFavouriteMeasurements(state)(nodeId)
+  let getMeasurementName = selectMeasurementName(state)
   return {
     nodeName: name,
     measurementIds: measurementIds,
@@ -132,4 +132,4 @@ DataBox.propTypes = {
   nodeId: React.PropTypes.number.isRequired,
 }
 
-export default connect(mapStateToProps)(DataBox);
+export default connect(mapStateToProps)(DataBox)

@@ -14,7 +14,7 @@ import {
   SEND_REQUEST_OK,
   SEND_REQUEST_FAIL,
   WEBSOCKET_MESSAGE_FROM_SERVER,
-} from './constants';
+} from './constants'
 
 export function sendRequest(request) {
   return {

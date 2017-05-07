@@ -7,8 +7,8 @@
  */
 
 
-import React from 'react';
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
+import React from 'react'
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 
 function Chart(props) {
@@ -19,7 +19,7 @@ function Chart(props) {
       <XAxis orientation={"top"} dataKey={"x"} interval={3}/>
       <YAxis />
     </LineChart>
-  );
+  )
 }
 
-export default Chart;
+export default Chart

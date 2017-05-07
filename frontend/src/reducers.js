@@ -7,12 +7,12 @@
  */
 
 
-import { fromJS } from 'immutable';
-import { combineReducers } from 'redux-immutable';
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { fromJS } from 'immutable'
+import { combineReducers } from 'redux-immutable'
+import { LOCATION_CHANGE } from 'react-router-redux'
 
-import globalReducer from './containers/App/reducer';
-import treeListReducer from './containers/TreeList/reducer';
+import globalReducer from './containers/App/reducer'
+import treeListReducer from './containers/TreeList/reducer'
 import requestManagerReducer from './containers/RequestManager/reducer'
 import nodePageReducer from './containers/NodePage/reducer'
 
@@ -26,7 +26,7 @@ import nodePageReducer from './containers/NodePage/reducer'
 // Initial routing state
 const routeInitialState = fromJS({
   locationBeforeTransitions: null,
-});
+})
 
 /**
  * Merge route into the global application state
@@ -36,9 +36,9 @@ function routeReducer(state = routeInitialState, action) {
     case LOCATION_CHANGE:
       return state.merge({
         locationBeforeTransitions: action.payload,
-      });
+      })
     default:
-      return state;
+      return state
   }
 }
 
@@ -49,5 +49,5 @@ export default function createReducer() {
     TreeList: treeListReducer,
     RequestManager: requestManagerReducer,
     NodePage: nodePageReducer,
-  });
+  })
 }
