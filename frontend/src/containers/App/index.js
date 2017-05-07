@@ -8,16 +8,16 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
-import NavigationBack from 'material-ui/svg-icons/navigation/arrow-back';
-import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
-import IconButton from 'material-ui/IconButton';
+import { push } from 'react-router-redux'
+import NavigationBack from 'material-ui/svg-icons/navigation/arrow-back'
+import NavigationMenu from 'material-ui/svg-icons/navigation/menu'
+import IconButton from 'material-ui/IconButton'
 
 import TreeList from '../TreeList/index'
 import config from './config';
 import { selectDrawerOpen, selectTreeStructure } from './selectors';
 import { drawerToggle, drawerChange, changeActiveSubtree } from './actions';
-import { MAP_URL } from '../MapPage/constants';
+import { MAP_URL } from '../MapPage/constants'
 
 
 // Needed for buttons to react on user tap
