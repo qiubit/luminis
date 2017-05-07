@@ -16,12 +16,17 @@ import AppBar from 'material-ui/AppBar'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 import { createStructuredSelector } from 'reselect'
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux'
+import NavigationBack from 'material-ui/svg-icons/navigation/arrow-back'
+import NavigationMenu from 'material-ui/svg-icons/navigation/menu'
+import IconButton from 'material-ui/IconButton'
 
 import TreeList from '../TreeList/index'
 import config from './config'
 import { selectDrawerOpen, selectTreeStructure } from './selectors'
 import { drawerToggle, drawerChange, changeActiveSubtree } from './actions'
+import { MAP_URL } from '../MapPage/constants'
 
 
 // Needed for buttons to react on user tap
@@ -29,11 +34,18 @@ injectTapEventPlugin()
 
 class AppPage extends React.Component {
   render() {
+    const currentPath = this.props.location.pathname
     return(
       <div>
         <AppBar
           title="Luminis"
-          onLeftIconButtonTouchTap={this.props.onDrawerToggle}
+          onLeftIconButtonTouchTap={
+            currentPath !== MAP_URL ?
+            this.props.onReturnToMap : this.props.onDrawerToggle
+          }
+          iconElementLeft={currentPath !== MAP_URL ?
+            <IconButton><NavigationBack/></IconButton> : <IconButton><NavigationMenu/></IconButton>
+          }
         />
         <Drawer
           width={config.drawerWidth}
@@ -43,7 +55,13 @@ class AppPage extends React.Component {
           <AppBar
             title="Luminis"
             showMenuIconButton={true}
-            onLeftIconButtonTouchTap={this.props.onDrawerToggle}
+            onLeftIconButtonTouchTap={
+              currentPath !== MAP_URL ?
+              this.props.onReturnToMap : this.props.onDrawerToggle
+            }
+            iconElementLeft={currentPath !== MAP_URL ?
+              <IconButton><NavigationBack/></IconButton> : <IconButton><NavigationMenu/></IconButton>
+            }
           />
           <List>
             <TreeList/>
@@ -66,6 +84,7 @@ function mapDispatchToProps(dispatch) {
     onRequestDrawerChange: (drawerOpen) => dispatch(drawerChange(drawerOpen)),
     onDrawerToggle: () => dispatch(drawerToggle()),
     onTreeListNodeClick: (nodeId) => () => dispatch(changeActiveSubtree(nodeId)),
+    onReturnToMap: () => dispatch(push(MAP_URL)),
   }
 }
 
