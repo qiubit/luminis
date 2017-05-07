@@ -5,7 +5,6 @@ import {
   DRAWER_CHANGE,
   SAVE_ACTIVE_NODE_ID,
   SAVE_METADATA,
-  SAVE_MEASUREMENTDATA
 } from './constants';
 
 
@@ -17,21 +16,7 @@ const initialState = fromJS({
   treeStructure: [],
   treeTimestamp: null,
   measurementsMetadata: {},
-  requestedData: {},
 });
-
-function updateRequestedData(currentData, newData) {
-  let updatedData = currentData;
-  newData.forEach((data) =>{
-    let newValue = fromJS({
-      type: data.get('type'),
-      data: data.get('data')
-    });
-    updatedData = updatedData.set(data.get('request_id'), newValue);
-  });
-  return updatedData;
-}
-
 
 function appReducer(state = initialState, action) {
   switch (action.type) {
@@ -50,10 +35,6 @@ function appReducer(state = initialState, action) {
         .set('treeStructure', action.dataTree.get('tree'))
         .set('measurementsMetadata', action.dataTree.get('measurements_metadata'))
         .set('treeTimestamp', action.dataTimestamp)
-    case SAVE_MEASUREMENTDATA:
-      let updatedRequestedData = updateRequestedData(state.get('requestedData'), action.requestedData)
-      return state
-        .set('requestedData', updatedRequestedData);
     default:
       return state;
   }

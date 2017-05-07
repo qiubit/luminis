@@ -3,7 +3,6 @@ import {
   DRAWER_CHANGE,
   CHANGE_ACTIVE_NODE_ID,
   SAVE_METADATA,
-  SAVE_MEASUREMENTDATA,
   SAVE_ACTIVE_NODE_ID,
   SIGNAL_ACTIVE_NODE_ID_CHANGE,
   HANDLE_REQUEST
@@ -48,13 +47,6 @@ export function signalActiveNodeIdChange(nodeId) {
   return {
     type: SIGNAL_ACTIVE_NODE_ID_CHANGE,
     nodeId
-  }
-}
-
-export function saveData(requestedData) {
-  return {
-    type: SAVE_MEASUREMENTDATA,
-    requestedData,
   }
 }
 
