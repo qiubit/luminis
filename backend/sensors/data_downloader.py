@@ -10,7 +10,6 @@
 import configparser
 import os
 import re
-import time
 
 import logging
 
@@ -36,6 +35,7 @@ def push_new_measurements(directory, pattern):
                 logging.error(err)
 
     session.close()
+
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()

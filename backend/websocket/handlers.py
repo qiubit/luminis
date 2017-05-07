@@ -11,7 +11,7 @@ import time
 from typing import Dict, Any
 from typing import Optional
 
-from voluptuous import Schema, Required, Any
+from voluptuous import Schema, Required, Or
 
 from database.helpers import get_one
 from database.influx_selector import InfluxReader
@@ -77,7 +77,7 @@ class NewChartRequestHandler(AbstractRequestHandler):
         Required('end_ts'): int,
         Required('update_data'): bool,
         Required('aggregation_length'): int,
-        Required('aggregation_type'): Any('mean', 'max', 'min'),
+        Required('aggregation_type'): Or('mean', 'max', 'min'),
     })
 
     def __init__(self, request_id: int, payload: dict):

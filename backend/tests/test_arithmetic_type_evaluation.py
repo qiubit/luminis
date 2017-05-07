@@ -9,7 +9,8 @@ import unittest
 from unittest.mock import patch
 
 from .test_utils import mocked_get_one
-from websocket.arithmetic import create_measurement_handler, MeasurementIdType, UnaryMeasurementType, BinaryMeasurementType
+from websocket.arithmetic import create_measurement_handler, MeasurementIdType, UnaryMeasurementType, \
+    BinaryMeasurementType
 
 DEFAULT_ENTITY_ID = 1
 DEFAULT_AGGREGATION_LENGTH = 60
@@ -32,7 +33,7 @@ class TestArithmeticTypeEvaluation(unittest.TestCase):
         self.assertTrue(isinstance(handler._child, MeasurementIdType))
 
         handler = create_measurement_handler(DEFAULT_ENTITY_ID, DEFAULT_AGGREGATION_LENGTH, DEFAULT_AGGREGATION_TYPE,
-                                             {'binary_operator': 'add', 'arg1': {'measurement_id': 17}, 
+                                             {'binary_operator': 'add', 'arg1': {'measurement_id': 17},
                                               'arg2': {'unary_operator': 'minus', 'arg': {'measurement_id': 12}}})
         self.assertTrue(isinstance(handler, BinaryMeasurementType))
         self.assertTrue(isinstance(handler._child1, MeasurementIdType))
@@ -42,7 +43,7 @@ class TestArithmeticTypeEvaluation(unittest.TestCase):
     def test_measurement_id_returns_proper_data(self, query_patch):
         handler = create_measurement_handler(DEFAULT_ENTITY_ID, DEFAULT_AGGREGATION_LENGTH, DEFAULT_AGGREGATION_TYPE,
                                              {'measurement_id': 17})
-        
+
         self.assertEqual(handler.evaluate(1, 10), [(100000, 0.5), (100001, None)])
         self.assertEqual(query_patch.call_count, 1)
 
@@ -55,7 +56,7 @@ class TestArithmeticTypeEvaluation(unittest.TestCase):
 
     def test_binary_measurement_type_add_returns_proper_data(self, query_patch):
         handler = create_measurement_handler(DEFAULT_ENTITY_ID, DEFAULT_AGGREGATION_LENGTH, DEFAULT_AGGREGATION_TYPE,
-                                             {'binary_operator': 'add', 'arg1': {'measurement_id': 17}, 
+                                             {'binary_operator': 'add', 'arg1': {'measurement_id': 17},
                                               'arg2': {'measurement_id': 12}})
 
         self.assertEqual(handler.evaluate(1, 10), [(100000, 1), (100001, None)])
@@ -63,7 +64,7 @@ class TestArithmeticTypeEvaluation(unittest.TestCase):
 
     def test_binary_measurement_type_minus_returns_proper_data(self, query_patch):
         handler = create_measurement_handler(DEFAULT_ENTITY_ID, DEFAULT_AGGREGATION_LENGTH, DEFAULT_AGGREGATION_TYPE,
-                                             {'binary_operator': 'minus', 'arg1': {'measurement_id': 17}, 
+                                             {'binary_operator': 'minus', 'arg1': {'measurement_id': 17},
                                               'arg2': {'measurement_id': 12}})
 
         self.assertEqual(handler.evaluate(1, 10), [(100000, 0), (100001, None)])
@@ -71,7 +72,7 @@ class TestArithmeticTypeEvaluation(unittest.TestCase):
 
     def test_binary_measurement_type_multiply_returns_proper_data(self, query_patch):
         handler = create_measurement_handler(DEFAULT_ENTITY_ID, DEFAULT_AGGREGATION_LENGTH, DEFAULT_AGGREGATION_TYPE,
-                                             {'binary_operator': 'multiply', 'arg1': {'measurement_id': 17}, 
+                                             {'binary_operator': 'multiply', 'arg1': {'measurement_id': 17},
                                               'arg2': {'measurement_id': 12}})
 
         self.assertEqual(handler.evaluate(1, 10), [(100000, 0.25), (100001, None)])
@@ -79,7 +80,7 @@ class TestArithmeticTypeEvaluation(unittest.TestCase):
 
     def test_binary_measurement_type_divide_returns_proper_data(self, query_patch):
         handler = create_measurement_handler(DEFAULT_ENTITY_ID, DEFAULT_AGGREGATION_LENGTH, DEFAULT_AGGREGATION_TYPE,
-                                             {'binary_operator': 'divide', 'arg1': {'measurement_id': 17}, 
+                                             {'binary_operator': 'divide', 'arg1': {'measurement_id': 17},
                                               'arg2': {'measurement_id': 12}})
 
         self.assertEqual(handler.evaluate(1, 10), [(100000, 1), (100001, None)])

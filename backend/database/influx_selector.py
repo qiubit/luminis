@@ -58,7 +58,7 @@ class InfluxReader(object):
             only_newest (bool): if set to True only one newest result will be returned
             date_specifier (str/NoneType): if not None, database will be required to return timestamps in epoch format
                                            of selected granularity
-        Returns: 
+        Returns:
             list: records in json format depending on function arguments
         """
         if type(attributes) is not tuple:
@@ -109,8 +109,10 @@ class InfluxReader(object):
             result.append(dict(zip(cols, record)))
         return result
 
+
 '''
 # Example:
 ir = InfluxReader(host='localhost', port='8086', database='mydb')
-print(ir.query(attributes=('time', 'value'), measurement='cpu', constraints=(('value', 0.63), ('time', '>', 'now() - 5m'))))
+print(ir.query(attributes=('time', 'value'), measurement='cpu',
+               constraints=(('value', 0.63), ('time', '>', 'now() - 5m'))))
 '''

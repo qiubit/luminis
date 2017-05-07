@@ -38,24 +38,26 @@ CREATE_TS_PROMPT = 'Enter entity creation ts (in s, -val causes ts to be now-val
 UPDATE_PERIOD_PROMPT = 'Enter entity update period (in s): '
 
 ENTITIES_TO_BLACKLIST_PROMPT = '''
-Which entities should be turned off? (e.g. "1,2,3") 
+Which entities should be turned off? (e.g. "1,2,3")
 '''
 
 
 # Represent state preserved between simulator reruns
 class SimulatorState(object):
     def __init__(self, create_ts: float, update_period: float, node_entity_types: map,
-        entity_type_measurements: map, measurement_series: map, entity_blacklist: set, entity_series: map):
+                 entity_type_measurements: map, measurement_series: map, entity_blacklist: set, entity_series: map):
         """SimulatorState constructor
 
         Args:
             create_ts: timestamp (in s) representing entity creation time
             update_period: period (in s) after which measurement will be sampled
             node_entity_types: map from entity_id to entity_type_id
-            entity_type_measurements: map from entity_type_id to sorted list of tuples (measurement_id, measurement_name)
+            entity_type_measurements: map from entity_type_id to sorted list of tuples
+                (measurement_id, measurement_name)
             measurement_series: map from measurement_id to corresponding random_series_function constructor
             entity_blacklist: set of entity_ids for which measurements won't be produced
-            entity_series: map from entity_id to map, which for given mesurement_id returns corresponding random_series_function
+            entity_series: map from entity_id to map, which for given mesurement_id returns corresponding
+                random_series_function
         """
         self.create_ts = create_ts
         self.update_period = update_period
@@ -118,7 +120,7 @@ def get_config(filename):
 
 def available_functions_dict():
     """Returns current mapping from number string to random_series_function"""
-    available_functions = { "1": RandomSinSeries, "2": RandomConstantSeries }
+    available_functions = {"1": RandomSinSeries, "2": RandomConstantSeries}
     return available_functions
 
 
@@ -181,6 +183,7 @@ def retrieve_previous_state(pkl_dir: str) -> SimulatorState:
         print("ERROR: Invalid previous state. Will launch initial configuration...")
     return previous_state
 
+
 def should_run_update_state(previous_state: SimulatorState,
                             node_entity_types: map,
                             entity_type_measurements: map) -> bool:
@@ -196,7 +199,7 @@ def should_run_update_state(previous_state: SimulatorState,
         bool that says whether previous_state should be updated for current simulator run
     """
     return (previous_state.node_entity_types != node_entity_types or
-        previous_state.entity_type_measurements != entity_type_measurements)
+            previous_state.entity_type_measurements != entity_type_measurements)
 
 
 def should_run_initial_config(previous_state: SimulatorState,
@@ -269,7 +272,8 @@ def update_state(previous_state: SimulatorState,
             node_series = {}
             for measurement_id in measurement_ids:
                 node_series[measurement_id] = \
-                    current_state.measurement_series[measurement_id](current_state.create_ts, current_state.update_period)
+                    current_state.measurement_series[measurement_id](current_state.create_ts,
+                                                                     current_state.update_period)
             current_state.entity_series[node] = node_series
     return current_state
 
@@ -293,7 +297,7 @@ def initial_config(node_entity_types: map, entity_type_measurements: map) -> Sim
     """
 
     # Parse create_ts and update_period from user
-    try:       
+    try:
         create_ts = get_input(CREATE_TS_PROMPT)
         update_period = get_input(UPDATE_PERIOD_PROMPT)
 
@@ -347,7 +351,7 @@ def initial_config(node_entity_types: map, entity_type_measurements: map) -> Sim
 
     # Save everything in SimulatorState
     state = SimulatorState(create_ts, update_period, node_entity_types,
-        entity_type_measurements, measurement_series, entities_blacklist, entity_series)
+                           entity_type_measurements, measurement_series, entities_blacklist, entity_series)
 
     return state
 
