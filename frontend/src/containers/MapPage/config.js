@@ -14,4 +14,4 @@ var config = {
   mapTileLayerId: 'mapbox.satellite',
 }
 
-export default config;
+export default config

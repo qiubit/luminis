@@ -7,9 +7,9 @@
  */
 
 
-import { put, takeEvery } from 'redux-saga/effects';
+import { put, takeEvery } from 'redux-saga/effects'
 
-import { SEND_REQUEST } from './constants';
+import { SEND_REQUEST } from './constants'
 import { sendRequestSuccess, sendRequestFail } from './actions'
 import { getWebsocket } from './websocket'
 
@@ -41,4 +41,4 @@ function* sendRequestSaga(action) {
 
 export default [
   sendRequestSaga,
-];
+]

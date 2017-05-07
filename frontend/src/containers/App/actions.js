@@ -16,19 +16,19 @@ import {
   SAVE_ACTIVE_NODE_ID,
   SIGNAL_ACTIVE_NODE_ID_CHANGE,
   HANDLE_REQUEST
-} from './constants';
+} from './constants'
 
 export function drawerToggle() {
   return {
     type: DRAWER_TOGGLE,
-  };
+  }
 }
 
 export function drawerChange(drawerOpen) {
   return {
     type: DRAWER_CHANGE,
     drawerOpen,
-  };
+  }
 }
 
 export function saveTree(dataTimestamp, dataTree) {
@@ -36,14 +36,14 @@ export function saveTree(dataTimestamp, dataTree) {
     type: SAVE_METADATA,
     dataTimestamp,
     dataTree,
-  };
+  }
 }
 
 export function changeActiveNodeId(nodeId) {
   return {
     type: CHANGE_ACTIVE_NODE_ID,
     nodeId,
-  };
+  }
 }
 
 export function saveActiveNodeId(nodeId) {
@@ -69,13 +69,13 @@ export function saveData(requestedData) {
 
 function getNextRequestId() {
   if (typeof getNextRequestId.nextId === 'undefined') {
-    getNextRequestId.nextId = 1;
+    getNextRequestId.nextId = 1
   }
   return (getNextRequestId.nextId++)
 }
 
 export function requestNewLiveData(nodeId, measurementId) {
-  let requestId = getNextRequestId();
+  let requestId = getNextRequestId()
   let message = {
     request_id: requestId,
     type: 'new_live_data',
@@ -83,7 +83,7 @@ export function requestNewLiveData(nodeId, measurementId) {
       node_id: nodeId,
       measurement_id: measurementId
     }
-  };
+  }
   return {
     type: HANDLE_REQUEST,
     message
@@ -97,7 +97,7 @@ export function cancelRequest(requestId) {
     params: {
       request_id: requestId
     }
-  };
+  }
   return {
     type: HANDLE_REQUEST,
     message
@@ -105,12 +105,12 @@ export function cancelRequest(requestId) {
 }
 
 export function requestNewChart() {
-  let requestId = getNextRequestId();
+  let requestId = getNextRequestId()
   let message = {
     request_id: requestId,
     type: 'new_chart',
     params: {}
-  };
+  }
   return {
     type: HANDLE_REQUEST,
     message

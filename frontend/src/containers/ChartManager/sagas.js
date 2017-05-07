@@ -7,7 +7,7 @@
  */
 
 
-import { takeEvery, select, put } from 'redux-saga/effects';
+import { takeEvery, select, put } from 'redux-saga/effects'
 
 import { SIGNAL_ACTIVE_NODE_ID_CHANGE } from '../App/constants'
 import { selectActiveRequestId } from './selectors'
@@ -16,14 +16,14 @@ import { saveActiveRequestId } from './actions'
 
 
 function* updateActiveRequestId(action) {
-  let state = yield select();
-  let activeRequestId = selectActiveRequestId(state);
+  let state = yield select()
+  let activeRequestId = selectActiveRequestId(state)
   if (activeRequestId) {
-    yield put(cancelRequest(activeRequestId));
+    yield put(cancelRequest(activeRequestId))
   }
-  let requestAction = requestNewChart();
-  let newRequestId = requestAction.message.request_id;
-  yield put(requestAction);
+  let requestAction = requestNewChart()
+  let newRequestId = requestAction.message.request_id
+  yield put(requestAction)
   yield put(saveActiveRequestId(newRequestId))
 }
 
@@ -33,4 +33,4 @@ function* updateActiveRequestIdSaga(action) {
 
 export default [
   updateActiveRequestIdSaga,
-];
+]

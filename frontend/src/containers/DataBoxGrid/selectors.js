@@ -7,7 +7,7 @@
  */
 
 
-import { createSelector } from 'reselect';
+import { createSelector } from 'reselect'
 
 import { selectDataTreeIdList, selectVisibleBoxesIdList } from '../DataBoxManager/selectors'
 
@@ -20,8 +20,8 @@ function createDataBoxesParams(dataTreeIdList, visibleBoxesIdList) {
       nodeId,
       filtered: !visibleBoxesIdList.includes(nodeId)
     })
-  );
-  return dataBoxesParams.toJS();
+  )
+  return dataBoxesParams.toJS()
 }
 
 export const selectDataBoxes = createSelector(

@@ -7,7 +7,7 @@
  */
 
 
-export const SEND_REQUEST = 'luminis/WebsocketConnection/SEND_REQUEST';
+export const SEND_REQUEST = 'luminis/WebsocketConnection/SEND_REQUEST'
 export const SEND_REQUEST_OK = 'luminis/WebsocketConnection/SEND_REQUEST_OK'
 export const SEND_REQUEST_FAIL = 'luminis/WebsocketConnection/SEND_REQUEST_FAIL'
 export const WEBSOCKET_MESSAGE_FROM_SERVER = 'luminis/WebsocketConnection/WEBSOCKET_MESSAGE_FROM_SERVER'

@@ -34,8 +34,10 @@ export function requestNewLiveData(nodeId, measurementId) {
   }
 }
 
-export function requestNewChart(nodeId, requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType) {
-  let requestId = getNextRequestId();
+export function requestNewChart(
+  nodeId, requestedData, beginTs, endTs, updateData, aggregationLength, aggregationType) {
+
+  let requestId = getNextRequestId()
   let message = {
     request_id: requestId,
     type: 'new_chart',

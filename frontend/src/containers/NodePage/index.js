@@ -7,15 +7,15 @@
  */
 
 
-import React from 'react';
-import MediaQuery from 'react-responsive';
-import { connect } from 'react-redux';
+import React from 'react'
+import MediaQuery from 'react-responsive'
+import { connect } from 'react-redux'
 import { Map, fromJS } from 'immutable'
 
-import { Card, CardTitle, CardText } from 'material-ui/Card';
-import { List, ListItem } from 'material-ui/List';
-import Paper from 'material-ui/Paper';
-import Subheader from 'material-ui/Subheader';
+import { Card, CardTitle, CardText } from 'material-ui/Card'
+import { List, ListItem } from 'material-ui/List'
+import Paper from 'material-ui/Paper'
+import Subheader from 'material-ui/Subheader'
 import Checkbox from 'material-ui/Checkbox'
 
 import {
@@ -24,8 +24,8 @@ import {
   selectNodeName,
   selectNodeMeasurements,
   selectMeasurementName,
-} from '../App/selectors';
-import { drawerChange } from '../App/actions';
+} from '../App/selectors'
+import { drawerChange } from '../App/actions'
 import ChartCard from '../ChartCard/index'
 import {
   selectShownMeasurements,
@@ -148,7 +148,7 @@ class NodePage extends React.Component {
       margin: 20,
       textAlign: 'center',
       display: 'inline-block',
-    };
+    }
     const rightBarStyle = {
       width: 200,
       height: "100vh",
@@ -159,7 +159,7 @@ class NodePage extends React.Component {
     }
 
     // Render error panel if node metadata was not found
-    const nodeMetadata = this.props.nodesMetadata.get(this.props.params.nodeId);
+    const nodeMetadata = this.props.nodesMetadata.get(this.props.params.nodeId)
     if (!nodeMetadata) {
       return (
         <Paper style={chartStyle} zDepth={3}>
@@ -201,7 +201,8 @@ const mapDispatchToProps = (dispatch) => {
     sendCloseDrawer: () => dispatch(drawerChange(false)),
     onShowMeasurement: (measurementId) => () => dispatch(showMeasurement(measurementId)),
     onHideMeasurement: (measurementId) => () => dispatch(hideMeasurement(measurementId)),
-    onChangeShownMeasurements: (measurementIds) => dispatch(changeShownMeasurements(measurementIds)),
+    onChangeShownMeasurements: (measurementIds) =>
+                                  dispatch(changeShownMeasurements(measurementIds)),
     dispatch,
   }
 }

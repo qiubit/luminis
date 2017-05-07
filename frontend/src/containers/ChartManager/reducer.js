@@ -14,7 +14,7 @@ import { SAVE_ACTIVE_REQUEST_ID } from './constants'
 
 const initialState = fromJS({
   activeRequestId: null
-});
+})
 
 function chartManagerReducer(state = initialState, action) {
   switch (action.type) {
@@ -22,8 +22,8 @@ function chartManagerReducer(state = initialState, action) {
       return state
         .set('activeRequestId', action.activeRequestId)
     default:
-      return state;
+      return state
   }
 }
 
-export default chartManagerReducer;
+export default chartManagerReducer

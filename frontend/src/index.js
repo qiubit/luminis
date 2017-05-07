@@ -14,45 +14,48 @@
  */
 
 // Needed by redux-saga to support older browsers
-import 'babel-polyfill';
+import 'babel-polyfill'
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { Router, browserHistory, IndexRedirect, Route, Redirect } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
-import configureStore from './store';
-import './index.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import { Router, browserHistory, IndexRedirect, Route, Redirect } from 'react-router'
+import { syncHistoryWithStore } from 'react-router-redux'
+import configureStore from './store'
+import './index.css'
 
 // Create store enchanced with history
-const initialState = {};
-const store = configureStore(initialState, browserHistory);
+const initialState = {}
+const store = configureStore(initialState, browserHistory)
 
 // Sync history and store, as the react-router-redux reducer
 // is under the non-default key, selectLocationState must be
 // provided for resolving how to retrieve the "route" in the state
-import { selectLocationState } from './containers/App/selectors';
+import { selectLocationState } from './containers/App/selectors'
 const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: selectLocationState(),
-});
+})
 
 // Setup websocket connection
 import { setupWebsocket } from './containers/WebsocketConnection/websocket'
 setupWebsocket(store.dispatch)
 
-import App from './containers/App/index';
-import MapPage from './containers/MapPage/index';
-import NodePage from './containers/NodePage/index';
-import TreeProvider from './containers/TreeProvider/index';
-import { MAP_URL } from './containers/MapPage/constants';
-import { NODE_ID_URL } from './containers/NodePage/constants';
+import App from './containers/App/index'
+import MapPage from './containers/MapPage/index'
+import NodePage from './containers/NodePage/index'
+import TreeProvider from './containers/TreeProvider/index'
+import { MAP_URL } from './containers/MapPage/constants'
+import { NODE_ID_URL } from './containers/NodePage/constants'
 import config from './config'
 
 ReactDOM.render(
   (
     <Provider store={store}>
       <div>
-        <TreeProvider timestampUrl={config.timestampUrl} treeUrl={config.treeUrl} refreshTime={config.fetchTreeRefreshTime}/>
+        <TreeProvider
+          timestampUrl={config.timestampUrl}
+          treeUrl={config.treeUrl}
+          refreshTime={config.fetchTreeRefreshTime}/>
         <Router history={history}>
           <Route path="/" component={App}>
             <IndexRedirect to={MAP_URL}/>
@@ -65,4 +68,4 @@ ReactDOM.render(
     </Provider>
   ),
   document.getElementById('root')
-);
+)

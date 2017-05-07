@@ -7,7 +7,7 @@
  */
 
 
-import { takeEvery, select, put } from 'redux-saga/effects';
+import { takeEvery, select, put } from 'redux-saga/effects'
 
 import { selectActiveNodeId } from './selectors'
 import { saveActiveNodeId, signalActiveNodeIdChange } from './actions'
@@ -15,10 +15,10 @@ import { sendRequest } from '../WebsocketConnection/actions'
 import { CHANGE_ACTIVE_NODE_ID, HANDLE_REQUEST } from './constants'
 
 function* changeActiveNodeId(action) {
-  let state = yield select();
-  let currentActiveNodeId = selectActiveNodeId(state);
+  let state = yield select()
+  let currentActiveNodeId = selectActiveNodeId(state)
   if (currentActiveNodeId !== action.nodeId) {
-    yield put(saveActiveNodeId(action.nodeId));
+    yield put(saveActiveNodeId(action.nodeId))
     yield put(signalActiveNodeIdChange(action.nodeId))
   }
 }
@@ -39,4 +39,4 @@ function* handleRequestSaga(action) {
 export default [
   changeActiveNodeIdSaga,
   handleRequestSaga,
-];
+]

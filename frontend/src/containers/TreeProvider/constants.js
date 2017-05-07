@@ -7,4 +7,4 @@
  */
 
 
-export const DOWNLOAD_TREE = 'luminis/TreeProvider/DOWNLOAD_TREE';
+export const DOWNLOAD_TREE = 'luminis/TreeProvider/DOWNLOAD_TREE'

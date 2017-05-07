@@ -126,7 +126,8 @@ class AggregationPickerBar extends React.Component {
   }
 
   getAggregationLength() {
-    return this.state.aggregationSeconds + 60 * this.state.aggregationMinutes + 3600 * this.state.aggregationHours
+    return this.state.aggregationSeconds +
+            60 * this.state.aggregationMinutes + 3600 * this.state.aggregationHours
   }
 
   render() {
@@ -288,7 +289,8 @@ class ChartCard extends React.Component {
   }
 
   makeRequest(nodeId, measurementIds, dataRange, aggregationLength) {
-    let requestedData = measurementIds.map((measurementId) => Object({measurement_id: measurementId})).toJS()
+    let requestedData =
+      measurementIds.map((measurementId) => Object({measurement_id: measurementId})).toJS()
     let beginTs = Math.floor(dataRange.get('begin').valueOf() / 1000)
     let endTs = Math.floor(dataRange.get('end').valueOf() / 1000)
     let updateData = dataRange.get('live')
@@ -308,8 +310,11 @@ class ChartCard extends React.Component {
       this.props.dispatch(cancelRequest(this.state.chartRequestId))
     }
 
-    let newChartRequest =
-      this.makeRequest(this.props.params.nodeId, newMeasurementIds, newDataRange, newAggregationLength)
+    let newChartRequest = this.makeRequest(
+                            this.props.params.nodeId,
+                            newMeasurementIds,
+                            newDataRange,
+                            newAggregationLength)
     this.props.dispatch(newChartRequest)
 
     this.setState({
@@ -368,7 +373,9 @@ class ChartCard extends React.Component {
     }
 
     if (newChartRequestData && this.state.chartRequestData !== newChartRequestData) {
-      this.setState({chartRequestData: newChartRequestData, data: this.makeData(newChartRequestData)})
+      this.setState({
+        chartRequestData: newChartRequestData,
+        data: this.makeData(newChartRequestData)})
     }
   }
 
@@ -410,7 +417,8 @@ class ChartCard extends React.Component {
   }
 
 
-  onAggregationChange = (newActiveAggregationButton, newAggregationLength, showAggregationPicker) => () => {
+  onAggregationChange =
+    (newActiveAggregationButton, newAggregationLength, showAggregationPicker) => () => {
     if (newAggregationLength) {
       this.setState({
         aggregationLength: newAggregationLength,
@@ -433,7 +441,10 @@ class ChartCard extends React.Component {
         <CardTitle title={nodeMetadata.get('name')}/>
         <CardText>
           <div>
-            <Graph data={this.state.data} labels={this.state.labels} visibility={this.state.visibility}/>
+            <Graph
+              data={this.state.data}
+              labels={this.state.labels}
+              visibility={this.state.visibility}/>
             {
               this.state.showDatePickers &&
                 <DatePickerBar

@@ -7,9 +7,9 @@
  */
 
 
-import { createSelector } from 'reselect';
+import { createSelector } from 'reselect'
 
-export const selectRequestManager = (state) => state.get('RequestManager');
+export const selectRequestManager = (state) => state.get('RequestManager')
 
 export const selectActiveRequests = createSelector(
   selectRequestManager,
