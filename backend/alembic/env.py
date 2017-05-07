@@ -1,5 +1,4 @@
 from alembic import context
-from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 from database.model import engine, Base
 
@@ -59,6 +58,7 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

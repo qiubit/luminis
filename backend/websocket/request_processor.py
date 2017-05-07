@@ -1,6 +1,6 @@
 import threading
 from typing import Dict, Any, Iterable
-from voluptuous import Schema, Required, Any
+from voluptuous import Schema, Required, Or
 
 from websocket.handlers import NewChartRequestHandler, NewLiveDataRequestHandler
 
@@ -13,7 +13,7 @@ class RequestProcessor(object):
     }
 
     REQUEST_SCHEMA = Schema({
-        Required('request_id'): Any(int, None),
+        Required('request_id'): Or(int, None),
         Required('type'): str,
         Required('params'): dict,
     })

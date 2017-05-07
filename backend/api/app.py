@@ -49,6 +49,7 @@ class Application(WSGI):
         ('Access-Control-Allow-Origin', get_allowed_origin()),
     ]
 
+
 if __name__ == "__main__":
     # this module can be executed to get simple WSGI server on localhost:8080
     from wsgiref.simple_server import make_server

@@ -62,8 +62,9 @@ class SimulatorSource(PointSource):
     def get_entity(self) -> Entity:
         return self._entity
 
+
 def prepare_measurements(previous_ts: float, current_ts: float, entity_id: int,
-                  measurement_series: map) -> map:
+                         measurement_series: map) -> map:
     """
     Generates all data between previous_ts and current_ts for entity with entity_id and
     measurements with measurement_ids. measurement_series should contain map from
@@ -142,9 +143,7 @@ def generate_data_to_influx(previous_ts: float, current_ts: float, entity_id: in
     straight to InfluxDB instead (so it doesn't need data_dir argument)
     """
     measurements = prepare_measurements(previous_ts, current_ts, entity_id, measurement_series)
-    if measurements:
-        measurement_points = len(next(iter(measurements.values())))
-    else:
+    if not measurements:
         return
 
     try:
