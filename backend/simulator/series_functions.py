@@ -64,3 +64,18 @@ class ConstantSeries(Series):
         for ts in np.arange(begin_ts, end_ts, self.update_period):
             vals.append(self.get_value(ts))
         return vals
+
+class GaussianSeries(Series):
+    def __init__(self, create_ts, update_period, loc=0.0, scale=1.0):
+        self.loc = loc
+        self.scale = scale
+        super(GaussianSeries, self).__init__(create_ts, update_period)
+
+    def get_value(self, ts):
+        return (ts, np.random.normal(loc=self.loc, scale=self.scale))
+
+    def get_values(self, begin_ts, end_ts):
+        vals = []
+        for ts in np.arange(begin_ts, end_ts, self.update_period):
+            vals.append(self.get_value(ts))
+        return vals

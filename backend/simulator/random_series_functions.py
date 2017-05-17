@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from simulator.series_functions import SinSeries, ConstantSeries
+from simulator.series_functions import SinSeries, ConstantSeries, GaussianSeries
 
 
 class RandomSinSeries(SinSeries):
@@ -25,3 +25,10 @@ class RandomConstantSeries(ConstantSeries):
                  constant_low=-5.0, constant_high=5.0):
         constant = np.random.uniform(constant_low, constant_high, 1)[0]
         super(RandomConstantSeries, self).__init__(create_ts, update_period, constant)
+
+class RandomGaussianSeries(GaussianSeries):
+    def __init__(self, create_ts, update_period,
+                 scale_low=0.5, scale_high=10,
+                 loc_low=0.0, loc_high=10.0):
+        scale = np.random.uniform(scale_low, scale_high, 1)[0]
+        super(RandomGaussianSeries, self).__init__(create_ts, update_period, scale=scale)

@@ -15,7 +15,7 @@ import json
 import pickle
 import time
 
-from simulator.random_series_functions import RandomSinSeries, RandomConstantSeries
+from simulator.random_series_functions import RandomSinSeries, RandomConstantSeries, RandomGaussianSeries
 from simulator.data_creator import generate_data_to_file, generate_data_to_influx
 
 BASE_URL = ''
@@ -31,6 +31,7 @@ AVAILABLE_FUNCTIONS = '''
 Available functions:
 1 - RandomSinSeries
 2 - RandomConstantSeries
+3 - RandomGaussianSeries
 '''
 
 CREATE_TS_PROMPT = 'Enter entity creation ts (in s, -val causes ts to be now-val, empty/0 for now): '
@@ -120,7 +121,7 @@ def get_config(filename):
 
 def available_functions_dict():
     """Returns current mapping from number string to random_series_function"""
-    available_functions = {"1": RandomSinSeries, "2": RandomConstantSeries}
+    available_functions = {"1": RandomSinSeries, "2": RandomConstantSeries, "3": RandomGaussianSeries}
     return available_functions
 
 
