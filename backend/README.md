@@ -2,7 +2,7 @@ This README assumes that PostgreSQL and InfluxDB databases are up and running on
 ports, which can be done by following the `README.md` file in root directory. It describes how to run backend deamons and services needed for running Luminis frontend. Optional instructions show how to add sample data to databases, which can be useful for testing.
 
 ## Instructions
- 1. You need to setup `virtualenv` to install all Python dependencies. 
+ 1. You need to setup `virtualenv` to install all Python dependencies.
 ```sh
 $ virtualenv -p python3 venv
 $ . venv/bin/activate
@@ -17,8 +17,9 @@ $ alembic -c config/alembic.ini upgrade head
  3. Run REST API for street light metadata. To do that, we supply helper script which gets your `virtalenv` name. To use it, you must `cd` into `backend` directory, and run e.g. `./start_api.sh venv`.
  4. Run WebSocket server. You can use helper script `./start_ws_server.sh` e.g. by running `./start_ws_server.sh venv`
  5. All services and deamons should be now up and running!
- 
+
 ## Inputting data
+If you're using provided STORAGE you can skip this section, your data is already in the database.
 There are two ways for inputting sample data. Before doing that however, all services must be up, which can be done by following instructions above.
 
 For testing, we recommend using `backend/cli/db_init.py` script, which gets REST API server link and data file describing street light infrastructure. It assumes that database is clean, so it should be first thing done after running instructions above. Sample file is available at `backend/cli/db_init_sample/asfaltowa.meta`. Here are commands that input `asfaltowa.meta` data into running instance of Luminis backend.
@@ -43,6 +44,18 @@ Initially, no alerts are set, you can use Luminis CLI (see section Inputting dat
 Emails will be sent on two situations:
 * Alert is checked for the first time
 * Alert status is other than the one on last check (for example, we have a delay now, but last time it was OK)
+
+## Simulator
+If you want to provide your system with sample data, you can use simulator.
+Here are the commands which start the simulator. Follow instructions given you by the program.
+Be warned that creating historical data can take a long time. If you were provided with STORAGE
+you probably have some historical data but you have to run simulator to provide system with live data.
+```sh
+$ cd <LUMINIS_ROOT>/backend
+$ . venv/bin/activate
+$ export PYTHONPATH=.
+$ ./simulator/run_simulator.py
+```
 
 ## Additional configuration
 In production environment you might want to tune some parameters, such as database users, locations, ports or names. All
