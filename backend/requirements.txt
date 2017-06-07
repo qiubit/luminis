@@ -8,3 +8,4 @@ nose
 coverage
 alembic
 numpy
+typing
